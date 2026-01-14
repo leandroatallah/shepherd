@@ -131,9 +131,6 @@ func (s *PhasesScene) Update() error {
 
 func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0, 0, 0, 0xff}) // force black
-	b := ebiten.NewImage(config.Get().ScreenWidth, 60)
-	b.Fill(color.RGBA{135, 206, 235, 0xff})
-	screen.DrawImage(b, nil)
 
 	// Get tilemap image and draw based on camera
 	tilemap, err := s.Tilemap().Image(screen)
@@ -173,8 +170,6 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 			}
 		}
 	}
-
-	s.DrawHUD(screen)
 }
 
 func (s *PhasesScene) OnFinish() {

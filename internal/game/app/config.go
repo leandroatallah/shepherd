@@ -8,8 +8,9 @@ import (
 )
 
 const (
+	// Celeste is 320 x 180
 	ScreenWidth   = 320
-	ScreenHeight  = 192
+	ScreenHeight  = 224
 	DefaultVolume = 0.5
 	MainFontFace  = "assets/fonts/pressstart2p.ttf"
 )
@@ -21,11 +22,11 @@ func NewConfig() config.AppConfig {
 		AirControlMultiplier:  0.25,
 		CoyoteTimeFrames:      6,
 		JumpBufferFrames:      6,
-		JumpForce:             6,
+		JumpForce:             4,
 		JumpCutMultiplier:     0.5,
-		UpwardGravity:         6,
-		DownwardGravity:       6,
-		MaxFallSpeed:          fp16.To16(4),
+		UpwardGravity:         4,
+		DownwardGravity:       4,
+		MaxFallSpeed:          fp16.To16(3),
 	}
 
 	cfg := config.AppConfig{

@@ -1,5 +1,5 @@
 { "compressionlevel":-1,
- "height":6,
+ "height":14,
  "infinite":false,
  "layers":[
         {
@@ -8,8 +8,41 @@
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-         "height":6,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+         "height":14,
+         "id":7,
+         "name":"BG",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":20,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "data":[33, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 34,
+            30, 0, 29, 30, 0, 0, 36, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29,
+            30, 0, 29, 30, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29,
+            30, 0, 17, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 26, 26, 26, 26, 26, 29,
+            30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29,
+            30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29,
+            30, 0, 0, 0, 0, 0, 0, 4, 5, 4, 5, 4, 5, 4, 5, 4, 5, 4, 5, 29,
+            30, 5, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29,
+            30, 0, 0, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29,
+            30, 0, 0, 0, 5, 4, 5, 4, 5, 4, 5, 4, 0, 0, 0, 0, 0, 0, 0, 29,
+            30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 11, 11, 11, 29,
+            30, 0, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 41, 27, 1, 27, 29,
+            30, 0, 13, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 21, 11, 21, 11, 21, 29,
+            16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16],
+         "height":14,
          "id":1,
          "name":"Tile Layer 1",
          "opacity":1,
@@ -25,7 +58,7 @@
          "name":"Obstacles",
          "objects":[
                 {
-                 "height":32,
+                 "height":16,
                  "id":1,
                  "name":"",
                  "properties":[
@@ -37,9 +70,247 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":640,
+                 "width":320,
                  "x":0,
+                 "y":208
+                }, 
+                {
+                 "height":192,
+                 "id":9,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"BORDER_RIGHT"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":304,
+                 "y":16
+                }, 
+                {
+                 "height":16,
+                 "id":12,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"GROUND_1"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":96,
+                 "x":208,
+                 "y":192
+                }, 
+                {
+                 "height":192,
+                 "id":15,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"BORDER_LEFT"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":0,
+                 "y":16
+                }, 
+                {
+                 "height":16,
+                 "id":18,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"PLATFORM_20"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":128,
+                 "x":64,
+                 "y":144
+                }, 
+                {
+                 "height":16,
+                 "id":19,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"PLATFORM_22"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":48,
+                 "y":128
+                }, 
+                {
+                 "height":16,
+                 "id":21,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"GROUND_223"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":240,
                  "y":160
+                }, 
+                {
+                 "height":16,
+                 "id":23,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"PLATFORM_23"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":48,
+                 "x":16,
+                 "y":112
+                }, 
+                {
+                 "height":16,
+                 "id":24,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"PLATFORM_002"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":192,
+                 "x":112,
+                 "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":27,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"ROOF"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":320,
+                 "x":0,
+                 "y":0
+                }, 
+                {
+                 "height":16,
+                 "id":28,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"PLATFORM_11"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":96,
+                 "x":208,
+                 "y":48
+                }, 
+                {
+                 "height":48,
+                 "id":29,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"ROOF_1"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":32,
+                 "y":16
+                }, 
+                {
+                 "height":32,
+                 "id":30,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"ROOF_2"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":96,
+                 "y":16
+                }, 
+                {
+                 "height":16,
+                 "id":31,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"ROOF_3"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":144,
+                 "y":16
+                }, 
+                {
+                 "height":16,
+                 "id":34,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"GROUND_222"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":80,
+                 "x":224,
+                 "y":176
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -71,8 +342,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":96,
-                 "y":128
+                 "x":64,
+                 "y":192
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -84,7 +355,18 @@
          "draworder":"topdown",
          "id":5,
          "name":"Endpoint",
-         "objects":[],
+         "objects":[
+                {
+                 "height":32,
+                 "id":32,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":32,
+                 "y":176
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -102,27 +384,27 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":7,
- "nextobjectid":9,
+ "nextlayerid":8,
+ "nextobjectid":35,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
- "tileheight":32,
+ "tileheight":16,
  "tilesets":[
         {
-         "columns":6,
+         "columns":7,
          "firstgid":1,
          "image":"..\/..\/..\/..\/..\/..\/Documents\/games\/Development\/shepherd\/tileset-1bit.png",
-         "imageheight":34,
-         "imagewidth":200,
+         "imageheight":104,
+         "imagewidth":120,
          "margin":1,
          "name":"tileset-1bit",
          "spacing":1,
-         "tilecount":81,
-         "tileheight":32,
-         "tilewidth":32
+         "tilecount":42,
+         "tileheight":16,
+         "tilewidth":16
         }],
- "tilewidth":32,
+ "tilewidth":16,
  "type":"map",
  "version":"1.10",
  "width":20
