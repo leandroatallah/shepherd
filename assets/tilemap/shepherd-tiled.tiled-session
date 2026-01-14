@@ -12,10 +12,10 @@
         },
         "/Users/leandroatallah/www/go/ebiten/firefly/assets/tilemap/sample-phase-1.tmj": {
             "scale": 2.2814,
-            "selectedLayer": 4,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 279.2145174015956,
-                "y": 439.20399754536686
+                "x": 422.1092311738406,
+                "y": 432.1907600596125
             }
         },
         "/Users/leandroatallah/www/go/ebiten/firefly/assets/tilemap/sample-phase-1.tmj#sample-enemies": {
@@ -27,24 +27,32 @@
         "/Users/leandroatallah/www/go/ebiten/firefly/assets/tilemap/sample-phase-1.tmj#sample-stage-3": {
             "scaleInDock": 1
         },
+        "sample-enemies.tsx": {
+            "scaleInDock": 1
+        },
         "shepherd-phase-0.tmj": {
             "expandedObjectLayers": [
                 4,
                 2
             ],
-            "scale": 2.9591,
-            "selectedLayer": 0,
+            "scale": 3.2726,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 141.59710722854922,
-                "y": 119.2930282856274
+                "x": 173.86787263949148,
+                "y": 117.03232903501802
             }
         },
-        "shepherd-phase-0.tmj#tileset-1bit": {
+        "shepherd-phase-0.tmj#sample-enemies": {
             "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "shepherd-phase-0.tmj#tileset-1bit": {
+            "scaleInDock": 2.9391,
             "scaleInEditor": 1
         }
     },
-    "last.imagePath": "/Users/leandroatallah/Documents/games/Development/shepherd",
+    "last.externalTilesetPath": "/Users/leandroatallah/www/go/ebiten/shepherd/assets/tilemap",
+    "last.imagePath": "/Users/leandroatallah/www/go/ebiten/shepherd/assets/tilemap",
     "map.height": 6,
     "map.lastUsedFormat": "json",
     "map.width": 10,
@@ -52,11 +60,12 @@
     ],
     "project": "shepherd-tiled.tiled-project",
     "recentFiles": [
-        "shepherd-phase-0.tmj",
-        "/Users/leandroatallah/www/go/ebiten/firefly/assets/tilemap/sample-phase-1.tmj"
+        "/Users/leandroatallah/www/go/ebiten/firefly/assets/tilemap/sample-phase-1.tmj",
+        "shepherd-phase-0.tmj"
     ],
     "tileset.embedInMap": true,
-    "tileset.margin": 1,
+    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
+    "tileset.margin": 0,
     "tileset.spacing": 1,
     "tileset.tileSize": {
         "height": 16,

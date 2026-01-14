@@ -377,7 +377,53 @@
          "draworder":"topdown",
          "id":6,
          "name":"Enemies",
-         "objects":[],
+         "objects":[
+                {
+                 "gid":48,
+                 "height":16,
+                 "id":46,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"WOLF_1"
+                        }, 
+                        {
+                         "name":"enemy_type",
+                         "type":"string",
+                         "value":"WOLF"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":256,
+                 "y":48
+                }, 
+                {
+                 "gid":48,
+                 "height":16,
+                 "id":47,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"WOLF_2"
+                        }, 
+                        {
+                         "name":"enemy_type",
+                         "type":"string",
+                         "value":"WOLF"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":272,
+                 "y":160
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -385,7 +431,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":35,
+ "nextobjectid":48,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -401,6 +447,33 @@
          "name":"tileset-1bit",
          "spacing":1,
          "tilecount":42,
+         "tileheight":16,
+         "tilewidth":16
+        }, 
+        {
+         "columns":5,
+         "firstgid":43,
+         "image":"sample-enemies.png",
+         "imageheight":50,
+         "imagewidth":84,
+         "margin":0,
+         "name":"sample-enemies",
+         "spacing":1,
+         "tilecount":15,
+         "tileheight":16,
+         "tilewidth":16,
+         "transparentcolor":"#ff00f6"
+        }, 
+        {
+         "columns":5,
+         "firstgid":58,
+         "image":"sample-rewards.png",
+         "imageheight":50,
+         "imagewidth":84,
+         "margin":0,
+         "name":"sample-rewards",
+         "spacing":1,
+         "tilecount":15,
          "tileheight":16,
          "tilewidth":16
         }],

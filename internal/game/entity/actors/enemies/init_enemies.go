@@ -9,13 +9,13 @@ import (
 )
 
 const (
-	BlueEnemyType enemies.EnemyType = "BLUE"
+	WolfEnemyType enemies.EnemyType = "WOLF"
 )
 
 func InitEnemyMap(ctx *app.AppContext) enemies.EnemyMap[gameentitytypes.PlatformerActorEntity] {
 	enemyMap := map[enemies.EnemyType]func(x, y int, id string) gameentitytypes.PlatformerActorEntity{
-		BlueEnemyType: func(x, y int, id string) gameentitytypes.PlatformerActorEntity {
-			enemy, err := NewBlueEnemy(x, y, id)
+		WolfEnemyType: func(x, y int, id string) gameentitytypes.PlatformerActorEntity {
+			enemy, err := NewWolfEnemy(x, y, id)
 			if err != nil {
 				log.Fatal(err)
 			}

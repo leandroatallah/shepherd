@@ -11,13 +11,13 @@ import (
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
-type BlueEnemy struct {
+type WolfEnemy struct {
 	gameentitytypes.PlatformerCharacter
 	count int
 }
 
-func NewBlueEnemy(x, y int, id string) (*BlueEnemy, error) {
-	spriteData, statData, err := enemies.ParseJsonEnemy("internal/game/entity/actors/enemies/blue_enemy.json")
+func NewWolfEnemy(x, y int, id string) (*WolfEnemy, error) {
+	spriteData, statData, err := enemies.ParseJsonEnemy("internal/game/entity/actors/enemies/wolf.json")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,7 +28,7 @@ func NewBlueEnemy(x, y int, id string) (*BlueEnemy, error) {
 	}
 
 	character.SetPosition(x, y)
-	enemy := &BlueEnemy{PlatformerCharacter: *character}
+	enemy := &WolfEnemy{PlatformerCharacter: *character}
 
 	if err = SetEnemyStats(enemy, statData); err != nil {
 		return nil, err
@@ -47,21 +47,21 @@ func NewBlueEnemy(x, y int, id string) (*BlueEnemy, error) {
 	return enemy, nil
 }
 
-func (e *BlueEnemy) SetTarget(target body.MovableCollidable) {
+func (e *WolfEnemy) SetTarget(target body.MovableCollidable) {
 	e.Character.SetMovementState(movement.Idle, target)
 }
 
 // Character Methods
-func (e *BlueEnemy) Update(space body.BodiesSpace) error {
+func (e *WolfEnemy) Update(space body.BodiesSpace) error {
 	e.count++
 	return e.Character.Update(space)
 }
 
-func (e *BlueEnemy) GetCharacter() *actors.Character {
+func (e *WolfEnemy) GetCharacter() *actors.Character {
 	return &e.Character
 }
 
-func (e *BlueEnemy) OnTouch(other body.Collidable) {
+func (e *WolfEnemy) OnTouch(other body.Collidable) {
 	player := e.MovementState().Target()
 	if other.ID() == player.ID() {
 		player.(gameentitytypes.PlatformerActorEntity).GetCharacter().Hurt(1)

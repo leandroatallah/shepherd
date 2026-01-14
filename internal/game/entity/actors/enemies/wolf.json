@@ -3,29 +3,29 @@
     "body_rect": {
       "x": 0,
       "y": 0,
-      "width": 32,
-      "height": 32
+      "width": 24,
+      "height": 24
     },
     "assets": {
       "idle": {
-        "path": "assets/images/blue-enemy.png",
+        "path": "assets/images/wolf-24-idle.png",
         "collision_rect": [
           {
             "x": 0,
             "y": 0,
-            "width": 32,
-            "height": 32
+            "width": 24,
+            "height": 24
           }
         ]
       },
       "walk": {
-        "path": "assets/images/blue-enemy.png",
+        "path": "assets/images/wolf-24-idle.png",
         "collision_rect": [
           {
-            "x": 0,
-            "y": 0,
-            "width": 32,
-            "height": 32
+            "x": 2,
+            "y": 8,
+            "width": 20,
+            "height": 16
           }
         ]
       }

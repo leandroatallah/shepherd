@@ -121,6 +121,8 @@ func InitEnemies[T actors.ActorEntity](s *TilemapScene, factory *enemies.EnemyFa
 
 	for _, e := range enemiesPos {
 		enemy, err := factory.Create(enemies.EnemyType(e.EnemyType), e.X, e.Y, e.ID)
+		pos := enemy.Position()
+		enemy.SetPosition(pos.Min.X, pos.Min.Y-pos.Dy()/2) // Adjust Y position based on enemy height
 		if err != nil {
 			return err
 		}
