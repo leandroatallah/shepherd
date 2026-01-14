@@ -197,3 +197,45 @@ func (t *Tilemap) GetEnemiesPositionID() []*EnemyPosition {
 
 	return res
 }
+
+type NpcPosition struct {
+	X, Y    int
+	NpcType string
+	ID      string
+}
+
+func (t *Tilemap) GetNpcsPositionID() []*NpcPosition {
+	if t == nil {
+		return nil
+	}
+
+	res := []*NpcPosition{}
+
+	layer, found := t.FindLayerByName("NPCs") // Assumes a layer named "NPCs"
+	if !found {
+		log.Printf("NPCs layer not found in tilemap")
+		return nil
+	}
+
+	for _, obj := range layer.Objects {
+		x16 := int(math.Round(obj.X))
+		yValue := obj.Y
+		if obj.Gid > 0 {
+			yValue -= obj.Height
+		}
+		y16 := int(math.Round(yValue))
+
+		var id, npcType string
+		for _, p := range obj.Properties {
+			if p.Name == "body_id" {
+				id = p.Value
+			}
+			if p.Name == "npc_type" {
+				npcType = p.Value
+			}
+		}
+		res = append(res, &NpcPosition{X: x16, Y: y16, NpcType: npcType, ID: id})
+	}
+
+	return res
+}

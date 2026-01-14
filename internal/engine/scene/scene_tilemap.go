@@ -9,6 +9,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/render/tilemap"
@@ -130,6 +131,23 @@ func InitEnemies[T actors.ActorEntity](s *TilemapScene, factory *enemies.EnemyFa
 		}
 
 		s.PhysicsSpace().AddBody(enemy)
+	}
+
+	return nil
+}
+
+func InitNPCs[T actors.ActorEntity](s *TilemapScene, factory *npcs.NpcFactory[T]) error {
+	npcsPos := s.Tilemap().GetNpcsPositionID()
+
+	for _, n := range npcsPos {
+		npc, err := factory.Create(npcs.NpcType(n.NpcType), n.X, n.Y, n.ID)
+		pos := npc.Position()
+		npc.SetPosition(pos.Min.X, pos.Min.Y-pos.Dy()/2) // Adjust Y position based on npc height
+		if err != nil {
+			return err
+		}
+
+		s.PhysicsSpace().AddBody(npc)
 	}
 
 	return nil
