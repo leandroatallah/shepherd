@@ -11,6 +11,7 @@ import (
 
 type ShepherdPlayer struct {
 	gameentitytypes.PlatformerCharacter
+	gameentitytypes.SheepCarrier
 }
 
 func NewShepherdPlayer() (gameentitytypes.PlatformerActorEntity, error) {
@@ -47,4 +48,7 @@ func NewShepherdPlayer() (gameentitytypes.PlatformerActorEntity, error) {
 
 func (p *ShepherdPlayer) GetCharacter() *actors.Character {
 	return &p.Character
+}
+
+func (p *ShepherdPlayer) GrabSheep() {
 }

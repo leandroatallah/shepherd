@@ -11,14 +11,14 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
-	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
+	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
-	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 const (
@@ -81,6 +81,10 @@ func (s *PhasesScene) OnStart() {
 	// Set enemies position from tilemap
 	enemyFactory := enemies.NewEnemyFactory(gameenemies.InitEnemyMap(s.AppContext()))
 	scene.InitEnemies(&s.TilemapScene, enemyFactory)
+
+	// Set NPCs position from tilemap
+	npcFactory := npcs.NewNpcFactory(gamenpcs.InitNpcMap(s.AppContext()))
+	scene.InitNPCs(&s.TilemapScene, npcFactory)
 
 	s.SetPlayerStartPosition(s.player)
 
@@ -179,10 +183,10 @@ func (s *PhasesScene) OnFinish() {
 }
 
 func (s *PhasesScene) finishPhase() {
-	if s.phaseCompleted {
-		return
-	}
-
-	s.phaseCompleted = true
-	s.AppContext().SceneManager.NavigateTo(scenestypes.SceneSummary, transition.NewFader(), true)
+	// if s.phaseCompleted {
+	// 	return
+	// }
+	//
+	// s.phaseCompleted = true
+	// s.AppContext().SceneManager.NavigateTo(scenestypes.SceneSummary, transition.NewFader(), true)
 }

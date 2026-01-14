@@ -6,6 +6,10 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
+type SheepCarrier interface {
+	GrabSheep()
+}
+
 type CoinCollector interface {
 	AddCoinCount(amount int)
 	CoinCount() int
@@ -13,7 +17,6 @@ type CoinCollector interface {
 
 type PlatformerActorEntity interface {
 	actors.ActorEntity
-	CoinCollector
 }
 
 type PlatformerCharacter struct {
@@ -28,11 +31,4 @@ func NewPlatformerCharacter(s sprites.SpriteMap, bodyRect *body.Rect) *Platforme
 	return &PlatformerCharacter{
 		Character: *c,
 	}
-}
-
-func (p *PlatformerCharacter) AddCoinCount(amount int) {
-	p.coinCount += amount
-}
-func (p *PlatformerCharacter) CoinCount() int {
-	return p.coinCount
 }

@@ -331,6 +331,63 @@
         }, 
         {
          "draworder":"topdown",
+         "id":8,
+         "name":"NPCs",
+         "objects":[
+                {
+                 "gid":58,
+                 "height":16,
+                 "id":50,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"SHEEP_1"
+                        }, 
+                        {
+                         "name":"npc_type",
+                         "type":"string",
+                         "value":"SHEEP"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":32,
+                 "y":112
+                }, 
+                {
+                 "gid":58,
+                 "height":16,
+                 "id":51,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"SHEEP_2"
+                        }, 
+                        {
+                         "name":"npc_type",
+                         "type":"string",
+                         "value":"SHEEP"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":224,
+                 "y":48
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":4,
          "name":"PlayerStart",
          "objects":[
@@ -430,8 +487,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":8,
- "nextobjectid":48,
+ "nextlayerid":9,
+ "nextobjectid":52,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
