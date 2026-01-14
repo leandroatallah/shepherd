@@ -6,7 +6,7 @@ import (
 )
 
 func createPlayer() (gameentitytypes.PlatformerActorEntity, error) {
-	p, err := gameplayer.NewCherryPlayer()
+	p, err := gameplayer.NewShepherdPlayer()
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,23 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+    },
+    "last.imagePath": "/Users/leandroatallah/Documents/games/Development/shepherd",
+    "map.height": 6,
+    "map.lastUsedFormat": "json",
+    "map.width": 10,
+    "openFiles": [
+    ],
+    "project": "shepherd-tiled.tiled-project",
+    "recentFiles": [
+    ],
+    "tileset.embedInMap": true,
+    "tileset.margin": 1,
+    "tileset.spacing": 1
+}

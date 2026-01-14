@@ -12,7 +12,7 @@ import (
 func (s *PhasesScene) DrawHUD(screen *ebiten.Image) {
 	coinCount := 0
 
-	if p, ok := s.player.(*gameplayer.CherryPlayer); ok {
+	if p, ok := s.player.(*gameplayer.ShepherdPlayer); ok {
 		coinCount = p.CoinCount()
 	}
 

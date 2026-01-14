@@ -9,12 +9,12 @@ import (
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
-type CherryPlayer struct {
+type ShepherdPlayer struct {
 	gameentitytypes.PlatformerCharacter
 }
 
-func NewCherryPlayer() (gameentitytypes.PlatformerActorEntity, error) {
-	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/player/cherry.json")
+func NewShepherdPlayer() (gameentitytypes.PlatformerActorEntity, error) {
+	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/player/shepherd.json")
 	if err != nil {
 		return nil, err
 	}
@@ -25,9 +25,8 @@ func NewCherryPlayer() (gameentitytypes.PlatformerActorEntity, error) {
 	}
 	character.AddSkill(skill.NewJumpSkill())
 	character.AddSkill(skill.NewHorizontalMovementSkill())
-	character.AddSkill(skill.NewDashSkill())
 
-	player := &CherryPlayer{
+	player := &ShepherdPlayer{
 		PlatformerCharacter: *character,
 	}
 	if err = SetPlayerBodies(player, spriteData); err != nil {
@@ -46,6 +45,6 @@ func NewCherryPlayer() (gameentitytypes.PlatformerActorEntity, error) {
 	return player, nil
 }
 
-func (p *CherryPlayer) GetCharacter() *actors.Character {
+func (p *ShepherdPlayer) GetCharacter() *actors.Character {
 	return &p.Character
 }
