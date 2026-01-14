@@ -96,6 +96,8 @@ func (s *TilemapScene) InitItems(items map[int]items.ItemType, factory *items.It
 		}
 
 		item, err := factory.Create(itemType, i.X, i.Y, i.ID)
+		pos := item.Position()
+		item.SetPosition(pos.Min.X, pos.Min.Y-pos.Dy()/2) // Adjust Y position based on item height
 		if err != nil {
 			return err
 		}
