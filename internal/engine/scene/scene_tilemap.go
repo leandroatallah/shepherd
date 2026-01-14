@@ -12,7 +12,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/render/tilemap"
-	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
 type TilemapScene struct {
@@ -112,7 +111,7 @@ func (s *TilemapScene) SetPlayerStartPosition(p actors.ActorEntity) {
 	// Set player initial position from tilemap
 	if x, y, found := s.tilemap.GetPlayerStartPosition(); found {
 		// Update Y position based on player height
-		y -= fp16.To16(p.Position().Dy())
+		y -= p.Position().Dy() / 2
 		p.SetPosition(x, y)
 	}
 }
@@ -131,4 +130,3 @@ func InitEnemies[T actors.ActorEntity](s *TilemapScene, factory *enemies.EnemyFa
 
 	return nil
 }
-

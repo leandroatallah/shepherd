@@ -49,6 +49,8 @@ func NewCamera(x, y int) *kamera.Camera {
 
 func (c *Controller) SetFollowTarget(b body.Body) {
 	c.followTarget = b
+	x, y := b.GetPositionMin()
+	c.Kamera().SetCenter(float64(x), float64(y))
 }
 
 func (c *Controller) Update() {

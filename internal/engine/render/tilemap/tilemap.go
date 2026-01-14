@@ -6,7 +6,6 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 )
 
 type Tilemap struct {
@@ -96,10 +95,6 @@ func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
 		return 0, 0, false
 	}
 
-	cfg := config.Get()
-	mapHeight := t.Height * t.Tileheight
-	yOffset := mapHeight - cfg.ScreenHeight - 100
-
 	layer, found := t.FindLayerByName("PlayerStart")
 	if !found {
 		log.Printf("PlayerStart layer not found in tilemap")
@@ -108,7 +103,7 @@ func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
 
 	obj := layer.Objects[0]
 	px := int(math.Round(obj.X))
-	py := int(math.Round(obj.Y)) + yOffset
+	py := int(math.Round(obj.Y))
 
 	return px, py, true
 }

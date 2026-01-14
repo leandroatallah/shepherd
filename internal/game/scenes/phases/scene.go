@@ -85,8 +85,8 @@ func (s *PhasesScene) OnStart() {
 	s.SetPlayerStartPosition(s.player)
 
 	// Init camera target
-	s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFollow})
-	s.Camera().SetFollowTarget(s.player)
+	s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFixed})
+	s.Camera().Kamera().SetCenter(float64(config.Get().ScreenWidth)/2, float64(config.Get().ScreenHeight)/2)
 
 	// Init collisions bodies and touch trigger for endpoints
 	endpointTrigger := bodyphysics.NewTouchTrigger(s.finishPhase, s.player)
