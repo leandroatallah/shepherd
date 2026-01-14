@@ -15,7 +15,7 @@ const (
 	MainFontFace  = "assets/fonts/pressstart2p.ttf"
 )
 
-func NewConfig() config.AppConfig {
+func NewConfig() *config.AppConfig {
 	defaultPhysics := config.PhysicsConfig{
 		HorizontalInertia:     2.0,
 		AirFrictionMultiplier: 0.5,
@@ -29,7 +29,7 @@ func NewConfig() config.AppConfig {
 		MaxFallSpeed:          fp16.To16(3),
 	}
 
-	cfg := config.AppConfig{
+	cfg := &config.AppConfig{
 		ScreenWidth:  ScreenWidth,
 		ScreenHeight: ScreenHeight,
 		Physics:      defaultPhysics,

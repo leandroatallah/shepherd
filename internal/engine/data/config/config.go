@@ -42,8 +42,10 @@ type AppConfig struct {
 
 var cfg AppConfig
 
-func Set(newCfg AppConfig) {
-	cfg = newCfg
+func Set(newCfg *AppConfig) {
+	if newCfg != nil {
+		cfg = *newCfg
+	}
 }
 
 func Get() *AppConfig {
