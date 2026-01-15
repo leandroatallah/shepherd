@@ -15,7 +15,7 @@ const (
 func InitEnemyMap(ctx *app.AppContext) enemies.EnemyMap[gameentitytypes.PlatformerActorEntity] {
 	enemyMap := map[enemies.EnemyType]func(x, y int, id string) gameentitytypes.PlatformerActorEntity{
 		WolfEnemyType: func(x, y int, id string) gameentitytypes.PlatformerActorEntity {
-			enemy, err := NewWolfEnemy(x, y, id)
+			enemy, err := NewWolfEnemy(ctx, x, y, id)
 			if err != nil {
 				log.Fatal(err)
 			}

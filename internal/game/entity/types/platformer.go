@@ -1,6 +1,7 @@
 package gameentitytypes
 
 import (
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
@@ -21,6 +22,7 @@ type PlatformerActorEntity interface {
 
 type PlatformerCharacter struct {
 	actors.Character
+	app.AppContextHolder
 
 	coinCount        int
 	movementBlockers int

@@ -61,7 +61,7 @@ func (s *PhasesScene) OnStart() {
 	}()
 
 	// Create player and register to space and context
-	p, err := createPlayer()
+	p, err := createPlayer(s.AppContext())
 	if err != nil {
 		log.Fatal(err)
 	}

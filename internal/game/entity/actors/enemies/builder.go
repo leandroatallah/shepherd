@@ -1,6 +1,7 @@
 package gameenemies
 
 import (
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
@@ -8,12 +9,12 @@ import (
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
-func CreateAnimatedCharacter(data schemas.SpriteData) (*gameentitytypes.PlatformerCharacter, error) {
+func CreateAnimatedCharacter(ctx *app.AppContext, data schemas.SpriteData) (*gameentitytypes.PlatformerCharacter, error) {
 	stateMap := map[string]animation.SpriteState{
 		"idle": actors.Idle,
 		"walk": actors.Walking,
 	}
-	return builder.CreateAnimatedCharacter(data, stateMap)
+	return builder.CreateAnimatedCharacter(ctx, data, stateMap)
 }
 
 // SetEnemyBodies

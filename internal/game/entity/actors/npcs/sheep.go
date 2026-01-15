@@ -3,6 +3,7 @@ package gamenpcs
 import (
 	"log"
 
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
@@ -14,13 +15,13 @@ type Sheep struct {
 	gameentitytypes.PlatformerCharacter
 }
 
-func NewSheep(x, y int, id string) (*Sheep, error) {
+func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
 	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/npcs/sheep.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	character, err := CreateAnimatedCharacter(spriteData)
+	character, err := CreateAnimatedCharacter(ctx, spriteData)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -59,10 +60,17 @@ func (s *Sheep) GetCharacter() *actors.Character {
 }
 
 func (s *Sheep) OnTouch(other body.Collidable) {
-	sheepCarrier, ok := other.(gameentitytypes.SheepCarrier)
-	_ = sheepCarrier
+	player, found := s.AppContext().ActorManager.GetPlayer()
+	if !found {
+		return
+	}
+
+	if other.ID() != player.ID() {
+		return
+	}
+
+	sheepCarrier, ok := player.(gameentitytypes.SheepCarrier)
 	if ok {
-		// The sheep is "collected".
-		// FIX: Implement sheep carrier logic
+		sheepCarrier.GrabSheep()
 	}
 }

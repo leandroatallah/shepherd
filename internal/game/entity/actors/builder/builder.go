@@ -3,6 +3,7 @@ package builder
 import (
 	"fmt"
 
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
@@ -12,7 +13,11 @@ import (
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
-func CreateAnimatedCharacter(data schemas.SpriteData, stateMap map[string]animation.SpriteState) (*gameentitytypes.PlatformerCharacter, error) {
+func CreateAnimatedCharacter(
+	ctx *app.AppContext,
+	data schemas.SpriteData,
+	stateMap map[string]animation.SpriteState,
+) (*gameentitytypes.PlatformerCharacter, error) {
 	assets, err := sprites.GetSpritesFromAssets(data.Assets, stateMap)
 	if err != nil {
 		return nil, err
@@ -22,6 +27,7 @@ func CreateAnimatedCharacter(data schemas.SpriteData, stateMap map[string]animat
 	p := gameentitytypes.NewPlatformerCharacter(assets, rect)
 	p.SetFaceDirection(data.FacingDirection)
 	p.SetFrameRate(data.FrameRate)
+	p.SetAppContext(ctx)
 
 	return p, nil
 }

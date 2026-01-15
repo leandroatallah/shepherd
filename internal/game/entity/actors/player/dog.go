@@ -3,6 +3,7 @@ package gameplayer
 import (
 	"fmt"
 
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
@@ -13,20 +14,20 @@ type DogPlayer struct {
 	gameentitytypes.PlatformerCharacter
 }
 
-func NewDogPlayer() (gameentitytypes.PlatformerActorEntity, error) {
+func NewDogPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, error) {
 	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/player/dog.json")
 	if err != nil {
 		return nil, err
 	}
 
-	character, err := CreateAnimatedCharacter(spriteData)
+	character, err := CreateAnimatedCharacter(ctx, spriteData)
 	if err != nil {
 		return nil, err
 	}
 	character.AddSkill(skill.NewJumpSkill())
 	character.AddSkill(skill.NewHorizontalMovementSkill())
 
-	player := &ShepherdPlayer{
+	player := &DogPlayer{
 		PlatformerCharacter: *character,
 	}
 	if err = SetPlayerBodies(player, spriteData); err != nil {

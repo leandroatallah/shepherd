@@ -3,6 +3,7 @@ package gameplayer
 import (
 	"fmt"
 
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
@@ -14,13 +15,13 @@ type ShepherdPlayer struct {
 	gameentitytypes.SheepCarrier
 }
 
-func NewShepherdPlayer() (gameentitytypes.PlatformerActorEntity, error) {
+func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, error) {
 	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/player/shepherd.json")
 	if err != nil {
 		return nil, err
 	}
 
-	character, err := CreateAnimatedCharacter(spriteData)
+	character, err := CreateAnimatedCharacter(ctx, spriteData)
 	if err != nil {
 		return nil, err
 	}

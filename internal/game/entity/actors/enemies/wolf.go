@@ -3,6 +3,7 @@ package gameenemies
 import (
 	"log"
 
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
@@ -16,13 +17,13 @@ type WolfEnemy struct {
 	count int
 }
 
-func NewWolfEnemy(x, y int, id string) (*WolfEnemy, error) {
+func NewWolfEnemy(ctx *app.AppContext, x, y int, id string) (*WolfEnemy, error) {
 	spriteData, statData, err := enemies.ParseJsonEnemy("internal/game/entity/actors/enemies/wolf.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	character, err := CreateAnimatedCharacter(spriteData)
+	character, err := CreateAnimatedCharacter(ctx, spriteData)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,6 +65,6 @@ func (e *WolfEnemy) GetCharacter() *actors.Character {
 func (e *WolfEnemy) OnTouch(other body.Collidable) {
 	player := e.MovementState().Target()
 	if other.ID() == player.ID() {
-		player.(gameentitytypes.PlatformerActorEntity).GetCharacter().Hurt(1)
+		player.(gameentitytypes.PlatformerActorEntity).Hurt(1)
 	}
 }

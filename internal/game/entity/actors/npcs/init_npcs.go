@@ -15,7 +15,7 @@ const (
 func InitNpcMap(ctx *app.AppContext) npcs.NpcMap[gameentitytypes.PlatformerActorEntity] {
 	npcMap := map[npcs.NpcType]func(x, y int, id string) gameentitytypes.PlatformerActorEntity{
 		SheepNpcType: func(x, y int, id string) gameentitytypes.PlatformerActorEntity {
-			npc, err := NewSheep(x, y, id)
+			npc, err := NewSheep(ctx, x, y, id)
 			if err != nil {
 				log.Fatal(err)
 			}
