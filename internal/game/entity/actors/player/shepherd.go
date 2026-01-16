@@ -2,11 +2,14 @@ package gameplayer
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body" // ADDED THIS
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
+	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
@@ -31,6 +34,7 @@ func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEnti
 	player := &ShepherdPlayer{
 		PlatformerCharacter: *character,
 	}
+
 	if err = SetPlayerBodies(player, spriteData); err != nil {
 		return nil, fmt.Errorf("SetPlayerBodies: %w", err)
 	}
@@ -51,5 +55,19 @@ func (p *ShepherdPlayer) GetCharacter() *actors.Character {
 	return &p.Character
 }
 
-func (p *ShepherdPlayer) GrabSheep() {
+func (p *ShepherdPlayer) Hurt(damage int) {
+	state, err := p.NewState(actors.Hurted)
+	if err != nil {
+		return
+	}
+	p.SetState(state)
+}
+
+func (p *ShepherdPlayer) GrabSheep(s body.MovableCollidableTouchable) {
+	log.Printf("Shepherd: %v - grabs: %v", p.ID(), s.ID())
+	state, err := p.NewState(gamestates.Carrying)
+	if err != nil {
+		return
+	}
+	p.SetState(state)
 }

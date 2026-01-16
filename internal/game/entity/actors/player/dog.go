@@ -30,6 +30,7 @@ func NewDogPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, e
 	player := &DogPlayer{
 		PlatformerCharacter: *character,
 	}
+
 	if err = SetPlayerBodies(player, spriteData); err != nil {
 		return nil, fmt.Errorf("SetPlayerBodies: %w", err)
 	}

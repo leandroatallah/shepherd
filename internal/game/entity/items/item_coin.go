@@ -54,6 +54,11 @@ func (c *CollectibleCoinItem) OnTouch(other body.Collidable) {
 	if !found {
 		return
 	}
+
+	if other.ID() != player.ID() {
+		return
+	}
+
 	coinCollector, ok := player.(gameentitytypes.CoinCollector)
 	if ok {
 		c.SetRemoved(true)
