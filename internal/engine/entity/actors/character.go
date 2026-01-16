@@ -51,7 +51,7 @@ func NewCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Character { 
 	}
 	c.StateCollisionManager = space.NewStateCollisionManager[ActorStateEnum](c)
 
-	state, err := NewActorState(c, Idle)
+	state, err := c.NewState(Idle)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -91,6 +91,10 @@ func (c *Character) AddCollisionRect(state ActorStateEnum, rect body.Collidable)
 
 func (c *Character) GetCharacter() *Character {
 	return c
+}
+
+func (c *Character) NewState(state ActorStateEnum) (ActorState, error) {
+	return NewState(c, state)
 }
 
 // SetState set a new Character state and update current collision shapes.
@@ -202,7 +206,7 @@ func (c *Character) handleState() {
 	}
 
 	setNewState := func(s ActorStateEnum) {
-		state, err := NewActorState(c, s)
+		state, err := c.NewState(s)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -234,7 +238,7 @@ func (c *Character) Hurt(damage int) {
 	c.LoseHealth(damage)
 
 	// Switch to Hurt state
-	state, err := NewActorState(c, Hurted)
+	state, err := c.NewState(Hurted)
 	if err != nil {
 		log.Fatal(err)
 	}

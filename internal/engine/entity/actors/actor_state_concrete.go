@@ -1,5 +1,12 @@
 package actors
 
+func init() {
+	Idle = RegisterState("idle", func(b BaseState) ActorState { return &IdleState{BaseState: b} })
+	Walking = RegisterState("walk", func(b BaseState) ActorState { return &WalkState{BaseState: b} })
+	Falling = RegisterState("fall", func(b BaseState) ActorState { return &FallState{BaseState: b} })
+	Hurted = RegisterState("hurt", func(b BaseState) ActorState { return &HurtState{BaseState: b} })
+}
+
 // Idle
 type IdleState struct {
 	BaseState

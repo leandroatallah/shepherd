@@ -6,7 +6,6 @@ import (
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 )
 
-// Controllable defines methods for an actor that can be moved or have its movement blocked.
 type Controllable interface {
 	OnMoveLeft(force int)
 	OnMoveRight(force int)
@@ -26,6 +25,7 @@ type Stateful interface {
 	)
 	SwitchMovementState(state movement.MovementStateEnum)
 	MovementState() movement.MovementState
+	NewState(state ActorStateEnum) (ActorState, error)
 }
 
 // Damageable represents any actor that can take damage.
