@@ -33,6 +33,13 @@ type Character struct {
 	imageOptions         *ebiten.DrawImageOptions
 
 	skills []skill.Skill
+
+	StateTransitionHandler func(*Character) bool
+}
+
+// SetStateTransitionHandler sets a function that can override the default state transition logic.
+func (c *Character) SetStateTransitionHandler(handler func(*Character) bool) {
+	c.StateTransitionHandler = handler
 }
 
 func NewCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Character { // Modified signature
@@ -203,6 +210,11 @@ func (c *Character) handleState() {
 		if c.invulnerabilityTimer == 0 {
 			c.SetInvulnerability(false)
 		}
+	}
+
+	// Allow game-specific logic to override the default behavior
+	if c.StateTransitionHandler != nil && c.StateTransitionHandler(c) {
+		return
 	}
 
 	setNewState := func(s ActorStateEnum) {
