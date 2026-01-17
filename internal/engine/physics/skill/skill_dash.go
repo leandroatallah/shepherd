@@ -3,6 +3,7 @@ package skill
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
@@ -63,7 +64,7 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 		} else {
 			// Apply dash movement by setting it in the movement model
 			var dirX int = 1
-			if b.FaceDirection() == body.FaceDirectionLeft {
+			if b.FaceDirection() == animation.FaceDirectionLeft {
 				dirX = -1
 			}
 			model.SetDashActive(true, d.speed*dirX)

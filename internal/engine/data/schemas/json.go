@@ -1,6 +1,8 @@
 package schemas
 
-import "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+import (
+	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
+)
 
 // ShapeRect defines a rectangular shape with position and dimensions.
 type ShapeRect struct {
@@ -25,8 +27,8 @@ type AssetData struct {
 // SpriteData contains all data related to a sprite's appearance and behavior,
 // including its body rectangle, assets for different states, animation frame rate, and initial facing direction.
 type SpriteData struct {
-	BodyRect        ShapeRect                `json:"body_rect"`
-	Assets          map[string]AssetData     `json:"assets"`
-	FrameRate       int                      `json:"frame_rate"`
-	FacingDirection body.FacingDirectionEnum `json:"facing_direction"` // 0 - right, 1 - left
+	BodyRect        ShapeRect                     `json:"body_rect"`
+	Assets          map[string]AssetData          `json:"assets"`
+	FrameRate       int                           `json:"frame_rate"`
+	FacingDirection animation.FacingDirectionEnum `json:"facing_direction"` // 0 - right, 1 - left
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
@@ -178,14 +179,14 @@ func (c *Character) UpdateImageOptions() {
 	fDirection := c.FaceDirection()
 
 	if accX > 0 {
-		fDirection = body.FaceDirectionRight
+		fDirection = animation.FaceDirectionRight
 	} else if accX < 0 {
-		fDirection = body.FaceDirectionLeft
+		fDirection = animation.FaceDirectionLeft
 	}
 
 	c.SetFaceDirection(fDirection)
 
-	if fDirection == body.FaceDirectionLeft {
+	if fDirection == animation.FaceDirectionLeft {
 		width := c.Position().Dx()
 		c.imageOptions.GeoM.Scale(-1, 1)
 		c.imageOptions.GeoM.Translate(float64(width), 0)

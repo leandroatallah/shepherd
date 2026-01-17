@@ -4,13 +4,7 @@ import (
 	"image"
 
 	"github.com/hajimehoshi/ebiten/v2"
-)
-
-type FacingDirectionEnum int
-
-const (
-	FaceDirectionRight FacingDirectionEnum = iota
-	FaceDirectionLeft
+	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 )
 
 type Shape interface {
@@ -44,8 +38,8 @@ type Movable interface {
 	MaxSpeed() int
 	Immobile() bool
 	SetImmobile(immobile bool)
-	FaceDirection() FacingDirectionEnum
-	SetFaceDirection(value FacingDirectionEnum)
+	FaceDirection() animation.FacingDirectionEnum
+	SetFaceDirection(value animation.FacingDirectionEnum)
 	IsIdle() bool
 	IsWalking() bool
 	IsFalling() bool

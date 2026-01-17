@@ -3,7 +3,7 @@ package body
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
@@ -18,7 +18,7 @@ type MovableBody struct {
 	speed         int
 	maxSpeed      int
 	immobile      bool
-	faceDirection body.FacingDirectionEnum
+	faceDirection animation.FacingDirectionEnum
 }
 
 func NewMovableBody(body *Body) *MovableBody {
@@ -119,11 +119,11 @@ func (b *MovableBody) SetImmobile(immobile bool) {
 	b.immobile = immobile
 }
 
-func (b *MovableBody) FaceDirection() body.FacingDirectionEnum {
+func (b *MovableBody) FaceDirection() animation.FacingDirectionEnum {
 	return b.faceDirection
 }
 
-func (b *MovableBody) SetFaceDirection(value body.FacingDirectionEnum) {
+func (b *MovableBody) SetFaceDirection(value animation.FacingDirectionEnum) {
 	b.faceDirection = value
 }
 
@@ -171,8 +171,8 @@ func (b *MovableBody) TryJump(force int) {
 // CheckMovementDirectionX set face direction based on accelerationX
 func (b *MovableBody) CheckMovementDirectionX() {
 	if b.accelerationX > 0 {
-		b.SetFaceDirection(body.FaceDirectionRight)
+		b.SetFaceDirection(animation.FaceDirectionRight)
 	} else if b.accelerationX < 0 {
-		b.SetFaceDirection(body.FaceDirectionLeft)
+		b.SetFaceDirection(animation.FaceDirectionLeft)
 	}
 }
