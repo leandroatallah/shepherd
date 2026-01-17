@@ -27,7 +27,9 @@ func (s *BaseScene) Update() error {
 	return nil
 }
 
-func (s *BaseScene) OnStart() {}
+func (s *BaseScene) OnStart() {
+	s.AppContext().Space.Clear()
+}
 
 func (s *BaseScene) OnFinish() {}
 

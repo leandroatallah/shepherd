@@ -114,6 +114,9 @@ type BodiesSpace interface {
 	AddBody(body Collidable)
 	Bodies() []Collidable
 	RemoveBody(body Collidable)
+	QueueForRemoval(body Collidable)
+	ProcessRemovals()
+	Clear()
 	ResolveCollisions(body Collidable) (touching bool, blocking bool)
 	SetTilemapDimensionsProvider(provider tilemaplayer.TilemapDimensionsProvider)
 	GetTilemapDimensionsProvider() tilemaplayer.TilemapDimensionsProvider

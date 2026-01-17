@@ -12,6 +12,7 @@ import (
 type Space struct {
 	mu                        sync.RWMutex
 	bodies                    map[string]body.Collidable
+	toBeRemoved               []body.Collidable
 	tilemapDimensionsProvider tilemaplayer.TilemapDimensionsProvider
 }
 
@@ -40,6 +41,13 @@ func (s *Space) AddBody(b body.Collidable) {
 	s.bodies[b.ID()] = b
 }
 
+func (s *Space) Clear() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.bodies = make(map[string]body.Collidable)
+}
+
 func (s *Space) RemoveBody(body body.Collidable) {
 	if body == nil {
 		return
@@ -53,6 +61,23 @@ func (s *Space) RemoveBody(body body.Collidable) {
 	}
 
 	delete(s.bodies, body.ID())
+}
+
+func (s *Space) QueueForRemoval(body body.Collidable) {
+	s.toBeRemoved = append(s.toBeRemoved, body)
+}
+
+func (s *Space) ProcessRemovals() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for _, b := range s.toBeRemoved {
+		if b == nil {
+			continue
+		}
+		delete(s.bodies, b.ID())
+	}
+	s.toBeRemoved = nil
 }
 
 func (s *Space) Bodies() []body.Collidable {
