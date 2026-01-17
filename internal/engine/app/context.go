@@ -5,6 +5,7 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/assets/imagemanager"
 	"github.com/leandroatallah/firefly/internal/engine/audio"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/data/datamanager"
@@ -27,6 +28,7 @@ type AppContext struct {
 	PhaseManager    *phases.Manager
 	Assets          fs.FS
 	Config          *config.AppConfig
+	Space           body.BodiesSpace
 }
 
 // AppContextHolder is a reusable component for embedding app context

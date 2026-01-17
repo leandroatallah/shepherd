@@ -6,7 +6,6 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 )
 
 type LayerNameID int
@@ -27,7 +26,7 @@ var LayerNameMap = map[string]LayerNameID{
 	"Endpoint":    EndpointLayer,
 }
 
-func (t *Tilemap) CreateCollisionBodies(space *space.Space, triggerEndpoint body.Touchable) {
+func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, triggerEndpoint body.Touchable) {
 	endpointLayer, found := t.FindLayerByName("Endpoint")
 	if !found {
 		log.Printf("Endpoint layer not found in tilemap")

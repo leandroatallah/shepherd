@@ -3,7 +3,6 @@ package movement
 import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	spacephysics "github.com/leandroatallah/firefly/internal/engine/physics/space"
 	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
@@ -125,7 +124,7 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 		m.onGround = false
 	}
 
-	if clampToPlayArea(body, space.(*spacephysics.Space)) {
+	if clampToPlayArea(body, space) {
 		vy16 = cfg.Physics.DownwardGravity - 1
 		body.SetVelocity(vx16, vy16)
 	}

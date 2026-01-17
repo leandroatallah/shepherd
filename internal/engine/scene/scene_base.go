@@ -18,7 +18,7 @@ type BaseScene struct {
 }
 
 func NewScene() *BaseScene {
-	return &BaseScene{space: space.NewSpace()}
+	return &BaseScene{}
 }
 
 func (s *BaseScene) Draw(screen *ebiten.Image) {}
@@ -40,11 +40,8 @@ func (s *BaseScene) AddBoundaries(boundaries ...body.MovableCollidable) {
 	}
 }
 
-func (s *BaseScene) PhysicsSpace() *space.Space {
-	if s.space == nil {
-		s.space = space.NewSpace()
-	}
-	return s.space
+func (s *BaseScene) PhysicsSpace() body.BodiesSpace {
+	return s.AppContext().Space
 }
 
 func (s *BaseScene) EnableKeys() {

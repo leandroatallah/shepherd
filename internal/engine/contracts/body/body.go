@@ -5,6 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/tilemaplayer"
 )
 
 type Shape interface {
@@ -114,4 +115,6 @@ type BodiesSpace interface {
 	Bodies() []Collidable
 	RemoveBody(body Collidable)
 	ResolveCollisions(body Collidable) (touching bool, blocking bool)
+	SetTilemapDimensionsProvider(provider tilemaplayer.TilemapDimensionsProvider)
+	GetTilemapDimensionsProvider() tilemaplayer.TilemapDimensionsProvider
 }

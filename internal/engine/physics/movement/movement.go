@@ -6,7 +6,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
@@ -83,7 +82,7 @@ func clampAxisVelocity(velocity, limit int) int {
 // It adjusts the body's position if it goes beyond the edges of the play area.
 // It returns true if the body is touching or has gone past the bottom of the screen,
 // which can be interpreted as being on the ground for platformer.
-func clampToPlayArea(body body.MovableCollidable, space *space.Space) bool {
+func clampToPlayArea(body body.MovableCollidable, space body.BodiesSpace) bool {
 	rect, ok := body.GetShape().(*bodyphysics.Rect)
 	if !ok {
 		return false

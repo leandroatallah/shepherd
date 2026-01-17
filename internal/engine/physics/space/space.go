@@ -5,16 +5,17 @@ import (
 	"sync"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/tilemaplayer"
 )
 
 // Space centralizes physics bodies and collision resolution.
 type Space struct {
 	mu                        sync.RWMutex
 	bodies                    map[string]body.Collidable
-	tilemapDimensionsProvider TilemapDimensionsProvider
+	tilemapDimensionsProvider tilemaplayer.TilemapDimensionsProvider
 }
 
-func NewSpace() *Space {
+func NewSpace() body.BodiesSpace {
 	return &Space{
 		bodies: make(map[string]body.Collidable),
 	}
@@ -128,13 +129,13 @@ func HasCollision(a, b body.Collidable) bool {
 	return false
 }
 
-func (s *Space) SetTilemapDimensionsProvider(provider TilemapDimensionsProvider) {
+func (s *Space) SetTilemapDimensionsProvider(provider tilemaplayer.TilemapDimensionsProvider) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.tilemapDimensionsProvider = provider
 }
 
-func (s *Space) GetTilemapDimensionsProvider() TilemapDimensionsProvider {
+func (s *Space) GetTilemapDimensionsProvider() tilemaplayer.TilemapDimensionsProvider {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.tilemapDimensionsProvider

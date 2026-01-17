@@ -6,7 +6,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/input"
-	spacephysics "github.com/leandroatallah/firefly/internal/engine/physics/space"
 	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
@@ -37,7 +36,7 @@ func (m *TopDownMovementModel) Update(body body.MovableCollidable, space body.Bo
 	vx16, vy16 = body.Velocity()
 
 	// Prevents leaving the play area`
-	clampToPlayArea(body, space.(*spacephysics.Space))
+	clampToPlayArea(body, space)
 
 	// Convert the raw input acceleration into a scaled and normalized vector.
 	accX, accY := body.Acceleration()

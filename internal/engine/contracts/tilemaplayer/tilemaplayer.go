@@ -1,4 +1,4 @@
-package space
+package tilemaplayer
 
 type TilemapDimensionsProvider interface {
 	GetTilemapWidth() int
