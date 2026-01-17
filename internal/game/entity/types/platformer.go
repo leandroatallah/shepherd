@@ -10,6 +10,8 @@ import (
 
 type SheepCarrier interface {
 	GrabSheep(s body.MovableCollidableTouchable)
+	IsCarryingSheep() bool
+	DropSheep()
 }
 
 type CoinCollector interface {

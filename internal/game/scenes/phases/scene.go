@@ -93,7 +93,7 @@ func (s *PhasesScene) OnStart() {
 	s.Camera().Kamera().SetCenter(float64(config.Get().ScreenWidth)/2, float64(config.Get().ScreenHeight)/2)
 
 	// Init collisions bodies and touch trigger for endpoints
-	endpointTrigger := bodyphysics.NewTouchTrigger(s.finishPhase, s.player)
+	endpointTrigger := bodyphysics.NewTouchTrigger(s.endpointTrigget, s.player)
 	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), endpointTrigger)
 
 	s.phaseCompleted = false
@@ -129,6 +129,9 @@ func (s *PhasesScene) Update() error {
 			continue
 		}
 	}
+
+	// Remove bodies queued for removal
+	space.ProcessRemovals()
 
 	return nil
 }
@@ -182,7 +185,16 @@ func (s *PhasesScene) OnFinish() {
 	s.Audiomanager().PauseMusic(bgSound)
 }
 
-func (s *PhasesScene) finishPhase() {
+func (s *PhasesScene) endpointTrigget() {
+	sheepCarrier, ok := s.player.(gameentitytypes.SheepCarrier)
+	if !ok {
+		return
+	}
+
+	if sheepCarrier.IsCarryingSheep() {
+		sheepCarrier.DropSheep()
+	}
+
 	// if s.phaseCompleted {
 	// 	return
 	// }

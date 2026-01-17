@@ -70,7 +70,7 @@ func (s *Sheep) OnTouch(other body.Collidable) {
 	}
 
 	sheepCarrier, ok := player.(gameentitytypes.SheepCarrier)
-	if ok {
+	if ok && !sheepCarrier.IsCarryingSheep() {
 		sheepCarrier.GrabSheep(s)
 	}
 }

@@ -97,6 +97,10 @@ func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEnti
 	return player, nil
 }
 
+func (p *ShepherdPlayer) Update(space body.BodiesSpace) error {
+	return p.Character.Update(space)
+}
+
 func (p *ShepherdPlayer) GetCharacter() *actors.Character {
 	return &p.Character
 }
@@ -111,6 +115,24 @@ func (p *ShepherdPlayer) Hurt(damage int) {
 
 func (p *ShepherdPlayer) GrabSheep(s body.MovableCollidableTouchable) {
 	state, err := p.NewState(gamestates.CarryingIdle)
+	if err != nil {
+		return
+	}
+	p.SetState(state)
+	// log.Println(p.AppContext().Space.Debug())
+	p.AppContext().Space.QueueForRemoval(s)
+}
+
+func (p *ShepherdPlayer) IsCarryingSheep() bool {
+	state := p.State()
+	return state == gamestates.CarryingIdle ||
+		state == gamestates.CarryingWalking ||
+		state == gamestates.CarryingFalling
+}
+
+func (p *ShepherdPlayer) DropSheep() {
+	log.Println("ShepherdPlayer: Dropping sheep")
+	state, err := p.NewState(actors.Idle)
 	if err != nil {
 		return
 	}
