@@ -13,6 +13,49 @@ import (
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
+// shepherdStateTransitionLogic provides custom state handling for the ShepherdPlayer,
+// specifically for managing the "carrying" states.
+func shepherdStateTransitionLogic(c *actors.Character) bool {
+	state := c.State()
+
+	// NOTE: These carrying states (Carrying, CarryingIdle, CarryingWalking, CarryingFalling)
+	// must be defined in the `gamestates` package. This logic also assumes they are implemented
+	// and registered for the character, allowing for different animations and physics,
+	// such as slower movement speed.
+
+	isCarryingState := state == gamestates.CarryingIdle ||
+		state == gamestates.CarryingWalking ||
+		state == gamestates.CarryingFalling
+
+	if !isCarryingState {
+		return false // Let the engine handle other states
+	}
+
+	setNewState := func(s actors.ActorStateEnum) {
+		state, err := c.NewState(s)
+		if err != nil {
+			// Log the error instead of crashing if a state is not registered.
+			log.Printf("Failed to create new state %v: %v", s, err)
+			return
+		}
+		c.SetState(state)
+	}
+
+	// State machine for when the character is carrying something.
+	switch {
+	case state != gamestates.CarryingFalling && c.IsFalling():
+		setNewState(gamestates.CarryingFalling)
+	case state != gamestates.CarryingWalking && c.IsWalking():
+		setNewState(gamestates.CarryingWalking)
+	case state != gamestates.CarryingIdle && c.IsIdle():
+		// This case also handles the initial transition from the base "Carrying"
+		// state to the more specific "CarryingIdle" state.
+		setNewState(gamestates.CarryingIdle)
+	}
+
+	return true // We've handled the state, so the engine shouldn't.
+}
+
 type ShepherdPlayer struct {
 	gameentitytypes.PlatformerCharacter
 	gameentitytypes.SheepCarrier
@@ -30,6 +73,9 @@ func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEnti
 	}
 	character.AddSkill(skill.NewJumpSkill())
 	character.AddSkill(skill.NewHorizontalMovementSkill())
+
+	// Set the custom state transition logic for the player
+	character.SetStateTransitionHandler(shepherdStateTransitionLogic)
 
 	player := &ShepherdPlayer{
 		PlatformerCharacter: *character,
@@ -64,8 +110,7 @@ func (p *ShepherdPlayer) Hurt(damage int) {
 }
 
 func (p *ShepherdPlayer) GrabSheep(s body.MovableCollidableTouchable) {
-	log.Printf("Shepherd: %v - grabs: %v", p.ID(), s.ID())
-	state, err := p.NewState(gamestates.Carrying)
+	state, err := p.NewState(gamestates.CarryingIdle)
 	if err != nil {
 		return
 	}

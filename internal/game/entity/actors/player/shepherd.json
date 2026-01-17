@@ -19,8 +19,44 @@
           }
         ]
       },
-      "carry": {
-        "path": "assets/images/dog-24-idle.png",
+      "walk": {
+        "path": "assets/images/shepherd-24-walk.png",
+        "loop": true,
+        "collision_rect": [
+          {
+            "x": 7,
+            "y": 1,
+            "width": 14,
+            "height": 23
+          }
+        ]
+      },
+      "carry_idle": {
+        "path": "assets/images/shepherd-24-carry-walk.png",
+        "loop": true,
+        "collision_rect": [
+          {
+            "x": 7,
+            "y": 1,
+            "width": 14,
+            "height": 23
+          }
+        ]
+      },
+      "carry_walking": {
+        "path": "assets/images/shepherd-24-carry-walk.png",
+        "loop": true,
+        "collision_rect": [
+          {
+            "x": 7,
+            "y": 1,
+            "width": 14,
+            "height": 23
+          }
+        ]
+      },
+      "carry_falling": {
+        "path": "assets/images/shepherd-24-carry-walk.png",
         "loop": true,
         "collision_rect": [
           {
@@ -33,7 +69,7 @@
       }
     },
     "facing_direction": 0,
-    "frame_rate": 6
+    "frame_rate": 9
   },
   "stats": {
     "health": 5,

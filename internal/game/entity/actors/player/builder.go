@@ -1,7 +1,8 @@
 package gameplayer
 
 import (
-	"fmt" // ADDED THIS
+	"fmt"
+
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
@@ -13,7 +14,7 @@ import (
 
 func CreateAnimatedCharacter(ctx *app.AppContext, data schemas.SpriteData) (*gameentitytypes.PlatformerCharacter, error) {
 	stateMap := make(map[string]animation.SpriteState)
-	for _, stateName := range []string{"idle", "walk", "fall", "hurt", "carry"} {
+	for stateName := range data.Assets {
 		enum, ok := actors.GetStateEnum(stateName)
 		if !ok {
 			return nil, fmt.Errorf("state '%s' not registered", stateName)
@@ -28,7 +29,7 @@ func SetPlayerBodies(player gameentitytypes.PlatformerActorEntity, data schemas.
 	player.SetID("player")
 
 	stateMap := make(map[string]animation.SpriteState)
-	for _, stateName := range []string{"idle", "walk", "fall", "hurt", "carry"} {
+	for stateName := range data.Assets {
 		enum, ok := actors.GetStateEnum(stateName)
 		if !ok {
 			return fmt.Errorf("state '%s' not registered", stateName)
