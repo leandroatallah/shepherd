@@ -31,6 +31,9 @@ type PhasesScene struct {
 	player         gameentitytypes.PlatformerActorEntity
 	phaseCompleted bool
 	mainText       *font.FontText
+
+	// UI effects
+	ShowDrawScreenFlash int
 }
 
 func NewPhasesScene(context *app.AppContext) *PhasesScene {
@@ -90,7 +93,8 @@ func (s *PhasesScene) OnStart() {
 
 	// Init camera target
 	s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFixed})
-	s.Camera().Kamera().SetCenter(float64(config.Get().ScreenWidth)/2, float64(config.Get().ScreenHeight)/2)
+	s.Camera().SetFollowTarget(s.player)
+	s.Camera().SetCenter(float64(config.Get().ScreenWidth)/2, float64(config.Get().ScreenHeight)/2)
 
 	// Init collisions bodies and touch trigger for endpoints
 	endpointTrigger := bodyphysics.NewTouchTrigger(s.endpointTrigget, s.player)
@@ -103,6 +107,13 @@ func (s *PhasesScene) Update() error {
 	if config.Get().CamDebug {
 		s.CamDebug()
 	}
+
+	// UI Effects
+	if s.AppContext().ScreenFlash {
+		s.ShowDrawScreenFlash = 4 // frames
+		s.AppContext().ScreenFlash = false
+	}
+
 	s.TilemapScene.Update() // Update the camera if in follow mode
 
 	s.count++
@@ -176,6 +187,11 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 				s.Camera().Draw(sb.ImageCollisionBox(), opts, screen)
 			}
 		}
+	}
+
+	if s.ShowDrawScreenFlash > 0 {
+		DrawScreenFlash(screen)
+		s.ShowDrawScreenFlash--
 	}
 }
 

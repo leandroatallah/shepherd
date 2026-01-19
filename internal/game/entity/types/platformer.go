@@ -37,3 +37,13 @@ func NewPlatformerCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Pl
 		Character: *c,
 	}
 }
+
+// Overwrite Character NewState to pass PlatformerCharacter as argument.
+func (c *PlatformerCharacter) NewState(state actors.ActorStateEnum) (actors.ActorState, error) {
+	s, err := actors.NewState(c, state)
+	if err != nil {
+		return nil, err
+	}
+	c.SetState(s)
+	return s, nil
+}

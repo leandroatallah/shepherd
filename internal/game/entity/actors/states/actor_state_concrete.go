@@ -1,6 +1,7 @@
 package gamestates
 
 import (
+	"github.com/leandroatallah/firefly/internal/engine/contracts/context"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 )
 
@@ -14,7 +15,10 @@ func (s *DyingState) OnStart(currentCount int) {
 
 	s.GetActor().SetHealth(0)
 	s.GetActor().SetImmobile(true)
-	// TODO: Add a flash animation to the screen
+
+	if ctxProvider, ok := s.GetActor().(context.ContextProvider); ok {
+		ctxProvider.AppContext().ScreenFlash = true
+	}
 }
 
 // CarryingIdle
