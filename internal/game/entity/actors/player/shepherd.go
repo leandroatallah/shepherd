@@ -18,10 +18,10 @@ import (
 func shepherdStateTransitionLogic(c *actors.Character) bool {
 	state := c.State()
 
-	// NOTE: These carrying states (Carrying, CarryingIdle, CarryingWalking, CarryingFalling)
-	// must be defined in the `gamestates` package. This logic also assumes they are implemented
-	// and registered for the character, allowing for different animations and physics,
-	// such as slower movement speed.
+	// When the player die, the state no longer changes.
+	if state == gamestates.Dying {
+		return true
+	}
 
 	isCarryingState := state == gamestates.CarryingIdle ||
 		state == gamestates.CarryingWalking ||
@@ -43,6 +43,8 @@ func shepherdStateTransitionLogic(c *actors.Character) bool {
 
 	// State machine for when the character is carrying something.
 	switch {
+	case state != gamestates.Dying && c.Health() <= 0:
+		setNewState(gamestates.Dying)
 	case state != gamestates.CarryingFalling && c.IsFalling():
 		setNewState(gamestates.CarryingFalling)
 	case state != gamestates.CarryingWalking && c.IsWalking():
@@ -106,20 +108,20 @@ func (p *ShepherdPlayer) GetCharacter() *actors.Character {
 }
 
 func (p *ShepherdPlayer) Hurt(damage int) {
-	state, err := p.NewState(actors.Hurted)
+	state, err := p.NewState(gamestates.Dying)
 	if err != nil {
 		return
 	}
 	p.SetState(state)
 }
 
+// SheepCarrier Methods
 func (p *ShepherdPlayer) GrabSheep(s body.MovableCollidableTouchable) {
 	state, err := p.NewState(gamestates.CarryingIdle)
 	if err != nil {
 		return
 	}
 	p.SetState(state)
-	// log.Println(p.AppContext().Space.Debug())
 	p.AppContext().Space.QueueForRemoval(s)
 }
 
@@ -131,7 +133,6 @@ func (p *ShepherdPlayer) IsCarryingSheep() bool {
 }
 
 func (p *ShepherdPlayer) DropSheep() {
-	log.Println("ShepherdPlayer: Dropping sheep")
 	state, err := p.NewState(actors.Idle)
 	if err != nil {
 		return
