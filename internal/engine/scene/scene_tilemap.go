@@ -32,12 +32,11 @@ func NewTilemapScene(ctx *app.AppContext) *TilemapScene {
 
 func (s *TilemapScene) SetCameraConfig(config CameraConfig) {
 	s.cameraConfig = config
+	s.cam.SetFollowing(config.Mode == CameraModeFollow)
 }
 
 func (s *TilemapScene) Update() error {
-	if s.cameraConfig.Mode == CameraModeFollow {
-		s.cam.Update()
-	}
+	s.cam.Update()
 	return s.BaseScene.Update()
 }
 

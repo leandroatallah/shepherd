@@ -16,6 +16,8 @@ type Controller struct {
 	followTarget    body.Body
 	DeadZoneRadius  float64
 	SmoothingFactor float64
+	isFollowing     bool
+	centerX, centerY float64
 }
 
 func NewController(x, y float64) *Controller {
@@ -29,8 +31,11 @@ func NewController(x, y float64) *Controller {
 	targetBody := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(0, 0, 1, 1))
 
 	return &Controller{
-		cam:    cam,
-		target: targetBody,
+		cam:         cam,
+		target:      targetBody,
+		isFollowing: false,
+		centerX:     x,
+		centerY:     y,
 	}
 }
 
@@ -47,6 +52,15 @@ func NewCamera(x, y int) *kamera.Camera {
 	return c
 }
 
+func (c *Controller) SetFollowing(following bool) {
+	c.isFollowing = following
+}
+
+func (c *Controller) SetCenter(x, y float64) {
+	c.centerX = x
+	c.centerY = y
+}
+
 func (c *Controller) SetFollowTarget(b body.Body) {
 	c.followTarget = b
 	x, y := b.GetPositionMin()
@@ -54,10 +68,16 @@ func (c *Controller) SetFollowTarget(b body.Body) {
 }
 
 func (c *Controller) Update() {
-	c.cam.LookAt(
-		float64(c.followTarget.Position().Min.X),
-		float64(c.followTarget.Position().Min.Y),
-	)
+	var targetX, targetY float64
+	if c.isFollowing && c.followTarget != nil {
+		x, y := c.followTarget.GetPositionMin()
+		targetX = float64(x)
+		targetY = float64(y)
+	} else {
+		targetX = c.centerX
+		targetY = c.centerY
+	}
+	c.cam.LookAt(targetX, targetY)
 }
 
 func (c *Controller) Draw(

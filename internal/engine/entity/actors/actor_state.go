@@ -9,10 +9,10 @@ type ActorState interface {
 type ActorStateEnum int
 
 var (
-	Idle ActorStateEnum
+	Idle    ActorStateEnum
 	Walking ActorStateEnum
 	Falling ActorStateEnum
-	Hurted ActorStateEnum
+	Hurted  ActorStateEnum
 )
 
 func init() {
