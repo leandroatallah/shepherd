@@ -18,6 +18,7 @@ type MovableBody struct {
 	speed         int
 	maxSpeed      int
 	immobile      bool
+	freeze        bool
 	faceDirection animation.FacingDirectionEnum
 }
 
@@ -117,6 +118,13 @@ func (b *MovableBody) Immobile() bool {
 
 func (b *MovableBody) SetImmobile(immobile bool) {
 	b.immobile = immobile
+}
+func (b *MovableBody) SetFreeze(freeze bool) {
+	b.freeze = freeze
+}
+
+func (b *MovableBody) Freeze() bool {
+	return b.freeze
 }
 
 func (b *MovableBody) FaceDirection() animation.FacingDirectionEnum {

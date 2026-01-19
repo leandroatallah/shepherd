@@ -39,6 +39,9 @@ type Movable interface {
 	MaxSpeed() int
 	Immobile() bool
 	SetImmobile(immobile bool)
+	SetFreeze(freeze bool)
+	Freeze() bool
+
 	FaceDirection() animation.FacingDirectionEnum
 	SetFaceDirection(value animation.FacingDirectionEnum)
 	IsIdle() bool

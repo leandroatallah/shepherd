@@ -21,6 +21,10 @@ func NewTopDownMovementModel(playerMovementBlocker PlayerMovementBlocker) *TopDo
 }
 
 func (m *TopDownMovementModel) Update(body body.MovableCollidable, space body.BodiesSpace) error {
+	if body.Freeze() {
+		return nil
+	}
+
 	// Handle input for player movement
 	if m.playerMovementBlocker != nil {
 		m.InputHandler(body, space)

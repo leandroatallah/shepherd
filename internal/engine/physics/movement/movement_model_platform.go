@@ -93,6 +93,10 @@ func (m *PlatformMovementModel) handleGravity(b body.MovableCollidable) (int, in
 
 // Update handles the physics for a platformer-style character.
 func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.BodiesSpace) error {
+	if body.Freeze() {
+		return nil
+	}
+
 	cfg := config.Get()
 
 	vx16, vy16 := body.Velocity()
