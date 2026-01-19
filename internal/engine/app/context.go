@@ -29,6 +29,9 @@ type AppContext struct {
 	Assets          fs.FS
 	Config          *config.AppConfig
 	Space           body.BodiesSpace
+
+	// UI effects
+	ScreenFlash bool
 }
 
 // AppContextHolder is a reusable component for embedding app context
