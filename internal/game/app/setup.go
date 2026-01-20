@@ -11,6 +11,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/audio"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/event"
 	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
@@ -52,6 +53,7 @@ func Setup(assets fs.FS) error {
 	appContext := &app.AppContext{
 		AudioManager:    audioManager,
 		DialogueManager: dialogueManager,
+		EventManager:    event.NewManager(),
 		ActorManager:    actorManager,
 		SceneManager:    sceneManager,
 		PhaseManager:    phaseManager,

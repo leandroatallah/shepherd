@@ -21,6 +21,9 @@ func InitSceneMap(context *app.AppContext) navigation.SceneMap {
 		scenestypes.SceneSummary: func() navigation.Scene {
 			return NewSummaryScene(context)
 		},
+		scenestypes.ScenePhaseReboot: func() navigation.Scene {
+			return NewPhaseRebootScene(context)
+		},
 	}
 	return sceneMap
 }

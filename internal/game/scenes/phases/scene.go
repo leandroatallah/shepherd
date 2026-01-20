@@ -3,7 +3,6 @@ package gamescenephases
 import (
 	"image/color"
 	"log"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
@@ -13,12 +12,16 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
+	"github.com/leandroatallah/firefly/internal/engine/event"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
+	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
+	"github.com/leandroatallah/firefly/internal/game/events"
+	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 const (
@@ -31,6 +34,10 @@ type PhasesScene struct {
 	player         gameentitytypes.PlatformerActorEntity
 	phaseCompleted bool
 	mainText       *font.FontText
+
+	// Reboot
+	isRebooting bool
+	rebootDelay int
 
 	// UI effects
 	ShowDrawScreenFlash int
@@ -47,24 +54,23 @@ func NewPhasesScene(context *app.AppContext) *PhasesScene {
 		mainText:     mainText,
 	}
 	scene.SetAppContext(context)
+
+	// Subscribe events
+	context.EventManager.Subscribe(events.CharacterDiedEventType, func(e event.Event) {
+		scene.Reboot()
+	})
+
 	return &scene
+}
+
+func (s *PhasesScene) Setup() {
 }
 
 func (s *PhasesScene) OnStart() {
 	s.TilemapScene.OnStart()
 
-	go func() {
-		time.Sleep(1 * time.Second)
-		if config.Get().NoSound {
-			return
-		}
-		am := s.AppContext().AudioManager
-		am.SetVolume(0.25)
-		am.PlayMusic(bgSound)
-	}()
-
 	// Create player and register to space and context
-	p, err := createPlayer(s.AppContext())
+	p, err := createPlayer(s.AppContext(), gameentitytypes.ShepherdPlayerType)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,24 +78,7 @@ func (s *PhasesScene) OnStart() {
 	s.AppContext().ActorManager.Register(s.player)
 	s.PhysicsSpace().AddBody(s.player)
 
-	// Set items map to factory creation process
-	itemsMap := map[int]items.ItemType{
-		0: gameitems.CollectibleCoinType,
-	}
-
-	// Set items position from tilemap
-	f := items.NewItemFactory(gameitems.InitItemMap(s.AppContext()))
-	s.InitItems(itemsMap, f)
-
-	// Set enemies position from tilemap
-	enemyFactory := enemies.NewEnemyFactory(gameenemies.InitEnemyMap(s.AppContext()))
-	scene.InitEnemies(&s.TilemapScene, enemyFactory)
-
-	// Set NPCs position from tilemap
-	npcFactory := npcs.NewNpcFactory(gamenpcs.InitNpcMap(s.AppContext()))
-	scene.InitNPCs(&s.TilemapScene, npcFactory)
-
-	s.SetPlayerStartPosition(s.player)
+	s.initTilemap()
 
 	// Init camera target
 	s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFixed})
@@ -99,8 +88,6 @@ func (s *PhasesScene) OnStart() {
 	// Init collisions bodies and touch trigger for endpoints
 	endpointTrigger := bodyphysics.NewTouchTrigger(s.endpointTrigget, s.player)
 	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), endpointTrigger)
-
-	s.phaseCompleted = false
 }
 
 func (s *PhasesScene) Update() error {
@@ -108,13 +95,13 @@ func (s *PhasesScene) Update() error {
 		s.CamDebug()
 	}
 
-	// UI Effects
-	if s.AppContext().ScreenFlash {
-		s.ShowDrawScreenFlash = 4 // frames
-		s.AppContext().ScreenFlash = false
+	if s.checkReboot() {
+		return nil
 	}
 
 	s.TilemapScene.Update() // Update the camera if in follow mode
+
+	s.playBackgroundMusic()
 
 	s.count++
 
@@ -195,10 +182,15 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	}
 }
 
+func (s *PhasesScene) Reboot() {
+	s.ShowDrawScreenFlash = 4 // frames
+	s.isRebooting = true
+	s.rebootDelay = 60 // frames
+}
+
 func (s *PhasesScene) OnFinish() {
 	s.TilemapScene.OnFinish()
-
-	s.Audiomanager().PauseMusic(bgSound)
+	s.AppContext().ActorManager.Unregister(s.player)
 }
 
 func (s *PhasesScene) endpointTrigget() {
@@ -217,4 +209,63 @@ func (s *PhasesScene) endpointTrigget() {
 	//
 	// s.phaseCompleted = true
 	// s.AppContext().SceneManager.NavigateTo(scenestypes.SceneSummary, transition.NewFader(), true)
+}
+
+func (s *PhasesScene) CompletePhase() {
+	s.Audiomanager().PauseMusic(bgSound)
+}
+
+func (s *PhasesScene) playBackgroundMusic() {
+	if s.AppContext().Config.NoSound {
+		return
+	}
+
+	if s.count < 60 {
+		return
+	}
+
+	am := s.AppContext().AudioManager
+	if !am.IsPlaying(bgSound) {
+		am.PlayMusic(bgSound)
+		am.SetVolume(0.25)
+	}
+}
+
+func (s *PhasesScene) initTilemap() {
+	// Set items map to factory creation process
+	itemsMap := map[int]items.ItemType{
+		0: gameitems.CollectibleCoinType,
+	}
+
+	// Set items position from tilemap
+	f := items.NewItemFactory(gameitems.InitItemMap(s.AppContext()))
+	s.InitItems(itemsMap, f)
+
+	// Set enemies position from tilemap
+	enemyFactory := enemies.NewEnemyFactory(gameenemies.InitEnemyMap(s.AppContext()))
+	scene.InitEnemies(&s.TilemapScene, enemyFactory)
+
+	// Set NPCs position from tilemap
+	npcFactory := npcs.NewNpcFactory(gamenpcs.InitNpcMap(s.AppContext()))
+	scene.InitNPCs(&s.TilemapScene, npcFactory)
+
+	s.SetPlayerStartPosition(s.player)
+}
+
+func (s *PhasesScene) checkReboot() bool {
+	if !s.isRebooting {
+		return false
+	}
+
+	if s.rebootDelay == 0 {
+		s.AppContext().SceneManager.NavigateTo(
+			scenestypes.ScenePhaseReboot,
+			transition.NewFader(),
+			true,
+		)
+	}
+
+	s.rebootDelay--
+
+	return false
 }

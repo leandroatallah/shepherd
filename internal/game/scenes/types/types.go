@@ -7,4 +7,5 @@ const (
 	SceneMenu
 	ScenePhases
 	SceneSummary
+	ScenePhaseReboot
 )
