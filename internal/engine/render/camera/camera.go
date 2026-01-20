@@ -11,12 +11,12 @@ import (
 )
 
 type Controller struct {
-	cam             *kamera.Camera
-	target          body.Collidable
-	followTarget    body.Body
-	DeadZoneRadius  float64
-	SmoothingFactor float64
-	isFollowing     bool
+	cam              *kamera.Camera
+	target           body.Collidable
+	followTarget     body.Body
+	DeadZoneRadius   float64
+	SmoothingFactor  float64
+	isFollowing      bool
 	centerX, centerY float64
 }
 
@@ -59,6 +59,7 @@ func (c *Controller) SetFollowing(following bool) {
 func (c *Controller) SetCenter(x, y float64) {
 	c.centerX = x
 	c.centerY = y
+	c.Kamera().SetCenter(x, y)
 }
 
 func (c *Controller) SetFollowTarget(b body.Body) {
