@@ -28,6 +28,7 @@ type SceneManager interface {
 	AudioManager() *audio.AudioManager
 	Draw(screen *ebiten.Image)
 	NavigateTo(sceneType SceneType, sceneTransition Transition, freshInstance bool)
+	NavigateBack(sceneTransition Transition)
 	// SetFactory(factory SceneFactory)
 	SwitchTo(scene Scene)
 	Update() error

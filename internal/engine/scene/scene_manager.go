@@ -12,10 +12,11 @@ import (
 type SceneManager struct {
 	app.AppContextHolder
 
-	current      navigation.Scene
-	factory      SceneFactory
-	nextScene    navigation.Scene
-	transitioner navigation.Transition
+	current       navigation.Scene
+	previousScene navigation.Scene
+	factory       SceneFactory
+	nextScene     navigation.Scene
+	transitioner  navigation.Transition
 }
 
 func NewSceneManager() *SceneManager {
@@ -66,6 +67,10 @@ func (m *SceneManager) SetFactory(factory SceneFactory) {
 func (m *SceneManager) NavigateTo(
 	sceneType navigation.SceneType, sceneTransition navigation.Transition, freshInstance bool,
 ) {
+	if m.current != nil {
+		m.previousScene = m.current
+	}
+
 	scene, err := m.factory.Create(sceneType, freshInstance)
 	if err != nil {
 		log.Fatalf("Error creating scene: %v", err)
@@ -80,6 +85,27 @@ func (m *SceneManager) NavigateTo(
 		})
 	} else {
 		m.SwitchTo(scene)
+	}
+}
+
+func (m *SceneManager) NavigateBack(sceneTransition navigation.Transition) {
+	if m.previousScene == nil {
+		log.Println("No previous scene to navigate back to.")
+		return
+	}
+
+	sceneToLoad := m.previousScene
+	m.previousScene = nil // Clear previous scene after navigating back
+
+	if sceneTransition != nil {
+		m.transitioner = sceneTransition
+		m.nextScene = sceneToLoad
+		m.transitioner.StartTransition(func() {
+			m.SwitchTo(m.nextScene)
+			m.nextScene = nil
+		})
+	} else {
+		m.SwitchTo(sceneToLoad)
 	}
 }
 
