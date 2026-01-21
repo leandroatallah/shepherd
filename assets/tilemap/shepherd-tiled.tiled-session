@@ -38,17 +38,41 @@
             "scale": 3.2726,
             "selectedLayer": 6,
             "viewCenter": {
-                "x": 173.86787263949148,
-                "y": 117.03232903501802
+                "x": 173.8678726394915,
+                "y": 117.03232903501801
             }
         },
         "shepherd-phase-0.tmj#sample-enemies": {
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "shepherd-phase-0.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
         "shepherd-phase-0.tmj#tileset-1bit": {
             "scaleInDock": 2.9391,
             "scaleInEditor": 1
+        },
+        "shepherd-phase-1.tmj": {
+            "expandedObjectLayers": [
+                4,
+                2
+            ],
+            "scale": 2.4191,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 205.86168409739162,
+                "y": 143.8551527427556
+            }
+        },
+        "shepherd-phase-1.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1.tmj#tileset-1bit": {
+            "scaleInDock": 2.9391
         }
     },
     "last.externalTilesetPath": "/Users/leandroatallah/www/go/ebiten/shepherd/assets/tilemap",

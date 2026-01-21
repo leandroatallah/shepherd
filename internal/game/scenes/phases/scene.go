@@ -294,8 +294,9 @@ func (s *PhasesScene) completePhase() {
 	}
 
 	if s.phaseCompletedDelay == 0 {
+		s.AppContext().PhaseManager.AdvanceToNextPhase()
 		s.AppContext().SceneManager.NavigateTo(
-			scenestypes.ScenePhaseReboot,
+			scenestypes.ScenePhases,
 			transition.NewFader(),
 			true,
 		)
