@@ -7,7 +7,7 @@ import (
 type MovementState interface {
 	State() MovementStateEnum
 	OnStart()
-	Move()
+	Move(space body.BodiesSpace)
 	Target() body.MovableCollidable
 }
 
@@ -21,6 +21,7 @@ const (
 	DumbChase
 	Patrol
 	Avoid
+	SideToSide
 )
 
 type BaseMovementState struct {

@@ -123,4 +123,5 @@ type BodiesSpace interface {
 	ResolveCollisions(body Collidable) (touching bool, blocking bool)
 	SetTilemapDimensionsProvider(provider tilemaplayer.TilemapDimensionsProvider)
 	GetTilemapDimensionsProvider() tilemaplayer.TilemapDimensionsProvider
+	Query(rect image.Rectangle) []Collidable
 }

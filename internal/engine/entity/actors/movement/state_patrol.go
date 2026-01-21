@@ -1,7 +1,10 @@
 // Package movement provides the patrol movement behavior for actors.
 package movement
 
-import bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+import (
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+)
 
 type patrolStateEnum int
 
@@ -81,7 +84,7 @@ func (s *PatrolMovementState) OnStart() {
 	s.BaseMovementState.OnStart()
 }
 
-func (s *PatrolMovementState) Move() {
+func (s *PatrolMovementState) Move(space body.BodiesSpace) {
 	s.count++
 
 	if s.actor.Immobile() {

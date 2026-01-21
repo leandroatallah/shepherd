@@ -1,6 +1,7 @@
 package space
 
 import (
+	"image"
 	"log"
 	"sync"
 
@@ -127,6 +128,40 @@ func (s *Space) ResolveCollisions(body body.Collidable) (touching bool, blocking
 	}
 
 	return touching, blocking
+}
+
+// Query returns all bodies that overlap with the given rectangle.
+func (s *Space) Query(rect image.Rectangle) []body.Collidable {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	var result []body.Collidable
+
+	for _, b := range s.bodies {
+		if b == nil {
+			continue
+		}
+
+		isOverlapping := false
+		// Check the main body position
+		if b.Position().Overlaps(rect) {
+			isOverlapping = true
+		} else {
+			// Check all collision shapes of the body
+			for _, collisionShape := range b.CollisionPosition() {
+				if collisionShape.Overlaps(rect) {
+					isOverlapping = true
+					break
+				}
+			}
+		}
+
+		if isOverlapping {
+			result = append(result, b)
+		}
+	}
+
+	return result
 }
 
 func HasCollision(a, b body.Collidable) bool {

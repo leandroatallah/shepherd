@@ -30,6 +30,8 @@ func NewMovementState(
 		movementState = NewAvoidMovementState(b)
 	case Patrol:
 		movementState = NewPatrolMovementState(b)
+	case SideToSide:
+		movementState = NewSideToSideMovementState(b)
 	default:
 		return nil, fmt.Errorf("unknown movement state type")
 	}

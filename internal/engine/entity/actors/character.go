@@ -152,7 +152,7 @@ func (c *Character) Update(space body.BodiesSpace) error {
 
 	// Handle movement by Movement State - must happen BEFORE UpdateMovement
 	if c.movementState != nil {
-		c.movementState.Move()
+		c.movementState.Move(space)
 	}
 
 	// Update physics and apply movement

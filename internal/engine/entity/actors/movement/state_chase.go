@@ -20,7 +20,7 @@ func NewChaseMovementState(base BaseMovementState) *ChaseMovementState {
 	return &ChaseMovementState{BaseMovementState: base}
 }
 
-func (s *ChaseMovementState) Move() {
+func (s *ChaseMovementState) Move(space body.BodiesSpace) {
 	s.count++
 
 	if s.actor.Immobile() {

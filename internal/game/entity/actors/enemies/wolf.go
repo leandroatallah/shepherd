@@ -49,7 +49,7 @@ func NewWolfEnemy(ctx *app.AppContext, x, y int, id string) (*WolfEnemy, error) 
 }
 
 func (e *WolfEnemy) SetTarget(target body.MovableCollidable) {
-	e.Character.SetMovementState(movement.Idle, target)
+	e.Character.SetMovementState(movement.SideToSide, target)
 }
 
 // Character Methods
