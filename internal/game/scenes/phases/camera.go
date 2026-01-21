@@ -1,8 +1,6 @@
 package gamescenephases
 
 import (
-	"image/color"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -37,15 +35,4 @@ func (s *PhasesScene) CamDebug() {
 	if ebiten.IsKeyPressed(ebiten.KeyI) {
 		s.Camera().Kamera().CenterOffsetY *= 1.02
 	}
-
-}
-
-func (s *PhasesScene) DrawCamTargetPoint(screen *ebiten.Image) {
-	tPos := s.Camera().Target().Position()
-	targetImage := ebiten.NewImage(tPos.Dx(), tPos.Dy())
-	targetImage.Fill(color.RGBA{0xff, 0, 0, 0xff})
-	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Reset()
-	opts.GeoM.Translate(float64(tPos.Min.X), float64(tPos.Min.Y))
-	s.Camera().Draw(targetImage, opts, screen)
 }

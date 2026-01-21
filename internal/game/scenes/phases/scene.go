@@ -3,6 +3,7 @@ package gamescenephases
 import (
 	"image/color"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
@@ -30,10 +31,15 @@ const (
 
 type PhasesScene struct {
 	scene.TilemapScene
-	count          int
-	player         gameentitytypes.PlatformerActorEntity
-	phaseCompleted bool
-	mainText       *font.FontText
+	count       int
+	player      gameentitytypes.PlatformerActorEntity
+	mainText    *font.FontText
+	bodyCounter *BodyCounter
+
+	// Complete phase
+	isConcludingPhase   bool
+	phaseCompleted      bool
+	phaseCompletedDelay int
 
 	// Reboot
 	isRebooting bool
@@ -52,6 +58,7 @@ func NewPhasesScene(context *app.AppContext) *PhasesScene {
 	scene := PhasesScene{
 		TilemapScene: *tilemapScene,
 		mainText:     mainText,
+		bodyCounter:  &BodyCounter{},
 	}
 	scene.SetAppContext(context)
 
@@ -63,11 +70,9 @@ func NewPhasesScene(context *app.AppContext) *PhasesScene {
 	return &scene
 }
 
-func (s *PhasesScene) Setup() {
-}
-
 func (s *PhasesScene) OnStart() {
 	s.TilemapScene.OnStart()
+	s.count = 0
 
 	// Create player and register to space and context
 	p, err := createPlayer(s.AppContext(), gameentitytypes.ShepherdPlayerType)
@@ -79,6 +84,11 @@ func (s *PhasesScene) OnStart() {
 	s.PhysicsSpace().AddBody(s.player)
 
 	s.initTilemap()
+
+	// After init bodies, set body counter
+	s.bodyCounter.setBodyCounter(s.PhysicsSpace())
+
+	s.PhysicsSpace().Bodies()
 
 	// Init camera target
 	s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFixed})
@@ -97,6 +107,10 @@ func (s *PhasesScene) Update() error {
 
 	if s.checkReboot() {
 		return nil
+	}
+
+	if s.checkPhaseCompleted() {
+		s.completePhase()
 	}
 
 	s.TilemapScene.Update() // Update the camera if in follow mode
@@ -201,18 +215,8 @@ func (s *PhasesScene) endpointTrigget() {
 
 	if sheepCarrier.IsCarryingSheep() {
 		sheepCarrier.DropSheep()
+		s.bodyCounter.sheepRescued++
 	}
-
-	// if s.phaseCompleted {
-	// 	return
-	// }
-	//
-	// s.phaseCompleted = true
-	// s.AppContext().SceneManager.NavigateTo(scenestypes.SceneSummary, transition.NewFader(), true)
-}
-
-func (s *PhasesScene) CompletePhase() {
-	s.Audiomanager().PauseMusic(bgSound)
 }
 
 func (s *PhasesScene) playBackgroundMusic() {
@@ -220,15 +224,13 @@ func (s *PhasesScene) playBackgroundMusic() {
 		return
 	}
 
-	if s.count < 60 {
-		return
+	if s.count == 60 {
+		if am := s.AppContext().AudioManager; !am.IsPlaying(bgSound) {
+			am.PlayMusic(bgSound)
+			am.SetVolume(0.25)
+		}
 	}
 
-	am := s.AppContext().AudioManager
-	if !am.IsPlaying(bgSound) {
-		am.PlayMusic(bgSound)
-		am.SetVolume(0.25)
-	}
 }
 
 func (s *PhasesScene) initTilemap() {
@@ -266,6 +268,40 @@ func (s *PhasesScene) checkReboot() bool {
 	}
 
 	s.rebootDelay--
-
 	return false
+}
+
+// TODO: Define phase objective. For now, it checks if all sheeps were rescued.
+func (s *PhasesScene) checkPhaseCompleted() bool {
+	if s.isConcludingPhase {
+		return true
+	}
+
+	if s.bodyCounter.sheep > s.bodyCounter.sheepRescued {
+		return false
+	}
+
+	s.player.SetImmobile(true)
+	s.Audiomanager().FadeOut(bgSound, time.Second)
+	s.isConcludingPhase = true
+	s.phaseCompletedDelay = 120 // frames
+	return true
+}
+
+func (s *PhasesScene) completePhase() {
+	if s.phaseCompleted {
+		return
+	}
+
+	if s.phaseCompletedDelay == 0 {
+		s.AppContext().SceneManager.NavigateTo(
+			scenestypes.ScenePhaseReboot,
+			transition.NewFader(),
+			true,
+		)
+		s.phaseCompleted = true
+		return
+	}
+
+	s.phaseCompletedDelay--
 }
