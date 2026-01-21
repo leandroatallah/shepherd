@@ -227,6 +227,7 @@ func (am *AudioManager) FadeOut(name string, duration time.Duration) {
 			elapsed := time.Since(startTime)
 			if elapsed >= duration {
 				player.SetVolume(0)
+				player.Rewind()
 				player.Pause()
 				return
 			}
