@@ -19,6 +19,8 @@ func InitNpcMap(ctx *app.AppContext) npcs.NpcMap[gameentitytypes.PlatformerActor
 			if err != nil {
 				log.Fatal(err)
 			}
+			player, _ := ctx.ActorManager.GetPlayer()
+			npc.SetTarget(player)
 			return npc
 		},
 	}

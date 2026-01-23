@@ -17,10 +17,25 @@
             "height": 12
           }
         ]
+      },
+      "walk": {
+        "path": "assets/images/sheep-24-idle.png",
+        "collision_rect": [
+          {
+            "x": 3,
+            "y": 12,
+            "width": 18,
+            "height": 12
+          }
+        ]
       }
     },
     "facing_direction": 0,
     "frame_rate": 10
   },
-  "stats": {}
+  "stats": {
+    "health": 1,
+    "speed": 1,
+    "max_speed": 2
+  }
 }

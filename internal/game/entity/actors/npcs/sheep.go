@@ -6,8 +6,8 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
+	gamemovement "github.com/leandroatallah/firefly/internal/game/entity/actors/movement"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
@@ -42,12 +42,13 @@ func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
 	}
 	sheep.SetMovementModel(model)
 	sheep.SetTouchable(sheep)
+	sheep.Character.SetMovementState(gamemovement.Wander, nil)
 
 	return sheep, nil
 }
 
 func (s *Sheep) SetTarget(target body.MovableCollidable) {
-	s.Character.SetMovementState(movement.Idle, target)
+	s.Character.SetMovementState(gamemovement.Wander, target)
 }
 
 // Character Methods
