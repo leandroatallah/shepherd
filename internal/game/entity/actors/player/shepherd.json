@@ -78,7 +78,7 @@
   },
   "stats": {
     "health": 1,
-    "speed": 1,
-    "max_speed": 2
+    "speed": 6,
+    "max_speed": 6
   }
 }

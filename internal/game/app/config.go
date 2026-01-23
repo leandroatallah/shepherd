@@ -17,6 +17,7 @@ const (
 
 func NewConfig() *config.AppConfig {
 	defaultPhysics := config.PhysicsConfig{
+		SpeedMultiplier:       0.25,
 		HorizontalInertia:     2.0,
 		AirFrictionMultiplier: 0.5,
 		AirControlMultiplier:  0.25,

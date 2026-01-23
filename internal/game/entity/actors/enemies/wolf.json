@@ -11,10 +11,10 @@
         "path": "assets/images/wolf-24-idle.png",
         "collision_rect": [
           {
-            "x": 0,
-            "y": 0,
-            "width": 24,
-            "height": 24
+            "x": 2,
+            "y": 8,
+            "width": 20,
+            "height": 16
           }
         ]
       },

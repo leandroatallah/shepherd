@@ -30,6 +30,23 @@
         "sample-enemies.tsx": {
             "scaleInDock": 1
         },
+        "sample-phase-1.tmj": {
+            "scale": 0.4197674418604651,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 688.4764542936289,
+                "y": 383.54570637119116
+            }
+        },
+        "sample-phase-1.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "sample-phase-1.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "sample-phase-1.tmj#sample-stage-3": {
+            "scaleInDock": 1
+        },
         "shepherd-phase-0.tmj": {
             "expandedObjectLayers": [
                 4,
@@ -84,6 +101,7 @@
     ],
     "project": "shepherd-tiled.tiled-project",
     "recentFiles": [
+        "sample-phase-1.tmj",
         "/Users/leandroatallah/www/go/ebiten/firefly/assets/tilemap/sample-phase-1.tmj",
         "shepherd-phase-0.tmj"
     ],
