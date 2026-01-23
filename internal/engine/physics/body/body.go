@@ -56,6 +56,20 @@ func (b *Body) SetPosition(x, y int) {
 	b.y16 = fp16.To16(y)
 }
 
+func (b *Body) SetPosition16(x16, y16 int) {
+	// NOTE: For now, it only accepts rect shape.
+	_, ok := b.GetShape().(*Rect)
+	if !ok {
+		log.Fatal("SetPosition expects a *Rect instance")
+	}
+	b.x16 = x16
+	b.y16 = y16
+}
+
+func (b *Body) GetPosition16() (int, int) {
+	return b.x16, b.y16
+}
+
 func (b *Body) GetShape() body.Shape {
 	return b.shape
 }

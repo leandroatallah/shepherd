@@ -30,11 +30,21 @@ func NewMovableBody(body *Body) *MovableBody {
 }
 
 func (b *MovableBody) MoveX(distance int) {
-	b.accelerationX = fp16.To16(distance)
+	multiplier := config.Get().Physics.SpeedMultiplier
+	if multiplier == 0 {
+		multiplier = 1.0
+	}
+	dist16 := fp16.To16(distance)
+	b.accelerationX = int(float64(dist16) * multiplier)
 }
 
 func (b *MovableBody) MoveY(distance int) {
-	b.accelerationY = fp16.To16(distance)
+	multiplier := config.Get().Physics.SpeedMultiplier
+	if multiplier == 0 {
+		multiplier = 1.0
+	}
+	dist16 := fp16.To16(distance)
+	b.accelerationY = int(float64(dist16) * multiplier)
 }
 
 func (b *MovableBody) OnMoveLeft(distance int) {

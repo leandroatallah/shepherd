@@ -1,6 +1,8 @@
 package movement
 
 import (
+	"image"
+
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
@@ -40,7 +42,11 @@ func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollid
 		vx16, vy16 := body.Velocity()
 
 		vx16 = increaseVelocity(vx16, scaledAccX)
-		vx16 = clampAxisVelocity(vx16, fp16.To16(body.MaxSpeed()))
+		limit := fp16.To16(body.MaxSpeed())
+		if cfg.Physics.SpeedMultiplier != 0 {
+			limit = int(float64(limit) * cfg.Physics.SpeedMultiplier)
+		}
+		vx16 = clampAxisVelocity(vx16, limit)
 
 		// Apply friction if the player is not actively moving
 		if accX == 0 {
@@ -117,10 +123,22 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 	// Apply vertical movement to the body and check for collisions.
 	_, _, isBlockingY := body.ApplyValidPosition(vy16, false, space)
 	vx16, vy16 = body.Velocity()
+
+	isGrounded := false
 	if isBlockingY {
-		if !m.onGround && vy16 > 0 { // Moving down and collided (i.e., landed)
-			m.onGround = true
-			// Set a small downward velocity to "stick" to the ground, ensuring it's less than the falling threshold.
+		if vy16 > 0 {
+			isGrounded = true
+		}
+	} else {
+		if vy16 >= 0 && m.CheckGround(body, space) {
+			isGrounded = true
+		}
+	}
+
+	if isGrounded {
+		m.onGround = true
+		// Set a small downward velocity to "stick" to the ground, ensuring it's less than the falling threshold.
+		if vy16 >= 0 {
 			vy16 = cfg.Physics.DownwardGravity - 1
 			body.SetVelocity(vx16, vy16)
 		}
@@ -162,4 +180,38 @@ func (m *PlatformMovementModel) SetOnGround(value bool) {
 func (m *PlatformMovementModel) SetDashActive(active bool, vx int) {
 	m.dashActive = active
 	m.dashVelocityX = vx
+}
+
+func (m *PlatformMovementModel) CheckGround(b body.MovableCollidable, space body.BodiesSpace) bool {
+	collisionRects := b.CollisionPosition()
+	// If no specific collision shapes are defined, fall back to the main body shape.
+	if len(collisionRects) == 0 {
+		collisionRects = []image.Rectangle{b.Position()}
+	}
+
+	for _, pos := range collisionRects {
+		// Create a rect shifted 1 pixel down
+		checkRect := pos.Add(image.Point{0, 1})
+
+		// Shrink horizontally to avoid wall friction
+		width := checkRect.Dx()
+		if width > 4 {
+			checkRect.Min.X += 2
+			checkRect.Max.X -= 2
+		} else if width > 2 {
+			checkRect.Min.X += 1
+			checkRect.Max.X -= 1
+		}
+
+		collidables := space.Query(checkRect)
+		for _, c := range collidables {
+			if c.ID() == b.ID() {
+				continue
+			}
+			if c.IsObstructive() {
+				return true
+			}
+		}
+	}
+	return false
 }

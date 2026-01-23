@@ -1,6 +1,8 @@
 package config
 
 type PhysicsConfig struct {
+	// SpeedMultiplier is a global multiplier for all actor speeds.
+	SpeedMultiplier float64
 	// HorizontalInertia controls the smoothness of horizontal movement. Higher values lead to more sliding.
 	// 0.0 means instant movement.
 	HorizontalInertia float64

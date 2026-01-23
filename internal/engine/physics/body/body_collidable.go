@@ -19,6 +19,10 @@ type CollidableBody struct {
 	Touchable     body.Touchable
 	collisionList []body.Collidable
 	isObstructive bool
+
+	// Accumulators for sub-pixel movement
+	accumulatorX16 int
+	accumulatorY16 int
 }
 
 func NewCollidableBody(body *Body) *CollidableBody {
@@ -113,25 +117,45 @@ func (b *CollidableBody) ClearCollisions() {
 
 // SetPosition overrides Body.SetPosition method to updates the body position and its collisions
 func (b *CollidableBody) SetPosition(x, y int) {
-	// Calculate the difference to move the collision areas as well
-	diffX16 := fp16.To16(x) - b.Body.x16
-	diffY16 := fp16.To16(y) - b.Body.y16
+	b.SetPosition16(fp16.To16(x), fp16.To16(y))
+}
 
-	b.Body.SetPosition(x, y)
+func (b *CollidableBody) SetPosition16(x16, y16 int) {
+	// Calculate the difference to move the collision areas as well
+	diffX16 := x16 - b.Body.x16
+	diffY16 := y16 - b.Body.y16
+
+	b.Body.SetPosition16(x16, y16)
 
 	for _, c := range b.collisionList {
-		x, y := c.GetPositionMin()
-		x16, y16 := fp16.To16(x), fp16.To16(y)
-		c.SetPosition(fp16.From16(x16+diffX16), fp16.From16(y16+diffY16))
+		cx16, cy16 := c.GetPosition16()
+		c.SetPosition16(cx16+diffX16, cy16+diffY16)
 	}
 }
 
 // ApplyValidPosition moves the body by a given distance, ensuring it stops at the first collision.
-// It works by moving one pixel at a time to avoid truncation issues with sub-pixel velocities
-// and guarantees the body will be perfectly flush with any obstacle it collides with.
+// It accumulates sub-pixel movements and only moves when a full pixel step is reached.
 // Might update: Body x16 and y16
 func (b *CollidableBody) ApplyValidPosition(distance16 int, isXAxis bool, space body.BodiesSpace) (int, int, bool) {
 	if distance16 == 0 || space == nil {
+		x, y := b.GetPositionMin()
+		return x, y, false
+	}
+
+	var totalDistance16 int
+	if isXAxis {
+		b.accumulatorX16 += distance16
+		totalDistance16 = b.accumulatorX16
+	} else {
+		b.accumulatorY16 += distance16
+		totalDistance16 = b.accumulatorY16
+	}
+
+	// Calculate whole pixels to move
+	pixelSteps := fp16.From16(totalDistance16)
+
+	if pixelSteps == 0 {
+		// Not enough accumulated distance to move a full pixel yet
 		x, y := b.GetPositionMin()
 		return x, y, false
 	}
@@ -140,35 +164,46 @@ func (b *CollidableBody) ApplyValidPosition(distance16 int, isXAxis bool, space 
 
 	// Determine the direction of movement (step is one pixel).
 	step := 1
-	if distance16 < 0 {
+	if pixelSteps < 0 {
 		step = -1
+		pixelSteps = -pixelSteps
 	}
 
-	// Calculate how many pixels we need to move.
-	// We use ceiling division to ensure that any velocity, no matter how small,
-	// results in at least a 1-pixel check.
-	pixelDistance := fp16.From16(abs(distance16) + fp16.To16(1) - 1)
-
 	// Move pixel by pixel and check for collisions.
-	for i := 0; i < pixelDistance; i++ {
-		lastX, lastY := b.GetPositionMin()
+	pixelsMoved := 0
+	for i := 0; i < pixelSteps; i++ {
+		lastX16, lastY16 := b.GetPosition16()
 
-		// Move one pixel.
+		// Move one pixel (in 16.16 fixed point)
+		step16 := fp16.To16(step)
 		if isXAxis {
-			b.SetPosition(lastX+step, lastY)
+			b.SetPosition16(lastX16+step16, lastY16)
 		} else {
-			b.SetPosition(lastX, lastY+step)
+			b.SetPosition16(lastX16, lastY16+step16)
 		}
 
 		// Check if this new position causes a collision.
 		_, blocking := space.ResolveCollisions(b)
 		if blocking {
-			// A collision occurred. We should only undo the movement if the collision
-			// is on the same axis we are currently moving on.
-			// It does. The last position was the correct one.
-			b.SetPosition(lastX, lastY)
+			// A collision occurred. Revert to the last valid position.
+			b.SetPosition16(lastX16, lastY16)
 			isBlocking = true
 			break
+		}
+		pixelsMoved += step
+	}
+
+	// Update the accumulator by subtracting the distance actually moved
+	movedDistance16 := fp16.To16(pixelsMoved)
+	if isXAxis {
+		b.accumulatorX16 -= movedDistance16
+		if isBlocking {
+			b.accumulatorX16 = 0 // Clear momentum on collision
+		}
+	} else {
+		b.accumulatorY16 -= movedDistance16
+		if isBlocking {
+			b.accumulatorY16 = 0 // Clear momentum on collision
 		}
 	}
 

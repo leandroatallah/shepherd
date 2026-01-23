@@ -5,6 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/input"
 	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
@@ -54,6 +55,10 @@ func (m *TopDownMovementModel) Update(body body.MovableCollidable, space body.Bo
 	// We need to check if the velocity magnitude `sqrt(vx² + vy²)` exceeds `speedMax16²`.
 	// To avoid a costly square root, we can compare the squared values:
 	speedMax16 := fp16.To16(body.MaxSpeed())
+	multiplier := config.Get().Physics.SpeedMultiplier
+	if multiplier != 0 {
+		speedMax16 = int(float64(speedMax16) * multiplier)
+	}
 	// Use int64 for squared values to prevent potential overflow.
 	velSq := int64(vx16) + int64(vy16)*int64(vy16)
 	maxSq := int64(speedMax16) * int64(speedMax16)

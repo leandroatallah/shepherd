@@ -64,6 +64,12 @@ func (b *BaseItem) Position() image.Rectangle {
 func (b *BaseItem) SetPosition(x, y int) {
 	b.MovableBody.SetPosition(x, y)
 }
+func (b *BaseItem) SetPosition16(x16, y16 int) {
+	b.MovableBody.SetPosition16(x16, y16)
+}
+func (b *BaseItem) GetPosition16() (int, int) {
+	return b.MovableBody.GetPosition16()
+}
 func (b *BaseItem) GetPositionMin() (int, int) {
 	return b.MovableBody.GetPositionMin()
 }

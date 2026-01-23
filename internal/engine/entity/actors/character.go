@@ -81,6 +81,12 @@ func (c *Character) Position() image.Rectangle {
 func (c *Character) SetPosition(x, y int) {
 	c.CollidableBody.SetPosition(x, y)
 }
+func (c *Character) SetPosition16(x16, y16 int) {
+	c.CollidableBody.SetPosition16(x16, y16)
+}
+func (c *Character) GetPosition16() (int, int) {
+	return c.MovableBody.GetPosition16()
+}
 func (c *Character) GetPositionMin() (int, int) {
 	return c.MovableBody.GetPositionMin()
 }

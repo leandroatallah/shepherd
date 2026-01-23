@@ -46,6 +46,15 @@ func (o *ObstacleRect) SetPosition(x, y int) {
 func (o *ObstacleRect) GetPositionMin() (int, int) {
 	return o.MovableBody.GetPositionMin()
 }
+
+func (o *ObstacleRect) SetPosition16(x16, y16 int) {
+	o.MovableBody.SetPosition16(x16, y16)
+}
+
+func (o *ObstacleRect) GetPosition16() (int, int) {
+	return o.MovableBody.GetPosition16()
+}
+
 func (o *ObstacleRect) GetShape() body.Shape {
 	return o.MovableBody.GetShape()
 }

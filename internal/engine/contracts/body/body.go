@@ -67,6 +67,8 @@ type Collidable interface {
 	AddCollision(list ...Collidable)
 	ClearCollisions()
 	SetPosition(x int, y int)
+	SetPosition16(x16, y16 int)
+	GetPosition16() (x16, y16 int)
 	SetTouchable(t Touchable)
 	ApplyValidPosition(distance16 int, isXAxis bool, space BodiesSpace) (x, y int, wasBlocked bool)
 }
@@ -109,6 +111,8 @@ type Body interface {
 	SetID(id string)
 	Position() image.Rectangle
 	SetPosition(x, y int)
+	SetPosition16(x16, y16 int)
+	GetPosition16() (x16, y16 int)
 	GetPositionMin() (x, y int)
 	GetShape() Shape
 }
