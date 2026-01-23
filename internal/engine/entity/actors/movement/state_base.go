@@ -48,6 +48,10 @@ func (s *BaseMovementState) Target() body.MovableCollidable {
 	return s.target
 }
 
+func (s *BaseMovementState) Actor() body.MovableCollidable {
+	return s.actor
+}
+
 // Movement utility functions
 type MovementDirections struct {
 	Up    bool

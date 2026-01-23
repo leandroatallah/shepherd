@@ -33,7 +33,12 @@ func NewMovementState(
 	case SideToSide:
 		movementState = NewSideToSideMovementState(b)
 	default:
-		return nil, fmt.Errorf("unknown movement state type")
+		// Check registry
+		constructor, err := GetMovementStateConstructor(state)
+		if err != nil {
+			return nil, fmt.Errorf("unknown movement state type: %d", state)
+		}
+		movementState = constructor(b)
 	}
 
 	// Apply options
