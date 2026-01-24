@@ -24,6 +24,7 @@ type BaseItem struct {
 	removed      bool
 	imageOptions *ebiten.DrawImageOptions
 	state        ItemState
+	bodyphysics.Ownership
 }
 
 func NewBaseItem(id string, s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *BaseItem {
@@ -38,6 +39,11 @@ func NewBaseItem(id string, s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Ba
 		imageOptions:   &ebiten.DrawImageOptions{},
 		SpriteEntity:   spriteEntity,
 	}
+	// Set the owner for all body components to this BaseItem
+	b.SetOwner(movable)
+	movable.SetOwner(base)
+	collidable.SetOwner(base)
+
 	base.SetID(id)
 	base.StateCollisionManager = space.NewStateCollisionManager[ItemStateEnum](base)
 
@@ -80,6 +86,7 @@ func (b *BaseItem) GetShape() body.Shape {
 func (b *BaseItem) SetTouchable(t body.Touchable) {
 	b.Touchable = t
 }
+
 
 func (b *BaseItem) Update(space body.BodiesSpace) error {
 	b.count++

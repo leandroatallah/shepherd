@@ -21,12 +21,18 @@ func NewObstacleRect(bodyRect *Rect) *ObstacleRect {
 	b := NewBody(bodyRect)
 	movable := NewMovableBody(b)
 	collidable := NewCollidableBody(b)
-	return &ObstacleRect{
+	obs := &ObstacleRect{
 		MovableBody:    movable,
 		CollidableBody: collidable,
 
 		imageOptions: &ebiten.DrawImageOptions{},
 	}
+	// Set the owner for all body components to this ObstacleRect
+	b.SetOwner(movable)
+	movable.SetOwner(obs)
+	collidable.SetOwner(obs)
+
+	return obs
 }
 
 // Forwarding methods for Body to avoid ambiguous selector
@@ -90,6 +96,8 @@ func (o *ObstacleRect) Image() *ebiten.Image {
 	i := ebiten.NewImage(w, h)
 	return i
 }
+
+
 
 func (o *ObstacleRect) ImageCollisionBox() *ebiten.Image {
 	img := o.Image()

@@ -16,10 +16,10 @@ var (
 )
 
 func init() {
-	Idle = RegisterState("Idle", func(b BaseState) ActorState { return &IdleState{BaseState: b} })
-	Walking = RegisterState("Walking", func(b BaseState) ActorState { return &WalkState{BaseState: b} })
-	Falling = RegisterState("Falling", func(b BaseState) ActorState { return &FallState{BaseState: b} })
-	Hurted = RegisterState("Hurted", func(b BaseState) ActorState { return &HurtState{BaseState: b} })
+	Idle = RegisterState("idle", func(b BaseState) ActorState { return &IdleState{BaseState: b} })
+	Walking = RegisterState("walk", func(b BaseState) ActorState { return &WalkState{BaseState: b} })
+	Falling = RegisterState("fall", func(b BaseState) ActorState { return &FallState{BaseState: b} })
+	Hurted = RegisterState("hurt", func(b BaseState) ActorState { return &HurtState{BaseState: b} })
 }
 
 type BaseState struct {

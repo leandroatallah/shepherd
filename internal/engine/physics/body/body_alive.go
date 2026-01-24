@@ -8,6 +8,8 @@ type AliveBody struct {
 
 	*Body
 
+	Ownership
+
 	health       int
 	maxHealth    int
 	invulnerable bool

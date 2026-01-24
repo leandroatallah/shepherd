@@ -13,6 +13,8 @@ type Body struct {
 
 	shape body.Shape
 
+	Ownership
+
 	id       string
 	x16, y16 int
 }
@@ -23,12 +25,16 @@ func NewBody(shape body.Shape) *Body {
 	}
 }
 
-func (b *Body) ID() string {
-	return b.id
+func (b *Body) GetShape() body.Shape {
+	return b.shape
 }
 
 func (b *Body) SetID(id string) {
 	b.id = id
+}
+
+func (b *Body) ID() string {
+	return b.id
 }
 
 // Position() returns the body coordinates as a image.Rectangle.
@@ -68,8 +74,4 @@ func (b *Body) SetPosition16(x16, y16 int) {
 
 func (b *Body) GetPosition16() (int, int) {
 	return b.x16, b.y16
-}
-
-func (b *Body) GetShape() body.Shape {
-	return b.shape
 }

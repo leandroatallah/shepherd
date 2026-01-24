@@ -54,7 +54,14 @@ func (m *StateCollisionManager[T]) RefreshCollisions() {
 				continue
 			}
 
-			newCollisionBody := bodyphysics.NewCollidableBody(bodyphysics.NewBody(template.GetShape()))
+			newBody := bodyphysics.NewBody(template.GetShape())
+			// Set owner to movable? We don't have movable here.
+			// But m.owner is typically a Character.
+			// If we set newBody.Owner = m.owner directly, newBody.TopOwner() -> m.owner.TopOwner().
+			// This shortcuts MovableBody but it's fine for collision bodies generated for states.
+			newBody.SetOwner(m.owner)
+			newCollisionBody := bodyphysics.NewCollidableBody(newBody)
+			newCollisionBody.SetOwner(m.owner)
 			relativePos := template.Position()
 			newPos := image.Rect(
 				x+relativePos.Min.X,

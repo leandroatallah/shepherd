@@ -11,6 +11,8 @@ import (
 type MovableBody struct {
 	*Body
 
+	Ownership
+
 	vx16          int
 	vy16          int
 	accelerationX int

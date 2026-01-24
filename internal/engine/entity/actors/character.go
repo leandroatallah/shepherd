@@ -36,6 +36,7 @@ type Character struct {
 	skills []skill.Skill
 
 	StateTransitionHandler func(*Character) bool
+	bodyphysics.Ownership
 }
 
 // SetStateTransitionHandler sets a function that can override the default state transition logic.
@@ -57,6 +58,13 @@ func NewCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Character { 
 		SpriteEntity: spriteEntity,
 		imageOptions: &ebiten.DrawImageOptions{},
 	}
+	// Set the owner for all body components to this Character
+	// Body.Owner -> MovableBody (chosen as the primary physical representation)
+	b.SetOwner(movable)
+	movable.SetOwner(c)
+	collidable.SetOwner(c)
+	alive.SetOwner(c)
+
 	c.StateCollisionManager = space.NewStateCollisionManager[ActorStateEnum](c)
 
 	state, err := c.NewState(Idle)

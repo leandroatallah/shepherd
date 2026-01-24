@@ -129,3 +129,9 @@ type BodiesSpace interface {
 	GetTilemapDimensionsProvider() tilemaplayer.TilemapDimensionsProvider
 	Query(rect image.Rectangle) []Collidable
 }
+
+type Ownable interface {
+	Owner() interface{}
+	SetOwner(interface{})
+	LastOwner() interface{}
+}

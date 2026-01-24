@@ -40,6 +40,7 @@ type ActorEntity interface {
 	Controllable
 	Stateful
 	Damageable
+	body.Ownable
 
 	body.MovableCollidableAlive
 
