@@ -203,9 +203,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_1"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -221,9 +221,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_2"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -239,9 +239,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_3"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -257,9 +257,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_4"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -275,9 +275,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_5"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -293,9 +293,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_6"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -311,9 +311,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_7"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -329,9 +329,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_8"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -347,9 +347,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_9"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -365,9 +365,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_10"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -383,9 +383,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_11"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -401,9 +401,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_12"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -419,9 +419,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_13"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -437,9 +437,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_14"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -455,9 +455,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_15"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -473,9 +473,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_16"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -491,9 +491,9 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
+                         "name":"item_type",
                          "type":"string",
-                         "value":"COIN_17"
+                         "value":"COIN"
                         }],
                  "rotation":0,
                  "type":"",
@@ -520,11 +520,6 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
-                         "type":"string",
-                         "value":"MINION_1"
-                        }, 
-                        {
                          "name":"enemy_type",
                          "type":"string",
                          "value":"BLUE"
@@ -542,11 +537,6 @@
                  "id":107,
                  "name":"",
                  "properties":[
-                        {
-                         "name":"body_id",
-                         "type":"string",
-                         "value":"MINION_2"
-                        }, 
                         {
                          "name":"enemy_type",
                          "type":"string",

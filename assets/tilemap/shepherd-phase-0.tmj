@@ -179,11 +179,6 @@
                  "name":"",
                  "properties":[
                         {
-                         "name":"body_id",
-                         "type":"string",
-                         "value":"WOLF_1"
-                        }, 
-                        {
                          "name":"enemy_type",
                          "type":"string",
                          "value":"WOLF"
@@ -201,11 +196,6 @@
                  "id":47,
                  "name":"",
                  "properties":[
-                        {
-                         "name":"body_id",
-                         "type":"string",
-                         "value":"WOLF_2"
-                        }, 
                         {
                          "name":"enemy_type",
                          "type":"string",
