@@ -3,8 +3,9 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "shepherd-phase-1.tmj",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
         "": {
@@ -49,14 +50,14 @@
         },
         "shepherd-phase-0.tmj": {
             "expandedObjectLayers": [
-                4,
-                2
+                8,
+                6
             ],
-            "scale": 3.2726,
-            "selectedLayer": 6,
+            "scale": 1.9392,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 173.8678726394915,
-                "y": 117.03232903501801
+                "x": 119.89480198019801,
+                "y": 126.85643564356432
             }
         },
         "shepherd-phase-0.tmj#sample-enemies": {
@@ -72,14 +73,14 @@
         },
         "shepherd-phase-1.tmj": {
             "expandedObjectLayers": [
-                4,
-                2
+                2,
+                4
             ],
             "scale": 2.4191,
-            "selectedLayer": 4,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 205.86168409739162,
-                "y": 143.8551527427556
+                "x": 168.45107684676123,
+                "y": 132.6939770989211
             }
         },
         "shepherd-phase-1.tmj#sample-enemies": {
@@ -98,12 +99,15 @@
     "map.lastUsedFormat": "json",
     "map.width": 10,
     "openFiles": [
+        "shepherd-phase-0.tmj",
+        "shepherd-phase-1.tmj"
     ],
     "project": "shepherd-tiled.tiled-project",
     "recentFiles": [
+        "shepherd-phase-0.tmj",
+        "shepherd-phase-1.tmj",
         "sample-phase-1.tmj",
-        "/Users/leandroatallah/www/go/ebiten/firefly/assets/tilemap/sample-phase-1.tmj",
-        "shepherd-phase-0.tmj"
+        "/Users/leandroatallah/www/go/ebiten/firefly/assets/tilemap/sample-phase-1.tmj"
     ],
     "tileset.embedInMap": true,
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
