@@ -10,7 +10,10 @@ import (
 // horizontally, changing direction upon detecting a ledge or a wall.
 type SideToSideMovementState struct {
 	BaseMovementState
-	movingRight bool
+	movingRight  bool
+	waitDuration int
+	waitTimer    int
+	isWaiting    bool
 }
 
 // NewSideToSideMovementState creates a new SideToSideMovementState.
@@ -21,6 +24,15 @@ func NewSideToSideMovementState(base BaseMovementState) *SideToSideMovementState
 	}
 }
 
+// WithWaitBeforeTurn sets a delay before the actor turns to the other side.
+func WithWaitBeforeTurn(duration int) MovementStateOption {
+	return func(ms MovementState) {
+		if s, ok := ms.(*SideToSideMovementState); ok {
+			s.waitDuration = duration
+		}
+	}
+}
+
 // Move executes the side-to-side movement logic. It checks for ledges and walls
 // to reverse direction and then applies movement.
 func (s *SideToSideMovementState) Move(space body.BodiesSpace) {
@@ -28,7 +40,21 @@ func (s *SideToSideMovementState) Move(space body.BodiesSpace) {
 		return
 	}
 
+	if s.isWaiting {
+		s.waitTimer--
+		if s.waitTimer <= 0 {
+			s.isWaiting = false
+			s.movingRight = !s.movingRight
+		}
+		return
+	}
+
 	if s.shouldTurn(space) {
+		if s.waitDuration > 0 {
+			s.isWaiting = true
+			s.waitTimer = s.waitDuration
+			return
+		}
 		s.movingRight = !s.movingRight
 	}
 
