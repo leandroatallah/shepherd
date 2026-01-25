@@ -1,6 +1,7 @@
 package tilemap
 
 import (
+	"fmt"
 	_ "image/png"
 	"log"
 	"math"
@@ -129,6 +130,7 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 		return nil
 	}
 
+	itemCount := 0
 	for _, obj := range layer.Objects {
 		x16 := int(math.Round(obj.X))
 		yValue := obj.Y
@@ -148,6 +150,11 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 				id = p.Value
 				break
 			}
+		}
+
+		if id == "" {
+			id = fmt.Sprintf("ITEM_%d_%d", itemType, itemCount)
+			itemCount++
 		}
 		// o.SetID(fmt.Sprintf("%v_%v", prefix, id))
 		res = append(res, &ItemPosition{X: x16, Y: y16, ItemType: itemType, ID: id})
@@ -175,6 +182,7 @@ func (t *Tilemap) GetEnemiesPositionID() []*EnemyPosition {
 		return nil
 	}
 
+	enemyCount := 0
 	for _, obj := range layer.Objects {
 		x16 := int(math.Round(obj.X))
 		yValue := obj.Y
@@ -192,6 +200,15 @@ func (t *Tilemap) GetEnemiesPositionID() []*EnemyPosition {
 				enemyType = p.Value
 			}
 		}
+
+		if id == "" {
+			if enemyType == "" {
+				enemyType = "UNKNOWN"
+			}
+			id = fmt.Sprintf("%s_%d", enemyType, enemyCount)
+			enemyCount++
+		}
+
 		res = append(res, &EnemyPosition{X: x16, Y: y16, EnemyType: enemyType, ID: id})
 	}
 
@@ -217,6 +234,7 @@ func (t *Tilemap) GetNpcsPositionID() []*NpcPosition {
 		return nil
 	}
 
+	npcCount := 0
 	for _, obj := range layer.Objects {
 		x16 := int(math.Round(obj.X))
 		yValue := obj.Y
@@ -234,6 +252,15 @@ func (t *Tilemap) GetNpcsPositionID() []*NpcPosition {
 				npcType = p.Value
 			}
 		}
+
+		if id == "" {
+			if npcType == "" {
+				npcType = "UNKNOWN"
+			}
+			id = fmt.Sprintf("%s_%d", npcType, npcCount)
+			npcCount++
+		}
+
 		res = append(res, &NpcPosition{X: x16, Y: y16, NpcType: npcType, ID: id})
 	}
 
