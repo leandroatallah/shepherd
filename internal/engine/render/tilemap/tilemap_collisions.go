@@ -27,27 +27,81 @@ var LayerNameMap = map[string]LayerNameID{
 }
 
 func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, triggerEndpoint body.Touchable) {
-	endpointLayer, found := t.FindLayerByName("Endpoint")
-	if !found {
+	foundEndpoint := false
+	foundObstacles := false
+
+	for _, layer := range t.Layers {
+		if !layer.Visible {
+			continue
+		}
+
+		if layer.Name == "Endpoint" {
+			foundEndpoint = true
+			if layer.Type == "tilelayer" {
+				for i, tileID := range layer.Data {
+					if tileID == 0 {
+						continue
+					}
+
+					// Calculate the x and y coordinates of the tile
+					x := (i % layer.Width) * t.Tilewidth
+					y := (i / layer.Width) * t.Tileheight
+
+					rect := bodyphysics.NewRect(x, y, t.Tilewidth, t.Tileheight)
+					obstacle := bodyphysics.NewObstacleRect(rect)
+					obstacle.SetPosition(x, y)
+					// Generate a unique ID for the obstacle based on its position
+					obstacle.SetID(fmt.Sprintf("ENDPOINT_%d_%d", x, y))
+					obstacle.AddCollisionBodies()
+					obstacle.SetIsObstructive(false)
+					obstacle.SetTouchable(triggerEndpoint)
+					space.AddBody(obstacle)
+				}
+			} else {
+				for _, obj := range layer.Objects {
+					obstacle := t.NewObstacleRect(obj, "Endpoint", false)
+					obstacle.SetTouchable(triggerEndpoint)
+					space.AddBody(obstacle)
+				}
+			}
+		}
+
+		if layer.Name == "Obstacles" {
+			foundObstacles = true
+			if layer.Type == "tilelayer" {
+				for i, tileID := range layer.Data {
+					if tileID == 0 {
+						continue
+					}
+
+					// Calculate the x and y coordinates of the tile
+					x := (i % layer.Width) * t.Tilewidth
+					y := (i / layer.Width) * t.Tileheight
+
+					rect := bodyphysics.NewRect(x, y, t.Tilewidth, t.Tileheight)
+					obstacle := bodyphysics.NewObstacleRect(rect)
+					obstacle.SetPosition(x, y)
+					// Generate a unique ID for the obstacle based on its position
+					obstacle.SetID(fmt.Sprintf("OBSTACLE_%d_%d", x, y))
+					obstacle.AddCollisionBodies()
+					obstacle.SetIsObstructive(true)
+					space.AddBody(obstacle)
+				}
+			} else {
+				for _, obj := range layer.Objects {
+					obstacle := t.NewObstacleRect(obj, "OBSTACLE", true)
+					space.AddBody(obstacle)
+				}
+			}
+		}
+	}
+
+	if !foundEndpoint {
 		log.Printf("Endpoint layer not found in tilemap")
-		return
 	}
 
-	for _, obj := range endpointLayer.Objects {
-		obstacle := t.NewObstacleRect(obj, "Endpoint", false)
-		obstacle.SetTouchable(triggerEndpoint)
-		space.AddBody(obstacle)
-	}
-
-	obstacleLayer, found := t.FindLayerByName("Obstacles")
-	if !found {
+	if !foundObstacles {
 		log.Printf("Obstacles layer not found in tilemap")
-		return
-	}
-
-	for _, obj := range obstacleLayer.Objects {
-		obstacle := t.NewObstacleRect(obj, "OBSTACLE", true)
-		space.AddBody(obstacle)
 	}
 }
 
