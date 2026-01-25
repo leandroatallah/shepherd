@@ -18,6 +18,11 @@
             "height": 14
           }
         ]
+      },
+      "die": {
+        "path": "assets/images/dog-24-idle.png",
+        "loop": false,
+        "collision_rect": []
       }
     },
     "facing_direction": 0,

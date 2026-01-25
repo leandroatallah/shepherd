@@ -8,7 +8,9 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gamemovement "github.com/leandroatallah/firefly/internal/game/entity/actors/movement"
+	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
+	"github.com/leandroatallah/firefly/internal/game/events"
 )
 
 type Sheep struct {
@@ -28,6 +30,8 @@ func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
 
 	character.SetPosition(x, y)
 	sheep := &Sheep{PlatformerCharacter: *character}
+	// Set the owner on the embedded character so LastOwner() works correctly
+	sheep.SetOwner(sheep)
 
 	if err = SetNpcStats(sheep, statData); err != nil {
 		return nil, err
@@ -73,5 +77,25 @@ func (s *Sheep) OnTouch(other body.Collidable) {
 	sheepCarrier, ok := player.(gameentitytypes.SheepCarrier)
 	if ok && !sheepCarrier.IsCarryingSheep() {
 		sheepCarrier.GrabSheep(s)
+	}
+}
+
+func (s *Sheep) Hurt(damage int) {
+	state, err := s.NewState(gamestates.Dying)
+	if err != nil {
+		return
+	}
+	s.SetState(state)
+}
+
+func (s *Sheep) OnDie() {
+	s.SetHealth(0)
+	// TODO: All actors need to freeze.
+	s.SetImmobile(true)
+	s.SetFreeze(true)
+
+	// Trigger event to reboot scene
+	if s.AppContext().EventManager != nil {
+		s.AppContext().EventManager.Publish(&events.CharacterDiedEvent{})
 	}
 }

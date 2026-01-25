@@ -32,6 +32,7 @@ func NewCollectibleCoinItem(ctx *app.AppContext, x, y int, id string) (*Collecti
 	// SetPosition must be before SetItemBodies
 	coinItem.SetPosition(x, y)
 	coinItem.SetAppContext(ctx)
+	coinItem.SetOwner(coinItem)
 
 	if err = SetItemBodies(coinItem, spriteData); err != nil {
 		return nil, fmt.Errorf("SetItemBodies: %w", err)

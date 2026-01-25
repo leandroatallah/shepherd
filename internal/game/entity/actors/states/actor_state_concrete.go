@@ -1,9 +1,8 @@
 package gamestates
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/contracts/context"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/game/events"
+	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
 // Dying
@@ -14,14 +13,16 @@ type DyingState struct {
 func (s *DyingState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
 
-	s.GetActor().SetHealth(0)
-	s.GetActor().SetImmobile(true)
-	s.GetActor().SetFreeze(true)
+	actor := s.GetActor()
 
-	if ctxProvider, ok := s.GetActor().(context.ContextProvider); ok {
-		if ctxProvider.AppContext().EventManager != nil {
-			ctxProvider.AppContext().EventManager.Publish(&events.CharacterDiedEvent{})
-		}
+	// Try to find the root owner (e.g. ShepherdPlayer) if the actor is just a component (e.g. Character)
+	var root interface{} = actor
+	if lastOwner := actor.LastOwner(); lastOwner != nil {
+		root = lastOwner
+	}
+
+	if p, ok := root.(gameentitytypes.PlatformerActorEntity); ok {
+		p.OnDie()
 	}
 }
 

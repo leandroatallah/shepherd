@@ -7,8 +7,14 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
+type AlivePlayer interface {
+	Hurt(damage int)
+}
+
 type PlatformerActorEntity interface {
 	actors.ActorEntity
+
+	OnDie()
 }
 
 type PlatformerCharacter struct {
@@ -21,17 +27,9 @@ type PlatformerCharacter struct {
 
 func NewPlatformerCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *PlatformerCharacter {
 	c := actors.NewCharacter(s, bodyRect)
-	return &PlatformerCharacter{
+	pf := &PlatformerCharacter{
 		Character: *c,
 	}
-}
-
-// Overwrite Character NewState to pass PlatformerCharacter as argument.
-func (c *PlatformerCharacter) NewState(state actors.ActorStateEnum) (actors.ActorState, error) {
-	s, err := actors.NewState(c, state)
-	if err != nil {
-		return nil, err
-	}
-	c.SetState(s)
-	return s, nil
+	c.SetOwner(pf)
+	return pf
 }

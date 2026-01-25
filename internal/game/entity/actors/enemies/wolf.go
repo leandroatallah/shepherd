@@ -68,3 +68,5 @@ func (e *WolfEnemy) OnTouch(other body.Collidable) {
 		player.(gameentitytypes.PlatformerActorEntity).Hurt(1)
 	}
 }
+
+func (e *WolfEnemy) OnDie() {}

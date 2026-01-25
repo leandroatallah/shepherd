@@ -11,6 +11,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
+	"github.com/leandroatallah/firefly/internal/game/events"
 )
 
 // shepherdStateTransitionLogic provides custom state handling for the ShepherdPlayer,
@@ -82,6 +83,8 @@ func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEnti
 	player := &ShepherdPlayer{
 		PlatformerCharacter: *character,
 	}
+	// Set the owner on the embedded character so LastOwner() works correctly
+	player.SetOwner(player)
 
 	if err = SetPlayerBodies(player, spriteData); err != nil {
 		return nil, fmt.Errorf("SetPlayerBodies: %w", err)
@@ -113,6 +116,19 @@ func (p *ShepherdPlayer) Hurt(damage int) {
 		return
 	}
 	p.SetState(state)
+}
+
+// TODO: Reduce repeated actions with Template Method pattern
+func (p *ShepherdPlayer) OnDie() {
+	p.SetHealth(0)
+	// TODO: All actors need to freeze.
+	p.SetImmobile(true)
+	p.SetFreeze(true)
+
+	// Trigger event to reboot scene
+	if p.AppContext().EventManager != nil {
+		p.AppContext().EventManager.Publish(&events.CharacterDiedEvent{})
+	}
 }
 
 // SheepCarrier Methods
