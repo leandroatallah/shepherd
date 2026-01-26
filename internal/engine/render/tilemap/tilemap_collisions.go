@@ -26,10 +26,11 @@ var LayerNameMap = map[string]LayerNameID{
 	"Endpoint":    EndpointLayer,
 }
 
-func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, triggerEndpoint body.Touchable) {
+func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, endpointTriggerFactory func(id string) body.Touchable) {
 	foundEndpoint := false
 	foundObstacles := false
 
+	eventCount := 0
 	for _, layer := range t.Layers {
 		if !layer.Visible {
 			continue
@@ -51,16 +52,33 @@ func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, triggerEndpoint 
 					obstacle := bodyphysics.NewObstacleRect(rect)
 					obstacle.SetPosition(x, y)
 					// Generate a unique ID for the obstacle based on its position
-					obstacle.SetID(fmt.Sprintf("ENDPOINT_%d_%d", x, y))
+					id := fmt.Sprintf("ENDPOINT_%d_%d", x, y)
+					obstacle.SetID(id)
 					obstacle.AddCollisionBodies()
 					obstacle.SetIsObstructive(false)
-					obstacle.SetTouchable(triggerEndpoint)
+					if endpointTriggerFactory != nil {
+						obstacle.SetTouchable(endpointTriggerFactory(id))
+					}
 					space.AddBody(obstacle)
 				}
 			} else {
 				for _, obj := range layer.Objects {
 					obstacle := t.NewObstacleRect(obj, "Endpoint", false)
-					obstacle.SetTouchable(triggerEndpoint)
+					var id string
+					for _, p := range obj.Properties {
+						if p.Name == "event_id" {
+							id = p.Value
+							break
+						}
+					}
+					if id == "" {
+						id = fmt.Sprintf("EVENT_%d", eventCount)
+						eventCount++
+					}
+					obstacle.SetID(id)
+					if endpointTriggerFactory != nil {
+						obstacle.SetTouchable(endpointTriggerFactory(id))
+					}
 					space.AddBody(obstacle)
 				}
 			}
