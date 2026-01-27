@@ -47,6 +47,8 @@ type PhasesScene struct {
 
 	// UI effects
 	ShowDrawScreenFlash int
+
+	screenFlipper *scene.ScreenFlipper
 }
 
 func NewPhasesScene(context *app.AppContext) *PhasesScene {
@@ -96,11 +98,30 @@ func (s *PhasesScene) OnStart() {
 	s.Camera().SetCenter(float64(config.Get().ScreenWidth)/2, float64(config.Get().ScreenHeight)/2)
 
 	// Init collisions bodies and touch trigger for endpoints
-	endpointTrigger := bodyphysics.NewTouchTrigger(s.endpointTrigget, s.player)
-	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), endpointTrigger)
+	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), func(id string) body.Touchable {
+		return bodyphysics.NewTouchTrigger(func() {
+			s.endpointTrigger(id)
+		}, s.player)
+	})
+
+	// Init screen flipper
+	s.screenFlipper = scene.NewScreenFlipper(s.Camera(), s.player, s.Tilemap())
+	s.screenFlipper.OnFlipStart = func() {
+		s.player.SetImmobile(true)
+	}
+	s.screenFlipper.OnFlipFinish = func() {
+		s.player.SetImmobile(false)
+	}
 }
 
 func (s *PhasesScene) Update() error {
+	if s.screenFlipper != nil {
+		s.screenFlipper.Update()
+		if s.screenFlipper.IsFlipping() {
+			return nil
+		}
+	}
+
 	if config.Get().CamDebug {
 		s.CamDebug()
 	}
@@ -207,7 +228,7 @@ func (s *PhasesScene) OnFinish() {
 	s.AppContext().ActorManager.Unregister(s.player)
 }
 
-func (s *PhasesScene) endpointTrigget() {
+func (s *PhasesScene) endpointTrigger(eventID string) {
 	sheepCarrier, ok := s.player.(gameentitytypes.SheepCarrier)
 	if !ok {
 		return
