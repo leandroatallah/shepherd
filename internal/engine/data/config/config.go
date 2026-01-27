@@ -40,6 +40,9 @@ type AppConfig struct {
 	CamDebug     bool
 	CollisionBox bool
 	NoSound      bool
+
+	// Transition
+	ScreenFlipSpeed float64
 }
 
 var cfg AppConfig
