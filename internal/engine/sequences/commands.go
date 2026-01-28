@@ -12,12 +12,14 @@ import (
 // DialogueCommand displays one or more lines of text and waits for player input.
 type DialogueCommand struct {
 	Lines           []string
+	Position        string
+	Speed           int
 	dialogueManager *speech.Manager
 }
 
 func (c *DialogueCommand) Init(appContext *app.AppContext) {
 	c.dialogueManager = appContext.DialogueManager
-	c.dialogueManager.ShowMessages(c.Lines)
+	c.dialogueManager.ShowMessages(c.Lines, c.Position, c.Speed)
 }
 
 func (c *DialogueCommand) Update() bool {

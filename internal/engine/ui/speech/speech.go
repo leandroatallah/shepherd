@@ -16,6 +16,7 @@ type Speech interface {
 	Update() error
 	Draw(screen *ebiten.Image, text string)
 	SetPosition(pos string)
+	SetSpeed(speed int)
 }
 
 type SpeechBase struct {
@@ -27,18 +28,29 @@ type SpeechBase struct {
 	spellingCount int
 	spellingDelay int
 	position      string
+	speed         int
 }
 
 func NewSpeechBase(fontSource *SpeechFont) *SpeechBase {
 	return &SpeechBase{
 		FontSource: fontSource,
 		position:   "bottom",
+		speed:      4,
 	}
 }
 
 func (s *SpeechBase) Update() error {
 	s.count++
-
+	if s.count > s.spellingDelay {
+		effectiveCount := s.count - s.spellingDelay
+		speed := s.speed
+		if speed <= 0 {
+			speed = 4
+		}
+		if effectiveCount > 0 && effectiveCount%speed == 0 {
+			s.spellingCount++
+		}
+	}
 	return nil
 }
 
@@ -69,16 +81,14 @@ func (s *SpeechBase) SetSpellingDelay(d int) {
 func (s *SpeechBase) Text(msg string, speed int) string {
 	s.text = msg // Store the full message
 
+	if speed > 0 && speed != s.speed {
+		s.speed = speed
+	}
+
 	if s.count < s.spellingDelay {
-		s.spellingCount = 0
 		return ""
 	}
 
-	// Adjust count to be relative to when spelling should start
-	effectiveCount := s.count - s.spellingDelay
-	if effectiveCount > 0 && effectiveCount%speed == 0 {
-		s.spellingCount++
-	}
 	limit := min(s.spellingCount, len(s.text))
 	return s.text[:limit]
 }
@@ -95,6 +105,7 @@ func (s *SpeechBase) CompleteSpelling() {
 
 func (s *SpeechBase) ResetText() {
 	s.spellingCount = 0
+	s.count = 0
 }
 
 func (s *SpeechBase) Image(screen *ebiten.Image) *ebiten.Image {
