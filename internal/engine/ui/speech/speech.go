@@ -15,6 +15,7 @@ type Speech interface {
 	Count() int
 	Update() error
 	Draw(screen *ebiten.Image, text string)
+	SetPosition(pos string)
 }
 
 type SpeechBase struct {
@@ -25,11 +26,13 @@ type SpeechBase struct {
 	text          string
 	spellingCount int
 	spellingDelay int
+	position      string
 }
 
 func NewSpeechBase(fontSource *SpeechFont) *SpeechBase {
 	return &SpeechBase{
 		FontSource: fontSource,
+		position:   "bottom",
 	}
 }
 

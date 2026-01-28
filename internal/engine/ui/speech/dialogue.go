@@ -21,7 +21,7 @@ func NewManager(speech Speech) *Manager {
 }
 
 // ShowMessages displays a list of messages.
-func (m *Manager) ShowMessages(lines []string) {
+func (m *Manager) ShowMessages(lines []string, position string) {
 	if len(lines) == 0 {
 		return
 	}
@@ -30,6 +30,7 @@ func (m *Manager) ShowMessages(lines []string) {
 	m.isSpeaking = true
 	m.waitingForInput = false
 	m.speech.ResetText()
+	m.speech.SetPosition(position)
 	m.speech.Show()
 }
 
