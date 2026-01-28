@@ -4,10 +4,34 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/event"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
+
+// EventCommand publishes an event to the global event manager.
+type EventCommand struct {
+	EventType string
+	Payload   map[string]interface{}
+
+	eventManager *event.Manager
+}
+
+func (c *EventCommand) Init(appContext *app.AppContext) {
+	c.eventManager = appContext.EventManager
+	if c.eventManager != nil {
+		evt := event.GenericEvent{
+			EventType: c.EventType,
+			Payload:   c.Payload,
+		}
+		c.eventManager.Publish(evt)
+	}
+}
+
+func (c *EventCommand) Update() bool {
+	return true
+}
 
 // DialogueCommand displays one or more lines of text and waits for player input.
 type DialogueCommand struct {

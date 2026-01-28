@@ -33,3 +33,14 @@ func (m *Manager) Publish(e Event) {
 		}
 	}
 }
+
+// GenericEvent is a simple event implementation that holds a type and a payload.
+type GenericEvent struct {
+	EventType string
+	Payload   map[string]interface{}
+}
+
+// Type returns the event type.
+func (e GenericEvent) Type() string {
+	return e.EventType
+}

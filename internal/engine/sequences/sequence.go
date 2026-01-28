@@ -42,6 +42,10 @@ type CommandData struct {
 	TargetID string  `json:"target_id,omitempty"`
 	EndX     float64 `json:"end_x,omitempty"`
 	Speed    float64 `json:"speed,omitempty"`
+
+	// Fields for "event"
+	EventType string                 `json:"event_type,omitempty"`
+	Payload   map[string]interface{} `json:"payload,omitempty"`
 }
 
 // SequenceData is a wrapper used for parsing a full sequence from JSON.
@@ -66,6 +70,11 @@ func (cd *CommandData) ToCommand() Command {
 			TargetID: cd.TargetID,
 			EndX:     cd.EndX,
 			Speed:    cd.Speed,
+		}
+	case "event":
+		return &EventCommand{
+			EventType: cd.EventType,
+			Payload:   cd.Payload,
 		}
 	}
 	return nil
