@@ -9,6 +9,13 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/render/tilemap"
 )
 
+type FlipType int
+
+const (
+	FlipTypeSmooth FlipType = iota
+	FlipTypeInstant
+)
+
 type ScreenFlipper struct {
 	cam     *camera.Controller
 	player  body.Movable
@@ -16,6 +23,10 @@ type ScreenFlipper struct {
 
 	screenWidth  float64
 	screenHeight float64
+
+	// Configuration
+	FlipStrategy       func(dx, dy int) FlipType
+	PlayerPushDistance float64 // pixels
 
 	// State
 	isFlipping    bool
@@ -37,11 +48,12 @@ type ScreenFlipper struct {
 func NewScreenFlipper(cam *camera.Controller, player body.Movable, tm *tilemap.Tilemap) *ScreenFlipper {
 	cfg := config.Get()
 	return &ScreenFlipper{
-		cam:          cam,
-		player:       player,
-		tilemap:      tm,
-		screenWidth:  float64(cfg.ScreenWidth),
-		screenHeight: float64(cfg.ScreenHeight),
+		cam:                cam,
+		player:             player,
+		tilemap:            tm,
+		screenWidth:        float64(cfg.ScreenWidth),
+		screenHeight:       float64(cfg.ScreenHeight),
+		PlayerPushDistance: 0.0,
 	}
 }
 
@@ -121,6 +133,39 @@ func (sf *ScreenFlipper) triggerFlip(dx, dy int) {
 		return
 	}
 
+	// Calculate Player Target
+	px, py := sf.player.GetPositionMin()
+	playerSourceX := float64(px)
+	playerSourceY := float64(py)
+	playerTargetX := playerSourceX
+	playerTargetY := playerSourceY
+
+	// Push player into new screen
+	if dx != 0 {
+		playerTargetX += float64(dx) * sf.PlayerPushDistance
+	}
+	if dy != 0 {
+		playerTargetY += float64(dy) * sf.PlayerPushDistance
+	}
+
+	// Determine Strategy
+	flipType := FlipTypeSmooth
+	if sf.FlipStrategy != nil {
+		flipType = sf.FlipStrategy(dx, dy)
+	}
+
+	if flipType == FlipTypeInstant {
+		if sf.OnFlipStart != nil {
+			sf.OnFlipStart()
+		}
+		sf.cam.SetCenter(targetCamX, targetCamY)
+		sf.player.SetPosition(int(playerTargetX), int(playerTargetY))
+		if sf.OnFlipFinish != nil {
+			sf.OnFlipFinish()
+		}
+		return
+	}
+
 	// Start Flip
 	sf.isFlipping = true
 	sf.flipSourceX = camX
@@ -130,33 +175,10 @@ func (sf *ScreenFlipper) triggerFlip(dx, dy int) {
 	sf.flipProgress = 0
 
 	// Player Transition
-	px, py := sf.player.GetPositionMin()
-	sf.playerSourceX = float64(px)
-	sf.playerSourceY = float64(py)
-
-	// Push player into new screen
-	// Move them enough to be inside the new view + a bit more
-	pushDistance := 32.0 // 2 tiles?
-	sf.playerTargetX = sf.playerSourceX
-	sf.playerTargetY = sf.playerSourceY
-
-	if dx != 0 {
-		sf.playerTargetX += float64(dx) * pushDistance * 1.5 // Move player in direction of flip
-		// Also we need to compensate for the fact they are "behind" the new edge
-		// If moving Right (dx=1): Player was at > RightEdge.
-		// New View Left Edge = Old Right Edge.
-		// So player is already at the New Left Edge. We just push them a bit more in.
-		// But wait, the camera moves by ScreenWidth.
-		// Relative to the WORLD, the player is at X.
-		// The Camera moves from C to C+W.
-		// Player should also move to keep relative screen position? NO.
-		// Zelda style: Player walks to edge, Screen scrolls, Player walks automatically a bit into the new room.
-		// So Player World Position changes by a small amount in the direction of travel.
-		sf.playerTargetX += float64(dx) * 48.0 // Push them 3 tiles into the new room
-	}
-	if dy != 0 {
-		sf.playerTargetY += float64(dy) * 48.0
-	}
+	sf.playerSourceX = playerSourceX
+	sf.playerSourceY = playerSourceY
+	sf.playerTargetX = playerTargetX
+	sf.playerTargetY = playerTargetY
 
 	if sf.OnFlipStart != nil {
 		sf.OnFlipStart()
