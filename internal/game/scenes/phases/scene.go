@@ -101,9 +101,20 @@ func (s *PhasesScene) OnStart() {
 	s.PhysicsSpace().Bodies()
 
 	// Init camera target
-	s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFixed})
+	s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFollow})
 	s.Camera().SetFollowTarget(s.player)
-	s.Camera().SetCenter(float64(config.Get().ScreenWidth)/2, float64(config.Get().ScreenHeight)/2)
+
+	// Set initial camera position to the screen where the player is
+	cfg := config.Get()
+	px, py := s.player.GetPositionMin()
+	pw, ph := s.player.GetShape().Width(), s.player.GetShape().Height()
+	pcx := px + pw/2
+	pcy := py + ph/2
+
+	camX := (pcx/cfg.ScreenWidth)*cfg.ScreenWidth + cfg.ScreenWidth/2
+	camY := (pcy/cfg.ScreenHeight)*cfg.ScreenHeight + cfg.ScreenHeight/2
+
+	s.Camera().SetCenter(float64(camX), float64(camY))
 
 	// Init collisions bodies and touch trigger for endpoints
 	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), func(id string) body.Touchable {
@@ -114,6 +125,15 @@ func (s *PhasesScene) OnStart() {
 
 	// Init screen flipper
 	s.screenFlipper = scene.NewScreenFlipper(s.Camera(), s.player, s.Tilemap())
+	tileWidth := s.Tilemap().Tilewidth
+	s.screenFlipper.PlayerPushDistance = float64(tileWidth / 2)
+	s.screenFlipper.FlipStrategy = func(dx, dy int) scene.FlipType {
+		// Vertical movement is instant
+		if dy != 0 {
+			return scene.FlipTypeInstant
+		}
+		return scene.FlipTypeSmooth
+	}
 	s.screenFlipper.OnFlipStart = func() {
 		s.player.SetImmobile(true)
 	}
