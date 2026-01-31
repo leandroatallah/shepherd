@@ -46,7 +46,13 @@ func Setup(assets fs.FS) error {
 	loadAudioAssetsFromFS(assets, audioManager)
 
 	// Load phases
-	phase0 := phases.Phase{ID: 1, Name: "Phase 1", TilemapPath: "assets/tilemap/shepherd-phase-0.tmj", NextPhaseID: 2}
+	phase0 := phases.Phase{
+		ID:           1,
+		Name:         "Phase 1",
+		TilemapPath:  "assets/tilemap/shepherd-phase-0.tmj",
+		NextPhaseID:  2,
+		SequencePath: "assets/sequences/sample.json",
+	}
 	phase1 := phases.Phase{ID: 2, Name: "Phase 2", TilemapPath: "assets/tilemap/shepherd-phase-1.tmj", NextPhaseID: 1}
 	phase2 := phases.Phase{ID: 2, Name: "Phase 2", TilemapPath: "assets/tilemap/shepherd-phase-2.tmj", NextPhaseID: 1}
 	phase3 := phases.Phase{ID: 3, Name: "Phase 3", TilemapPath: "assets/tilemap/shepherd-phase-3.tmj", NextPhaseID: 1}

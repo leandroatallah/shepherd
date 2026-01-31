@@ -20,6 +20,7 @@ const (
 	delayBeforeRemove   = 12
 	delayBeforeSpelling = 60
 	speedText           = 4
+	animDuration        = 15
 )
 
 type SpeechBubble struct {
@@ -73,6 +74,7 @@ func (s *SpeechBubble) Show() {
 	s.delay = 0
 	s.ending = false
 	s.removed = false
+	s.SpeechBase.SetSpellingDelay(animDuration)
 	s.SpeechBase.Show()
 }
 
@@ -87,11 +89,19 @@ func (s *SpeechBubble) Visible() bool {
 }
 
 func (s *SpeechBubble) Text(msg string) string {
-	return s.SpeechBase.Text(msg, s.speedText)
+	return s.SpeechBase.Text(msg, s.GetSpeed())
+}
+
+func (s *SpeechBubble) SetSpeed(speed int) {
+	s.SpeechBase.SetSpeed(speed)
+	s.speedText = speed
 }
 
 func (s *SpeechBubble) ResetText() {
 	s.SpeechBase.ResetText()
+	if s.Visible() && s.delay >= animDuration {
+		s.SpeechBase.SetSpellingDelay(0)
+	}
 }
 
 func (s *SpeechBubble) Draw(screen *ebiten.Image, msg string) {
@@ -106,10 +116,17 @@ func (s *SpeechBubble) Draw(screen *ebiten.Image, msg string) {
 	w_rest := float64(config.Get().ScreenWidth - minMargin*2)
 	h_rest := float64(52)
 	x_rest := float64(minMargin)
-	y_rest := float64(config.Get().ScreenHeight) - h_rest - float64(minMargin)
+	var y_rest float64
 
-	const animDuration = 15.0 // frames
-	progress := float64(s.delay) / animDuration
+	if s.GetPosition() == "top" {
+		y_rest = float64(minMargin)
+	} else {
+		// Default to bottom
+		y_rest = float64(config.Get().ScreenHeight) - h_rest - float64(minMargin)
+	}
+
+	const animDurationLocal = float64(animDuration)
+	progress := float64(s.delay) / animDurationLocal
 	if progress > 1.0 {
 		progress = 1.0
 	}

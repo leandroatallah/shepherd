@@ -8,7 +8,6 @@ const (
 // CharacterDiedEvent is dispatched when a character dies.
 type CharacterDiedEvent struct{}
 
-// Type returns the event type.
 func (e *CharacterDiedEvent) Type() string {
 	return CharacterDiedEventType
 }

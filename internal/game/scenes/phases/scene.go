@@ -17,6 +17,7 @@ import (
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
+	"github.com/leandroatallah/firefly/internal/engine/sequences"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
@@ -48,7 +49,8 @@ type PhasesScene struct {
 	// UI effects
 	ShowDrawScreenFlash int
 
-	screenFlipper *scene.ScreenFlipper
+	screenFlipper  *scene.ScreenFlipper
+	sequencePlayer *sequences.SequencePlayer
 }
 
 func NewPhasesScene(context *app.AppContext) *PhasesScene {
@@ -67,6 +69,12 @@ func NewPhasesScene(context *app.AppContext) *PhasesScene {
 	// Subscribe events
 	context.EventManager.Subscribe(events.CharacterDiedEventType, func(e event.Event) {
 		scene.Reboot()
+	})
+	context.EventManager.Subscribe(events.PlayerReachedFirstPointType, func(e event.Event) {
+		if genEvt, ok := e.(event.GenericEvent); ok {
+			msg := genEvt.Payload["message"].(string)
+			log.Println(msg)
+		}
 	})
 
 	return &scene
@@ -112,9 +120,27 @@ func (s *PhasesScene) OnStart() {
 	s.screenFlipper.OnFlipFinish = func() {
 		s.player.SetImmobile(false)
 	}
+
+	// Init sequence player
+	s.sequencePlayer = sequences.NewSequencePlayer(s.AppContext())
+
+	// Check if we need to run a sequence for this phase
+	phase, err := s.AppContext().PhaseManager.GetCurrentPhase()
+	if err == nil && phase.SequencePath != "" {
+		seq, err := sequences.NewSequenceFromJSON(phase.SequencePath)
+		if err != nil {
+			log.Printf("Failed to load sequence: %v", err)
+		} else {
+			s.sequencePlayer.Play(seq)
+		}
+	}
 }
 
 func (s *PhasesScene) Update() error {
+	if s.sequencePlayer != nil {
+		s.sequencePlayer.Update()
+	}
+
 	if s.screenFlipper != nil {
 		s.screenFlipper.Update()
 		if s.screenFlipper.IsFlipping() {

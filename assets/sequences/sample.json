@@ -7,7 +7,7 @@
     {
       "command": "move_actor",
       "target_id": "player",
-      "end_x": 240,
+      "end_x": 140,
       "speed": 15
     },
     {
@@ -15,8 +15,21 @@
       "frames": 60
     },
     {
+      "command": "event",
+      "event_type": "player_reached_first_point",
+      "payload": {
+        "message": "Player reached the first point."
+      }
+    },
+    {
       "command": "dialogue",
-      "lines": ["I've reached the first point.", "But, what can I expect now?"]
+      "lines": [
+        "In a quiet land of hills and stone,",
+        "A shepherd lived with his dog \nand a small flock of sheep.",
+        "Days passed in silence. \nNights passed in trust."
+      ],
+      "position": "top",
+      "speech_speed": 1
     },
     {
       "command": "delay",
