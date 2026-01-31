@@ -58,13 +58,15 @@ func Setup(assets fs.FS) error {
 	phase3 := phases.Phase{ID: 3, Name: "Phase 3", TilemapPath: "assets/tilemap/shepherd-phase-3.tmj", NextPhaseID: 1}
 	phase4 := phases.Phase{ID: 4, Name: "Phase 4", TilemapPath: "assets/tilemap/shepherd-phase-4.tmj", NextPhaseID: 1}
 	phase5 := phases.Phase{ID: 5, Name: "Phase 5", TilemapPath: "assets/tilemap/shepherd-phase-5.tmj", NextPhaseID: 1}
+	phase6 := phases.Phase{ID: 6, Name: "Phase 6", TilemapPath: "assets/tilemap/shepherd-phase-6.tmj", NextPhaseID: 1}
 	phaseManager.AddPhase(phase0)
 	phaseManager.AddPhase(phase1)
 	phaseManager.AddPhase(phase2)
 	phaseManager.AddPhase(phase3)
 	phaseManager.AddPhase(phase4)
 	phaseManager.AddPhase(phase5)
-	phaseManager.SetCurrentPhase(5)
+	phaseManager.AddPhase(phase6)
+	phaseManager.SetCurrentPhase(6)
 
 	appContext := &app.AppContext{
 		AudioManager:    audioManager,

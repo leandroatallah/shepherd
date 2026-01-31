@@ -99,14 +99,14 @@
         },
         "shepherd-phase-1.tmj": {
             "expandedObjectLayers": [
+                6,
                 4,
-                8,
-                6
+                8
             ],
             "scale": 1.4595,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 153.81980130181572,
+                "x": 71.59986296676945,
                 "y": 134.97773210003425
             }
         },
@@ -121,14 +121,14 @@
         },
         "shepherd-phase-2.tmj": {
             "expandedObjectLayers": [
-                8,
-                6
+                6,
+                8
             ],
-            "scale": 1.4842,
+            "scale": 1.3845,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 174.16790190001348,
-                "y": 127.3413286619054
+                "x": 186.71000361141202,
+                "y": 241.96460816179126
             }
         },
         "shepherd-phase-2.tmj#sample-enemies": {
@@ -153,8 +153,8 @@
             "scale": 1.2488,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 130.1249199231262,
-                "y": 177.77065983344016
+                "x": 323.1101857783473,
+                "y": 252.24215246636777
             }
         },
         "shepherd-phase-3.tmj#sample-enemies": {
@@ -179,8 +179,8 @@
             "scale": 1.3486,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 455.65771911612046,
-                "y": 158.68307874833158
+                "x": 366.6765534628504,
+                "y": 135.69627762123685
             }
         },
         "shepherd-phase-4.tmj#sample-enemies": {
@@ -197,15 +197,16 @@
         },
         "shepherd-phase-5.tmj": {
             "expandedObjectLayers": [
+                12,
                 4,
                 8,
                 6
             ],
-            "scale": 2.5182,
-            "selectedLayer": 1,
+            "scale": 2.026,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 187.6340243030736,
-                "y": 146.93034707330634
+                "x": 72.30997038499507,
+                "y": 220.63178677196447
             }
         },
         "shepherd-phase-5.tmj#sample-enemies": {
