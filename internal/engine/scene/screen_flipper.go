@@ -1,7 +1,9 @@
 package scene
 
 import (
+	"image"
 	"log"
+	"math"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
@@ -43,6 +45,10 @@ type ScreenFlipper struct {
 	// Hooks
 	OnFlipStart  func()
 	OnFlipFinish func()
+
+	// Room Management
+	rooms       []image.Rectangle
+	currentRoom *image.Rectangle
 }
 
 func NewScreenFlipper(cam *camera.Controller, player body.Movable, tm *tilemap.Tilemap) *ScreenFlipper {
@@ -75,19 +81,25 @@ func (sf *ScreenFlipper) checkTrigger() {
 		return
 	}
 
-	// Current Camera View
-	camX, camY := sf.cam.Kamera().Center()
-	left := camX - sf.screenWidth/2
-	right := camX + sf.screenWidth/2
-	top := camY - sf.screenHeight/2
-	bottom := camY + sf.screenHeight/2
+	sf.ensureRooms()
 
-	// Player Position (use center or min?)
-	// Using Min for trigger to ensure they are fully out or touching edge?
-	// User said: "when the player walks out of the screen"
-	// Let's use the player's center for smoother detection or Min/Max for strict bounds.
-	// Using Center is safer to avoid accidental triggers near edge.
-	// Actually, usually it's when the player's leading edge crosses the boundary.
+	// Initialize current room if needed
+	if sf.currentRoom == nil {
+		sf.updateCurrentRoom()
+		// Snap camera to room
+		if sf.currentRoom != nil {
+			sf.cam.SetBounds(sf.currentRoom)
+		}
+		return
+	}
+
+	// Check bounds of CURRENT ROOM, not camera view
+	left := float64(sf.currentRoom.Min.X)
+	right := float64(sf.currentRoom.Max.X)
+	top := float64(sf.currentRoom.Min.Y)
+	bottom := float64(sf.currentRoom.Max.Y)
+
+	// Player Position
 	px, py := sf.player.GetPositionMin()
 	w, h := sf.player.GetShape().Width(), sf.player.GetShape().Height()
 	pCenterX := float64(px) + float64(w)/2
@@ -107,40 +119,62 @@ func (sf *ScreenFlipper) checkTrigger() {
 	}
 }
 
+func (sf *ScreenFlipper) updateCurrentRoom() {
+	px, py := sf.player.GetPositionMin()
+	w, h := sf.player.GetShape().Width(), sf.player.GetShape().Height()
+	center := image.Point{X: px + w/2, Y: py + h/2}
+
+	for i := range sf.rooms {
+		if center.In(sf.rooms[i]) {
+			sf.currentRoom = &sf.rooms[i]
+			return
+		}
+	}
+}
+
+func (sf *ScreenFlipper) ensureRooms() {
+	if len(sf.rooms) > 0 {
+		return
+	}
+
+	// 1. Try to load from "Camera" layer
+	layer, found := sf.tilemap.FindLayerByName("Camera")
+	if found {
+		for _, obj := range layer.Objects {
+			r := image.Rect(int(obj.X), int(obj.Y), int(obj.X+obj.Width), int(obj.Y+obj.Height))
+			sf.rooms = append(sf.rooms, r)
+		}
+	}
+
+	// 2. Fallback: Generate Grid
+	if len(sf.rooms) == 0 {
+		mw := sf.tilemap.Width * sf.tilemap.Tilewidth
+		mh := sf.tilemap.Height * sf.tilemap.Tileheight
+		cols := int(math.Ceil(float64(mw) / sf.screenWidth))
+		rows := int(math.Ceil(float64(mh) / sf.screenHeight))
+
+		for y := 0; y < rows; y++ {
+			for x := 0; x < cols; x++ {
+				r := image.Rect(
+					x*int(sf.screenWidth),
+					y*int(sf.screenHeight),
+					(x+1)*int(sf.screenWidth),
+					(y+1)*int(sf.screenHeight),
+				)
+				sf.rooms = append(sf.rooms, r)
+			}
+		}
+	}
+}
+
 func (sf *ScreenFlipper) triggerFlip(dx, dy int) {
-	camX, camY := sf.cam.Kamera().Center()
-
-	targetCamX := camX + float64(dx)*sf.screenWidth
-	targetCamY := camY + float64(dy)*sf.screenHeight
-
-	// Validate against Map Bounds
-	// Assume layer 0 defines map size
-	if len(sf.tilemap.Layers) == 0 {
-		return
-	}
-	mapW := float64(sf.tilemap.Layers[0].Width * sf.tilemap.Tilewidth)
-	mapH := float64(sf.tilemap.Layers[0].Height * sf.tilemap.Tileheight)
-
-	// Check if target center is valid (should be within map bounds)
-	// Actually, the camera view should be within map bounds.
-	// Target View: [targetCamX - W/2, targetCamX + W/2]
-	if targetCamX-sf.screenWidth/2 < 0 || targetCamX+sf.screenWidth/2 > mapW {
-		log.Printf("Cannot flip: Target X out of bounds: %f", targetCamX)
-		return
-	}
-	if targetCamY-sf.screenHeight/2 < 0 || targetCamY+sf.screenHeight/2 > mapH {
-		log.Printf("Cannot flip: Target Y out of bounds: %f", targetCamY)
-		return
-	}
-
-	// Calculate Player Target
+	// Calculate Player Target (pushed into next room)
 	px, py := sf.player.GetPositionMin()
 	playerSourceX := float64(px)
 	playerSourceY := float64(py)
 	playerTargetX := playerSourceX
 	playerTargetY := playerSourceY
 
-	// Push player into new screen
 	if dx != 0 {
 		playerTargetX += float64(dx) * sf.PlayerPushDistance
 	}
@@ -148,16 +182,73 @@ func (sf *ScreenFlipper) triggerFlip(dx, dy int) {
 		playerTargetY += float64(dy) * sf.PlayerPushDistance
 	}
 
+	// Find Next Room based on Player Target
+	w, h := sf.player.GetShape().Width(), sf.player.GetShape().Height()
+	targetCenter := image.Point{
+		X: int(playerTargetX) + w/2,
+		Y: int(playerTargetY) + h/2,
+	}
+
+	var nextRoom *image.Rectangle
+	for i := range sf.rooms {
+		if targetCenter.In(sf.rooms[i]) {
+			nextRoom = &sf.rooms[i]
+			break
+		}
+	}
+
+	if nextRoom == nil {
+		log.Printf("Cannot flip: No room found for target position %v", targetCenter)
+		return
+	}
+
+	// Calculate Camera Target Position for the New Room
+	// We want to center the camera on the player, but clamped to the New Room.
+	// Temporarily calculate clamped position
+	halfW := sf.screenWidth / 2
+	halfH := sf.screenHeight / 2
+
+	minCamX := float64(nextRoom.Min.X) + halfW
+	maxCamX := float64(nextRoom.Max.X) - halfW
+	minCamY := float64(nextRoom.Min.Y) + halfH
+	maxCamY := float64(nextRoom.Max.Y) - halfH
+
+	targetCamX := float64(targetCenter.X)
+	targetCamY := float64(targetCenter.Y)
+
+	if targetCamX < minCamX {
+		targetCamX = minCamX
+	}
+	if targetCamX > maxCamX {
+		targetCamX = maxCamX
+	}
+	if targetCamY < minCamY {
+		targetCamY = minCamY
+	}
+	if targetCamY > maxCamY {
+		targetCamY = maxCamY
+	}
+
+	// Current Camera Position
+	camX, camY := sf.cam.Kamera().Center()
+
 	// Determine Strategy
 	flipType := FlipTypeSmooth
 	if sf.FlipStrategy != nil {
 		flipType = sf.FlipStrategy(dx, dy)
 	}
 
+	// Update Current Room immediately for Instant, or after for Smooth?
+	// Actually, during flip, we are "between" rooms.
+	// But we should unclamp the camera now.
+	sf.cam.SetBounds(nil)
+
 	if flipType == FlipTypeInstant {
 		if sf.OnFlipStart != nil {
 			sf.OnFlipStart()
 		}
+		sf.currentRoom = nextRoom
+		sf.cam.SetBounds(nextRoom) // Re-clamp immediately
 		sf.cam.SetCenter(targetCamX, targetCamY)
 		sf.player.SetPosition(int(playerTargetX), int(playerTargetY))
 		if sf.OnFlipFinish != nil {
@@ -179,6 +270,9 @@ func (sf *ScreenFlipper) triggerFlip(dx, dy int) {
 	sf.playerSourceY = playerSourceY
 	sf.playerTargetX = playerTargetX
 	sf.playerTargetY = playerTargetY
+
+	// Store next room to set it when finished
+	sf.currentRoom = nextRoom
 
 	if sf.OnFlipStart != nil {
 		sf.OnFlipStart()
@@ -221,4 +315,9 @@ func (sf *ScreenFlipper) finishFlip() {
 	// Force exact position
 	sf.cam.SetCenter(sf.flipTargetX, sf.flipTargetY)
 	sf.player.SetPosition(int(sf.playerTargetX), int(sf.playerTargetY))
+
+	// Re-enable bounds for the new room
+	if sf.currentRoom != nil {
+		sf.cam.SetBounds(sf.currentRoom)
+	}
 }

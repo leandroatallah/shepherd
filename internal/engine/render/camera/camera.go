@@ -18,6 +18,9 @@ type Controller struct {
 	SmoothingFactor  float64
 	isFollowing      bool
 	centerX, centerY float64
+	screenWidth      float64
+	screenHeight     float64
+	bounds           *image.Rectangle
 }
 
 func NewController(x, y float64) *Controller {
@@ -31,11 +34,13 @@ func NewController(x, y float64) *Controller {
 	targetBody := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(0, 0, 1, 1))
 
 	return &Controller{
-		cam:         cam,
-		target:      targetBody,
-		isFollowing: false,
-		centerX:     x,
-		centerY:     y,
+		cam:          cam,
+		target:       targetBody,
+		isFollowing:  false,
+		centerX:      x,
+		centerY:      y,
+		screenWidth:  float64(cfg.ScreenWidth),
+		screenHeight: float64(cfg.ScreenHeight),
 	}
 }
 
@@ -56,6 +61,11 @@ func (c *Controller) SetFollowing(following bool) {
 	c.isFollowing = following
 }
 
+// SetBounds restricts the camera movement to the specified rectangle.
+func (c *Controller) SetBounds(bounds *image.Rectangle) {
+	c.bounds = bounds
+}
+
 func (c *Controller) SetCenter(x, y float64) {
 	c.centerX = x
 	c.centerY = y
@@ -72,12 +82,43 @@ func (c *Controller) Update() {
 	var targetX, targetY float64
 	if c.isFollowing && c.followTarget != nil {
 		x, y := c.followTarget.GetPositionMin()
-		targetX = float64(x)
-		targetY = float64(y)
+		// Use center of target for following
+		w, h := c.followTarget.GetShape().Width(), c.followTarget.GetShape().Height()
+		targetX = float64(x) + float64(w)/2
+		targetY = float64(y) + float64(h)/2
 	} else {
 		targetX = c.centerX
 		targetY = c.centerY
 	}
+
+	if c.bounds != nil {
+		// Calculate viewport half-dimensions
+		halfW := c.screenWidth / 2
+		halfH := c.screenHeight / 2
+
+		// Calculate min and max center positions
+		minX := float64(c.bounds.Min.X) + halfW
+		maxX := float64(c.bounds.Max.X) - halfW
+		minY := float64(c.bounds.Min.Y) + halfH
+		maxY := float64(c.bounds.Max.Y) - halfH
+
+		// Clamp targetX
+		if targetX < minX {
+			targetX = minX
+		}
+		if targetX > maxX {
+			targetX = maxX
+		}
+
+		// Clamp targetY
+		if targetY < minY {
+			targetY = minY
+		}
+		if targetY > maxY {
+			targetY = maxY
+		}
+	}
+
 	c.cam.LookAt(targetX, targetY)
 }
 

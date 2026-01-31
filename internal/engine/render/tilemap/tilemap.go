@@ -11,6 +11,7 @@ import (
 
 type Tilemap struct {
 	Height       int        `json:"height"`
+	Width        int        `json:"width"`
 	Infinite     bool       `json:"infinite"`
 	Layers       []*Layer   `json:"layers"`
 	Tileheight   int        `json:"tileheight"`
