@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
@@ -49,14 +50,17 @@ type ScreenFlipper struct {
 	// Room Management
 	rooms       []image.Rectangle
 	currentRoom *image.Rectangle
+
+	context *app.AppContext
 }
 
-func NewScreenFlipper(cam *camera.Controller, player body.Movable, tm *tilemap.Tilemap) *ScreenFlipper {
+func NewScreenFlipper(cam *camera.Controller, player body.Movable, tm *tilemap.Tilemap, context *app.AppContext) *ScreenFlipper {
 	cfg := config.Get()
 	return &ScreenFlipper{
 		cam:                cam,
 		player:             player,
 		tilemap:            tm,
+		context:            context,
 		screenWidth:        float64(cfg.ScreenWidth),
 		screenHeight:       float64(cfg.ScreenHeight),
 		PlayerPushDistance: 0.0,
@@ -175,15 +179,55 @@ func (sf *ScreenFlipper) triggerFlip(dx, dy int) {
 	playerTargetX := playerSourceX
 	playerTargetY := playerSourceY
 
-	if dx != 0 {
-		playerTargetX += float64(dx) * sf.PlayerPushDistance
-	}
-	if dy != 0 {
-		playerTargetY += float64(dy) * sf.PlayerPushDistance
+	w, h := sf.player.GetShape().Width(), sf.player.GetShape().Height()
+
+	// Check for collisions and adjust push distance if needed
+	pushDist := sf.PlayerPushDistance
+	if sf.context != nil && sf.context.Space != nil && (dx != 0 || dy != 0) {
+		// Try to find a valid position, decreasing push distance if blocked
+		// We use a step of 4 pixels to check
+		for pushDist >= 0 {
+			tx := playerSourceX
+			ty := playerSourceY
+			if dx != 0 {
+				tx += float64(dx) * pushDist
+			}
+			if dy != 0 {
+				ty += float64(dy) * pushDist
+			}
+
+			// Check collision at this potential target
+			rect := image.Rect(int(tx), int(ty), int(tx)+w, int(ty)+h)
+			cols := sf.context.Space.Query(rect)
+			blocked := false
+			for _, c := range cols {
+				// Ignore self and non-obstructive bodies
+				if c.ID() != sf.player.ID() && c.IsObstructive() {
+					blocked = true
+					break
+				}
+			}
+
+			if !blocked {
+				// Found valid position
+				playerTargetX = tx
+				playerTargetY = ty
+				break
+			}
+
+			pushDist -= 4 // Back off
+		}
+	} else {
+		// No collision check available or needed
+		if dx != 0 {
+			playerTargetX += float64(dx) * sf.PlayerPushDistance
+		}
+		if dy != 0 {
+			playerTargetY += float64(dy) * sf.PlayerPushDistance
+		}
 	}
 
 	// Find Next Room based on Player Target
-	w, h := sf.player.GetShape().Width(), sf.player.GetShape().Height()
 	targetCenter := image.Point{
 		X: int(playerTargetX) + w/2,
 		Y: int(playerTargetY) + h/2,
