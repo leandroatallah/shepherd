@@ -9,9 +9,9 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
+	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
-	"github.com/leandroatallah/firefly/internal/game/events"
 )
 
 // shepherdStateTransitionLogic provides custom state handling for the ShepherdPlayer,
@@ -62,6 +62,9 @@ func shepherdStateTransitionLogic(c *actors.Character) bool {
 type ShepherdPlayer struct {
 	gameentitytypes.PlatformerCharacter
 	gameentitytypes.SheepCarrier
+	baseSpeed int
+
+	*gameplayermethods.PlayerDeathBehavior
 }
 
 func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, error) {
@@ -92,6 +95,8 @@ func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEnti
 	if err = SetPlayerStats(player, statData); err != nil {
 		return nil, fmt.Errorf("SetPlayerStats: %w", err)
 	}
+	player.baseSpeed = player.Speed()
+
 	// Pass player itself
 	if err = SetMovementModel(player, physicsmovement.Platform); err != nil {
 		return nil, fmt.Errorf("SetMovementModel: %w", err)
@@ -99,10 +104,21 @@ func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEnti
 
 	character.StateCollisionManager.RefreshCollisions()
 
+	player.PlayerDeathBehavior = gameplayermethods.NewPlayerDeathBehavior(player)
+
 	return player, nil
 }
 
 func (p *ShepherdPlayer) Update(space body.BodiesSpace) error {
+	if p.IsCarryingSheep() {
+		p.SetHorizontalInertia(1.0)
+		p.SetSpeed(int(float64(p.baseSpeed) * 0.5))
+		p.SetJumpForceMultiplier(0.95)
+	} else {
+		p.SetHorizontalInertia(-1.0)
+		p.SetSpeed(p.baseSpeed)
+		p.SetJumpForceMultiplier(1.0)
+	}
 	return p.Character.Update(space)
 }
 
@@ -116,19 +132,6 @@ func (p *ShepherdPlayer) Hurt(damage int) {
 		return
 	}
 	p.SetState(state)
-}
-
-// TODO: Reduce repeated actions with Template Method pattern
-func (p *ShepherdPlayer) OnDie() {
-	p.SetHealth(0)
-	// TODO: All actors need to freeze.
-	p.SetImmobile(true)
-	p.SetFreeze(true)
-
-	// Trigger event to reboot scene
-	if p.AppContext().EventManager != nil {
-		p.AppContext().EventManager.Publish(&events.CharacterDiedEvent{})
-	}
 }
 
 // SheepCarrier Methods

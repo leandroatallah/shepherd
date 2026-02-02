@@ -7,14 +7,16 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
+	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamemovement "github.com/leandroatallah/firefly/internal/game/entity/actors/movement"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
-	"github.com/leandroatallah/firefly/internal/game/events"
 )
 
 type Sheep struct {
 	gameentitytypes.PlatformerCharacter
+
+	*gameplayermethods.PlayerDeathBehavior
 }
 
 func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
@@ -47,6 +49,8 @@ func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
 	sheep.SetMovementModel(model)
 	sheep.SetTouchable(sheep)
 	sheep.Character.SetMovementState(gamemovement.Wander, nil)
+
+	sheep.PlayerDeathBehavior = gameplayermethods.NewPlayerDeathBehavior(sheep)
 
 	return sheep, nil
 }
@@ -86,16 +90,4 @@ func (s *Sheep) Hurt(damage int) {
 		return
 	}
 	s.SetState(state)
-}
-
-func (s *Sheep) OnDie() {
-	s.SetHealth(0)
-	// TODO: All actors need to freeze.
-	s.SetImmobile(true)
-	s.SetFreeze(true)
-
-	// Trigger event to reboot scene
-	if s.AppContext().EventManager != nil {
-		s.AppContext().EventManager.Publish(&events.CharacterDiedEvent{})
-	}
 }

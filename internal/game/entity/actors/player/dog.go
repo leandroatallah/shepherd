@@ -7,13 +7,15 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
+	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
-	"github.com/leandroatallah/firefly/internal/game/events"
 )
 
 type DogPlayer struct {
 	gameentitytypes.PlatformerCharacter
+
+	*gameplayermethods.PlayerDeathBehavior
 }
 
 func NewDogPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, error) {
@@ -47,6 +49,8 @@ func NewDogPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, e
 
 	character.StateCollisionManager.RefreshCollisions()
 
+	player.PlayerDeathBehavior = gameplayermethods.NewPlayerDeathBehavior(player)
+
 	return player, nil
 }
 
@@ -60,17 +64,4 @@ func (p *DogPlayer) Hurt(damage int) {
 		return
 	}
 	p.SetState(state)
-}
-
-// TODO: Reduce repeated actions with Template Method pattern
-func (p *DogPlayer) OnDie() {
-	p.SetHealth(0)
-	// TODO: All actors need to freeze.
-	p.SetImmobile(true)
-	p.SetFreeze(true)
-
-	// Trigger event to reboot scene
-	if p.AppContext().EventManager != nil {
-		p.AppContext().EventManager.Publish(&events.CharacterDiedEvent{})
-	}
 }
