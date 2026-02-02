@@ -52,6 +52,11 @@ type Movable interface {
 
 	// Platform methods
 	TryJump(force int)
+	SetJumpForceMultiplier(multiplier float64)
+	JumpForceMultiplier() float64
+
+	SetHorizontalInertia(inertia float64)
+	HorizontalInertia() float64
 }
 
 type Collidable interface {

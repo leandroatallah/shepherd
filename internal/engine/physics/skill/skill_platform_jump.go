@@ -46,7 +46,12 @@ func (s *JumpSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 func (s *JumpSkill) tryActivate(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
 	cfg := config.Get()
 	if model.OnGround() || s.coyoteTimeCounter > 0 {
-		body.TryJump(cfg.Physics.JumpForce)
+		force := int(float64(cfg.Physics.JumpForce) * body.JumpForceMultiplier())
+		if force <= 0 {
+			return
+		}
+
+		body.TryJump(force)
 
 		// Check against map boundaries if the actor has a physics space.
 		for _, other := range space.Bodies() {
@@ -89,7 +94,12 @@ func (s *JumpSkill) handleCoyoteAndJumpBuffering(body body.MovableCollidable, mo
 	}
 
 	if !wasOnGround && model.OnGround() && s.jumpBufferCounter > 0 {
-		body.TryJump(cfg.Physics.JumpForce)
+		force := int(float64(cfg.Physics.JumpForce) * body.JumpForceMultiplier())
+		if force <= 0 {
+			return
+		}
+
+		body.TryJump(force)
 		model.SetOnGround(false)
 		s.jumpBufferCounter = 0
 		s.coyoteTimeCounter = 0

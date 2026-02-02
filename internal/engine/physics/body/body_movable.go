@@ -18,8 +18,10 @@ type MovableBody struct {
 	accelerationX int
 	accelerationY int
 	speed         int
-	maxSpeed      int
-	immobile      bool
+	maxSpeed            int
+	jumpForceMultiplier float64
+	horizontalInertia   float64
+	immobile            bool
 	freeze        bool
 	faceDirection animation.FacingDirectionEnum
 }
@@ -28,7 +30,11 @@ func NewMovableBody(body *Body) *MovableBody {
 	if body == nil {
 		panic("NewMovableBody: body must not be nil")
 	}
-	return &MovableBody{Body: body}
+	return &MovableBody{
+		Body:                body,
+		jumpForceMultiplier: 1.0,
+		horizontalInertia:   -1.0,
+	}
 }
 
 func (b *MovableBody) MoveX(distance int) {
@@ -195,4 +201,20 @@ func (b *MovableBody) CheckMovementDirectionX() {
 	} else if b.accelerationX < 0 {
 		b.SetFaceDirection(animation.FaceDirectionLeft)
 	}
+}
+
+func (b *MovableBody) SetJumpForceMultiplier(multiplier float64) {
+	b.jumpForceMultiplier = multiplier
+}
+
+func (b *MovableBody) JumpForceMultiplier() float64 {
+	return b.jumpForceMultiplier
+}
+
+func (b *MovableBody) SetHorizontalInertia(inertia float64) {
+	b.horizontalInertia = inertia
+}
+
+func (b *MovableBody) HorizontalInertia() float64 {
+	return b.horizontalInertia
 }

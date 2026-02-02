@@ -28,8 +28,12 @@ func NewPlatformMovementModel(playerMovementBlocker PlayerMovementBlocker) *Plat
 
 func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollidable) (int, int) {
 	cfg := config.Get()
+	horizontalInertia := cfg.Physics.HorizontalInertia
+	if val := body.HorizontalInertia(); val >= 0 {
+		horizontalInertia = val
+	}
 
-	if cfg.Physics.HorizontalInertia > 0 {
+	if horizontalInertia > 0 {
 		// Acceleration-based movement
 		accX, _ := body.Acceleration()
 		scaledAccX, _ := smoothDiagonalMovement(accX, 0)
@@ -50,7 +54,8 @@ func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollid
 
 		// Apply friction if the player is not actively moving
 		if accX == 0 {
-			baseFriction := int(float64(fp16.To16(1)/4) * cfg.Physics.HorizontalInertia)
+			// Increase friction coefficient to reduce sliding distance
+			baseFriction := int(float64(fp16.To16(1)/2) * horizontalInertia)
 			friction := baseFriction
 
 			// Apply air friction multiplier if the player is in the air

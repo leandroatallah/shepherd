@@ -45,7 +45,12 @@ func (s *HorizontalMovementSkill) HandleInput(body body.MovableCollidable, _ *ph
 	moveLeft := input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft)
 	moveRight := input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight)
 
-	if cfg.Physics.HorizontalInertia > 0 {
+	horizontalInertia := cfg.Physics.HorizontalInertia
+	if val := body.HorizontalInertia(); val >= 0 {
+		horizontalInertia = val
+	}
+
+	if horizontalInertia > 0 {
 		if moveLeft {
 			body.OnMoveLeft(body.Speed())
 		}
