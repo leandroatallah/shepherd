@@ -29,6 +29,9 @@ func (s *BaseScene) Update() error {
 
 func (s *BaseScene) OnStart() {
 	s.AppContext().Space.Clear()
+	if s.AppContext().ActorManager != nil {
+		s.AppContext().ActorManager.Clear()
+	}
 }
 
 func (s *BaseScene) OnFinish() {}

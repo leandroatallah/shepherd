@@ -34,18 +34,25 @@ func (m *Manager) Unregister(actor ActorEntity) {
 	delete(m.actors, actor.ID())
 }
 
+// Clear removes all registered actors.
+func (m *Manager) Clear() {
+	for k := range m.actors {
+		delete(m.actors, k)
+	}
+}
+
 // GetPlayer retrieves the player actor.
 // It assumes the player is registered with the ID "player".
 func (m *Manager) GetPlayer() (ActorEntity, bool) {
-	actor, found := m.Find("player")
+	p, found := m.Find("player")
 	if !found {
 		return nil, false
 	}
-	player, ok := actor.(ActorEntity)
-	if !ok {
-		// This should ideally not happen if "player" ID is reserved for ActorEntity
-		fmt.Printf("Warning: Actor with ID 'player' is not a ActorEntity.\n")
-		return nil, false
+	return p, true
+}
+
+func (m *Manager) ForEach(f func(ActorEntity)) {
+	for _, actor := range m.actors {
+		f(actor)
 	}
-	return player, true
 }

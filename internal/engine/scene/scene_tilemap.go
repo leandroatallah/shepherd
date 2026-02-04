@@ -130,6 +130,9 @@ func InitEnemies[T actors.ActorEntity](s *TilemapScene, factory *enemies.EnemyFa
 		}
 
 		s.PhysicsSpace().AddBody(enemy)
+		if s.AppContext().ActorManager != nil {
+			s.AppContext().ActorManager.Register(enemy)
+		}
 	}
 
 	return nil
@@ -147,6 +150,9 @@ func InitNPCs[T actors.ActorEntity](s *TilemapScene, factory *npcs.NpcFactory[T]
 		}
 
 		s.PhysicsSpace().AddBody(npc)
+		if s.AppContext().ActorManager != nil {
+			s.AppContext().ActorManager.Register(npc)
+		}
 	}
 
 	return nil
