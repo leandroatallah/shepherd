@@ -9,8 +9,6 @@ import (
 )
 
 type Body struct {
-	body.Body
-
 	shape body.Shape
 
 	Ownership

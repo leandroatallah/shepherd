@@ -1,11 +1,7 @@
 package body
 
-import "github.com/leandroatallah/firefly/internal/engine/contracts/body"
-
 // Implements Alive
 type AliveBody struct {
-	body.Alive
-
 	*Body
 
 	Ownership

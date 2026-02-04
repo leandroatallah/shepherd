@@ -11,6 +11,7 @@ import (
 )
 
 type ObstacleRect struct {
+	Ownership
 	*MovableBody
 	*CollidableBody
 

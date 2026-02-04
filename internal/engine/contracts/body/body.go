@@ -110,6 +110,7 @@ type Alive interface {
 }
 
 type Body interface {
+	Ownable
 	ID() string
 	SetID(id string)
 	Position() image.Rectangle
