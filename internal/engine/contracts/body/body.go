@@ -83,7 +83,6 @@ type Obstacle interface {
 	Collidable
 	Drawable
 	DrawCollisionBox(screen *ebiten.Image, position image.Rectangle)
-	ImageCollisionBox() *ebiten.Image
 }
 
 // Drawable represents any object that can be drawn to the screen.
@@ -91,7 +90,6 @@ type Drawable interface {
 	Image() *ebiten.Image
 	ImageOptions() *ebiten.DrawImageOptions
 	UpdateImageOptions()
-	ImageCollisionBox() *ebiten.Image
 }
 
 type Touchable interface {

@@ -2,6 +2,7 @@ package camera
 
 import (
 	"image"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -9,6 +10,13 @@ import (
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/setanarut/kamera/v2"
 )
+
+var collisionBoxImage *ebiten.Image
+
+func init() {
+	collisionBoxImage = ebiten.NewImage(1, 1)
+	collisionBoxImage.Fill(color.White)
+}
 
 type Controller struct {
 	cam              *kamera.Camera
@@ -126,6 +134,37 @@ func (c *Controller) Draw(
 	src *ebiten.Image, options *ebiten.DrawImageOptions, dst *ebiten.Image,
 ) {
 	c.cam.Draw(src, options, dst)
+}
+
+func (c *Controller) DrawCollisionBox(screen *ebiten.Image, b body.Collidable) {
+	isObstructive := b.IsObstructive()
+	for _, rect := range b.CollisionPosition() {
+		// Draw outer rect
+		opts := &ebiten.DrawImageOptions{}
+		opts.GeoM.Scale(float64(rect.Dx()), float64(rect.Dy()))
+		opts.GeoM.Translate(float64(rect.Min.X), float64(rect.Min.Y))
+
+		if isObstructive {
+			opts.ColorScale.Scale(0.66, 0, 0, 1) // Dark Red
+		} else {
+			opts.ColorScale.Scale(0, 0.66, 0, 1) // Dark Green
+		}
+		c.Draw(collisionBoxImage, opts, screen)
+
+		// Draw inner rect
+		if rect.Dx() > 2 && rect.Dy() > 2 {
+			opts = &ebiten.DrawImageOptions{}
+			opts.GeoM.Scale(float64(rect.Dx()-2), float64(rect.Dy()-2))
+			opts.GeoM.Translate(float64(rect.Min.X+1), float64(rect.Min.Y+1))
+
+			if isObstructive {
+				opts.ColorScale.Scale(1, 0, 0, 1) // Red
+			} else {
+				opts.ColorScale.Scale(0, 1, 0, 1) // Green
+			}
+			c.Draw(collisionBoxImage, opts, screen)
+		}
+	}
 }
 
 // Useful for debugging

@@ -97,18 +97,6 @@ func (o *ObstacleRect) Image() *ebiten.Image {
 	return i
 }
 
-
-
-func (o *ObstacleRect) ImageCollisionBox() *ebiten.Image {
-	img := o.Image()
-	if o.IsObstructive() {
-		img.Fill(color.RGBA{G: 255})
-	} else {
-		img.Fill(color.RGBA{R: 255})
-	}
-	return img
-}
-
 func (o *ObstacleRect) ImageOptions() *ebiten.DrawImageOptions {
 	return o.imageOptions
 }

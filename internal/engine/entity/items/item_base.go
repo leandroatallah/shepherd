@@ -2,7 +2,6 @@ package items
 
 import (
 	"image"
-	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -117,16 +116,6 @@ func (b *BaseItem) Image() *ebiten.Image {
 
 	pos := b.Position()
 	return b.AnimatedSpriteImage(img, pos, b.count, b.SpriteEntity.FrameRate())
-}
-
-func (b *BaseItem) ImageCollisionBox() *ebiten.Image {
-	img := b.Image()
-	if b.IsObstructive() {
-		img.Fill(color.RGBA{G: 255, A: 255})
-	} else {
-		img.Fill(color.RGBA{R: 255, A: 255})
-	}
-	return img
 }
 
 func (b *BaseItem) ImageOptions() *ebiten.DrawImageOptions {

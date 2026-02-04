@@ -293,19 +293,6 @@ func (c *Character) Image() *ebiten.Image {
 	return c.AnimatedSpriteImage(sprite, pos, stateDurationCount, c.SpriteEntity.FrameRate())
 }
 
-// WithCollisionBox extend Image method to show a rect with the collision area
-func (c *Character) ImageCollisionBox() *ebiten.Image {
-	img := c.Image()
-	pos := c.Position()
-
-	// Create a new image and copy the subimage to it
-	res := ebiten.NewImage(img.Bounds().Dx(), img.Bounds().Dy())
-	res.DrawImage(img, nil)
-
-	c.DrawCollisionBox(res, pos)
-	return res
-}
-
 func (c *Character) ImageOptions() *ebiten.DrawImageOptions {
 	return c.imageOptions
 }
