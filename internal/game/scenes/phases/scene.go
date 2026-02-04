@@ -124,7 +124,7 @@ func (s *PhasesScene) OnStart() {
 	})
 
 	// Init screen flipper
-	s.screenFlipper = scene.NewScreenFlipper(s.Camera(), s.player, s.Tilemap())
+	s.screenFlipper = scene.NewScreenFlipper(s.Camera(), s.player, s.Tilemap(), s.AppContext())
 	tileWidth := s.Tilemap().Tilewidth
 	s.screenFlipper.PlayerPushDistance = float64(tileWidth / 2)
 	s.screenFlipper.FlipStrategy = func(dx, dy int) scene.FlipType {
@@ -232,10 +232,9 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 		case gameentitytypes.PlatformerActorEntity:
 			opts := sb.ImageOptions()
 			sb.UpdateImageOptions()
+			s.Camera().Draw(sb.Image(), opts, screen)
 			if config.Get().CollisionBox {
-				s.Camera().Draw(sb.ImageCollisionBox(), opts, screen)
-			} else {
-				s.Camera().Draw(sb.Image(), opts, screen)
+				s.Camera().DrawCollisionBox(screen, sb)
 			}
 		case items.Item:
 			if sb.IsRemoved() {
@@ -243,16 +242,13 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 			}
 			opts := sb.ImageOptions()
 			sb.UpdateImageOptions()
+			s.Camera().Draw(sb.Image(), opts, screen)
 			if config.Get().CollisionBox {
-				s.Camera().Draw(sb.ImageCollisionBox(), opts, screen)
-			} else {
-				s.Camera().Draw(sb.Image(), opts, screen)
+				s.Camera().DrawCollisionBox(screen, sb)
 			}
 		case body.Obstacle:
 			if config.Get().CollisionBox {
-				opts := sb.ImageOptions()
-				sb.UpdateImageOptions()
-				s.Camera().Draw(sb.ImageCollisionBox(), opts, screen)
+				s.Camera().DrawCollisionBox(screen, sb)
 			}
 		}
 	}
