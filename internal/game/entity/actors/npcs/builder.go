@@ -6,6 +6,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/game/entity/actors/builder"
+	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
@@ -13,6 +14,7 @@ func CreateAnimatedCharacter(ctx *app.AppContext, data schemas.SpriteData) (*gam
 	stateMap := map[string]animation.SpriteState{
 		"idle": actors.Idle,
 		"walk": actors.Walking,
+		"die":  gamestates.Dying,
 	}
 	return builder.CreateAnimatedCharacter(ctx, data, stateMap)
 }
@@ -23,6 +25,7 @@ func SetNpcBodies(npc gameentitytypes.PlatformerActorEntity, data schemas.Sprite
 	stateMap := map[string]animation.SpriteState{
 		"idle": actors.Idle,
 		"walk": actors.Walking,
+		"die":  gamestates.Dying,
 	}
 
 	return builder.SetCharacterBodies(npc, data, stateMap, "NPC")

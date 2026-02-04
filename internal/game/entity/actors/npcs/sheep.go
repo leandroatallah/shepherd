@@ -6,6 +6,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamemovement "github.com/leandroatallah/firefly/internal/game/entity/actors/movement"
@@ -14,11 +15,11 @@ import (
 )
 
 type Sheep struct {
-	gameentitytypes.PlatformerCharacter
-
+	*gameentitytypes.PlatformerCharacter
 	*gameplayermethods.PlayerDeathBehavior
 }
 
+// TODO: Use composition to reduce repeated actions in different places
 func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
 	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/npcs/sheep.json")
 	if err != nil {
@@ -31,7 +32,7 @@ func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
 	}
 
 	character.SetPosition(x, y)
-	sheep := &Sheep{PlatformerCharacter: *character}
+	sheep := &Sheep{PlatformerCharacter: character}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	sheep.SetOwner(sheep)
 
@@ -48,7 +49,9 @@ func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
 	}
 	sheep.SetMovementModel(model)
 	sheep.SetTouchable(sheep)
-	sheep.Character.SetMovementState(gamemovement.Wander, nil)
+	sheep.Character.SetMovementState(movement.Idle, nil)
+
+	sheep.Character.SetStateTransitionHandler(gameplayermethods.StandardStateTransitionLogic)
 
 	sheep.PlayerDeathBehavior = gameplayermethods.NewPlayerDeathBehavior(sheep)
 
@@ -65,10 +68,14 @@ func (s *Sheep) Update(space body.BodiesSpace) error {
 }
 
 func (s *Sheep) GetCharacter() *actors.Character {
-	return &s.Character
+	return s.Character
 }
 
 func (s *Sheep) OnTouch(other body.Collidable) {
+	if s.State() == gamestates.Dying {
+		return
+	}
+
 	player, found := s.AppContext().ActorManager.GetPlayer()
 	if !found {
 		return
@@ -85,6 +92,9 @@ func (s *Sheep) OnTouch(other body.Collidable) {
 }
 
 func (s *Sheep) Hurt(damage int) {
+	if s.State() == gamestates.Dying {
+		return
+	}
 	state, err := s.NewState(gamestates.Dying)
 	if err != nil {
 		return

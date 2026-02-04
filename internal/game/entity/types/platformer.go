@@ -20,7 +20,7 @@ type PlatformerActorEntity interface {
 }
 
 type PlatformerCharacter struct {
-	actors.Character
+	*actors.Character
 	app.AppContextHolder
 
 	coinCount        int
@@ -30,7 +30,7 @@ type PlatformerCharacter struct {
 func NewPlatformerCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *PlatformerCharacter {
 	c := actors.NewCharacter(s, bodyRect)
 	pf := &PlatformerCharacter{
-		Character: *c,
+		Character: c,
 	}
 	c.SetOwner(pf)
 	return pf

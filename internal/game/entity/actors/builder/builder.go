@@ -57,6 +57,7 @@ func SetCharacterBodies(
 		if !ok {
 			return
 		}
+		rect.SetOwner(character)
 		setter.AddCollisionRect(actorState, rect)
 		setter.RefreshCollisions()
 	}

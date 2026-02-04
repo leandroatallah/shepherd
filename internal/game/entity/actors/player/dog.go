@@ -31,10 +31,14 @@ func NewDogPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, e
 	character.AddSkill(skill.NewJumpSkill())
 	character.AddSkill(skill.NewHorizontalMovementSkill())
 
+	character.SetStateTransitionHandler(gameplayermethods.StandardStateTransitionLogic)
+
 	player := &DogPlayer{
 		PlatformerCharacter: *character,
 	}
 	player.SetOwner(player)
+	// Ensure the original character pointer (referenced by physics bodies) also points to the player
+	character.SetOwner(player)
 
 	if err = SetPlayerBodies(player, spriteData); err != nil {
 		return nil, fmt.Errorf("SetPlayerBodies: %w", err)
@@ -55,10 +59,13 @@ func NewDogPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, e
 }
 
 func (p *DogPlayer) GetCharacter() *actors.Character {
-	return &p.Character
+	return p.Character
 }
 
 func (p *DogPlayer) Hurt(damage int) {
+	if p.State() == gamestates.Dying {
+		return
+	}
 	state, err := p.NewState(gamestates.Dying)
 	if err != nil {
 		return

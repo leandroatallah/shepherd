@@ -17,12 +17,11 @@ import (
 // shepherdStateTransitionLogic provides custom state handling for the ShepherdPlayer,
 // specifically for managing the "carrying" states.
 func shepherdStateTransitionLogic(c *actors.Character) bool {
-	state := c.State()
-
-	// When the player die, the state no longer changes.
-	if state == gamestates.Dying {
+	if gameplayermethods.StandardStateTransitionLogic(c) {
 		return true
 	}
+
+	state := c.State()
 
 	isCarryingState := state == gamestates.CarryingIdle ||
 		state == gamestates.CarryingWalking ||
@@ -44,8 +43,6 @@ func shepherdStateTransitionLogic(c *actors.Character) bool {
 
 	// State machine for when the character is carrying something.
 	switch {
-	case state != gamestates.Dying && c.Health() <= 0:
-		setNewState(gamestates.Dying)
 	case state != gamestates.CarryingFalling && c.IsFalling():
 		setNewState(gamestates.CarryingFalling)
 	case state != gamestates.CarryingWalking && c.IsWalking():
@@ -88,6 +85,8 @@ func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEnti
 	}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	player.SetOwner(player)
+	// Ensure the original character pointer (referenced by physics bodies) also points to the player
+	character.SetOwner(player)
 
 	if err = SetPlayerBodies(player, spriteData); err != nil {
 		return nil, fmt.Errorf("SetPlayerBodies: %w", err)
@@ -123,10 +122,14 @@ func (p *ShepherdPlayer) Update(space body.BodiesSpace) error {
 }
 
 func (p *ShepherdPlayer) GetCharacter() *actors.Character {
-	return &p.Character
+	return p.Character
 }
 
 func (p *ShepherdPlayer) Hurt(damage int) {
+	if p.State() == gamestates.Dying {
+		return
+	}
+
 	state, err := p.NewState(gamestates.Dying)
 	if err != nil {
 		return
