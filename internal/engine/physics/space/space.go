@@ -3,6 +3,7 @@ package space
 import (
 	"image"
 	"log"
+	"sort"
 	"sync"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -13,13 +14,16 @@ import (
 type Space struct {
 	mu                        sync.RWMutex
 	bodies                    map[string]body.Collidable
+	bodiesCache               []body.Collidable
+	cacheDirty                bool
 	toBeRemoved               []body.Collidable
 	tilemapDimensionsProvider tilemaplayer.TilemapDimensionsProvider
 }
 
 func NewSpace() body.BodiesSpace {
 	return &Space{
-		bodies: make(map[string]body.Collidable),
+		bodies:     make(map[string]body.Collidable),
+		cacheDirty: true,
 	}
 }
 
@@ -40,6 +44,7 @@ func (s *Space) AddBody(b body.Collidable) {
 	}
 
 	s.bodies[b.ID()] = b
+	s.cacheDirty = true
 }
 
 func (s *Space) Clear() {
@@ -47,6 +52,7 @@ func (s *Space) Clear() {
 	defer s.mu.Unlock()
 
 	s.bodies = make(map[string]body.Collidable)
+	s.cacheDirty = true
 }
 
 func (s *Space) RemoveBody(body body.Collidable) {
@@ -62,6 +68,7 @@ func (s *Space) RemoveBody(body body.Collidable) {
 	}
 
 	delete(s.bodies, body.ID())
+	s.cacheDirty = true
 }
 
 func (s *Space) QueueForRemoval(body body.Collidable) {
@@ -72,6 +79,10 @@ func (s *Space) ProcessRemovals() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if len(s.toBeRemoved) == 0 {
+		return
+	}
+
 	for _, b := range s.toBeRemoved {
 		if b == nil {
 			continue
@@ -79,21 +90,42 @@ func (s *Space) ProcessRemovals() {
 		delete(s.bodies, b.ID())
 	}
 	s.toBeRemoved = nil
+	s.cacheDirty = true
 }
 
+// Bodies returns a slice of all collidable bodies in the space.
+// This method uses a cache for performance. The returned slice is a direct
+// reference to the cache and MUST NOT be modified by the caller. If modifications
+// are needed, the caller should create a copy. The slice is sorted by body ID.
 func (s *Space) Bodies() []body.Collidable {
 	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	res := make([]body.Collidable, 0, len(s.bodies))
-	for _, b := range s.bodies {
-		if b == nil {
-			continue
-		}
-		res = append(res, b)
+	if !s.cacheDirty {
+		defer s.mu.RUnlock()
+		return s.bodiesCache
 	}
+	s.mu.RUnlock()
 
-	return res
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// Re-check condition, as another goroutine could have updated the cache
+	// between the RUnlock and Lock.
+	if s.cacheDirty {
+		s.bodiesCache = make([]body.Collidable, 0, len(s.bodies))
+		for _, b := range s.bodies {
+			if b == nil {
+				continue
+			}
+			s.bodiesCache = append(s.bodiesCache, b)
+		}
+
+		// Sort the bodies by ID
+		sort.Slice(s.bodiesCache, func(i, j int) bool {
+			return s.bodiesCache[i].ID() < s.bodiesCache[j].ID()
+		})
+
+		s.cacheDirty = false
+	}
+	return s.bodiesCache
 }
 
 // ResolveCollisions compare a body parameter with all bodies in space.
