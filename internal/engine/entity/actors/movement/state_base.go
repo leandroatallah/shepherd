@@ -9,6 +9,7 @@ type MovementState interface {
 	OnStart()
 	Move(space body.BodiesSpace)
 	Target() body.MovableCollidable
+	SetTarget(target body.MovableCollidable)
 }
 
 type MovementStateEnum int
@@ -46,6 +47,9 @@ func (s *BaseMovementState) OnStart() {}
 
 func (s *BaseMovementState) Target() body.MovableCollidable {
 	return s.target
+}
+func (s *BaseMovementState) SetTarget(target body.MovableCollidable) {
+	s.target = target
 }
 
 func (s *BaseMovementState) Actor() body.MovableCollidable {

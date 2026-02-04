@@ -147,6 +147,7 @@ func (s *Space) ResolveCollisions(body body.Collidable) (touching bool, blocking
 			continue
 		}
 
+		body = s.Find(body.ID())
 		body.OnTouch(other)
 		other.OnTouch(body)
 		touching = true
@@ -160,6 +161,18 @@ func (s *Space) ResolveCollisions(body body.Collidable) (touching bool, blocking
 	}
 
 	return touching, blocking
+}
+
+// Find return a body with the given ID.
+func (s *Space) Find(id string) body.Collidable {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	b, ok := s.bodies[id]
+	if !ok {
+		return nil
+	}
+	return b
 }
 
 // Query returns all bodies that overlap with the given rectangle.
