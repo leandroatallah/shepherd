@@ -1,6 +1,7 @@
 package gameplayermethods
 
 import (
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	"github.com/leandroatallah/firefly/internal/game/events"
 )
@@ -18,9 +19,13 @@ func NewPlayerDeathBehavior(p gameentitytypes.PlatformerActorEntity) *PlayerDeat
 
 func (tm *PlayerDeathBehavior) OnDie() {
 	tm.player.SetHealth(0)
-	// TODO: All actors need to freeze.
-	tm.player.SetImmobile(true)
-	tm.player.SetFreeze(true)
+	// Freeze all actors
+	if tm.player.AppContext().ActorManager != nil {
+		tm.player.AppContext().ActorManager.ForEach(func(actor actors.ActorEntity) {
+			actor.SetImmobile(true)
+			actor.SetFreeze(true)
+		})
+	}
 
 	// Trigger event to reboot scene
 	if tm.player.AppContext().EventManager != nil {
