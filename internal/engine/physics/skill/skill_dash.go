@@ -1,12 +1,15 @@
 package skill
 
 import (
+	"time"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
+	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 )
 
 // DashSkill implements a dash and air dash ability.
@@ -23,8 +26,8 @@ func NewDashSkill() *DashSkill {
 	return &DashSkill{
 		SkillBase: SkillBase{
 			state:    StateReady,
-			duration: 8,  // 8 frames (short burst)
-			cooldown: 45, // 45 frames cooldown
+			duration: timing.FromDuration(133 * time.Millisecond), // 8 frames (short burst)
+			cooldown: timing.FromDuration(750 * time.Millisecond), // 45 frames
 			speed:    fp16.To16(10),
 		},
 		canAirDash:    true,
