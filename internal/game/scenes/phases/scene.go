@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -16,6 +17,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/event"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
+	"github.com/leandroatallah/firefly/internal/engine/scene/pause"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
@@ -52,6 +54,7 @@ type PhasesScene struct {
 
 	screenFlipper  *scene.ScreenFlipper
 	sequencePlayer *sequences.SequencePlayer
+	pauseScreen    *pause.PauseScreen
 }
 
 func NewPhasesScene(context *app.AppContext) *PhasesScene {
@@ -142,6 +145,9 @@ func (s *PhasesScene) OnStart() {
 		s.player.SetImmobile(false)
 	}
 
+	// Init pause screen
+	s.pauseScreen = pause.NewPauseScreen(ebiten.KeyEnter, 250*time.Millisecond)
+
 	// Init sequence player
 	s.sequencePlayer = sequences.NewSequencePlayer(s.AppContext())
 
@@ -158,6 +164,12 @@ func (s *PhasesScene) OnStart() {
 }
 
 func (s *PhasesScene) Update() error {
+	s.pauseScreen.Update()
+
+	if s.pauseScreen.IsPaused() {
+		return nil
+	}
+
 	if s.sequencePlayer != nil {
 		s.sequencePlayer.Update()
 	}
@@ -257,6 +269,10 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	if s.ShowDrawScreenFlash > 0 {
 		DrawScreenFlash(screen)
 		s.ShowDrawScreenFlash--
+	}
+
+	if s.pauseScreen.IsPaused() {
+		s.drawPause(screen)
 	}
 }
 
@@ -369,4 +385,30 @@ func (s *PhasesScene) completePhase() {
 	}
 
 	s.phaseCompletedDelay--
+}
+
+func (s *PhasesScene) drawPause(screen *ebiten.Image) {
+	if !s.pauseScreen.IsPaused() {
+		return
+	}
+
+	cfg := config.Get()
+	for x := 0; x < cfg.ScreenWidth; x++ {
+		for y := 0; y < cfg.ScreenWidth; y++ {
+			if x%2 == 0 && y%2 == 0 {
+				vector.DrawFilledRect(screen, float32(x), float32(y), 1, 1, color.Black, false)
+			}
+		}
+	}
+
+	speed := 10
+	initialW, initialH := cfg.ScreenWidth/4, cfg.ScreenHeight/4
+	w := max(min(initialW+s.pauseScreen.Count()*speed, cfg.ScreenWidth/2), 1)
+	h := max(min(initialH+s.pauseScreen.Count()*speed, cfg.ScreenHeight/2), 1)
+	container := ebiten.NewImage(w, h)
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(cfg.ScreenWidth)/2, float64(cfg.ScreenHeight)/2)
+	op.GeoM.Translate(-float64(w/2), -float64(h/2))
+	container.Fill(color.Black)
+	screen.DrawImage(container, op)
 }
