@@ -18,6 +18,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
+	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
@@ -260,9 +261,9 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 }
 
 func (s *PhasesScene) Reboot() {
-	s.ShowDrawScreenFlash = 4 // frames
+	s.ShowDrawScreenFlash = timing.FromDuration(67 * time.Millisecond) // 4 frames
 	s.isRebooting = true
-	s.rebootDelay = 60 // frames
+	s.rebootDelay = timing.FromDuration(1 * time.Second) // 60 frames
 }
 
 func (s *PhasesScene) OnFinish() {
@@ -347,7 +348,7 @@ func (s *PhasesScene) checkPhaseCompleted() bool {
 	s.player.SetImmobile(true)
 	s.Audiomanager().FadeOut(bgSound, time.Second)
 	s.isConcludingPhase = true
-	s.phaseCompletedDelay = 120 // frames
+	s.phaseCompletedDelay = timing.FromDuration(2 * time.Second)
 	return true
 }
 

@@ -2,15 +2,15 @@ package gamescene
 
 import (
 	"image/color"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
+	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 )
-
-const NAVIGATE_BACK_DELAY = 10 // frames
 
 type PhaseRebootScene struct {
 	scene.BaseScene
@@ -32,9 +32,11 @@ func (s *PhaseRebootScene) Draw(screen *ebiten.Image) {
 }
 
 func (s *PhaseRebootScene) Update() error {
+	navigateBackDelay := timing.FromDuration(167 * time.Millisecond) // 10 frames
+
 	s.count++
 
-	if s.count > NAVIGATE_BACK_DELAY && !s.redirected {
+	if s.count > navigateBackDelay && !s.redirected {
 		s.AppContext().SceneManager.NavigateBack(transition.NewFader())
 		s.redirected = true
 	}

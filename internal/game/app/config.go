@@ -2,9 +2,11 @@ package gamesetup
 
 import (
 	"flag"
+	"time"
 
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
+	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 )
 
 const (
@@ -21,8 +23,8 @@ func NewConfig() *config.AppConfig {
 		HorizontalInertia:     2.0,
 		AirFrictionMultiplier: 0.5,
 		AirControlMultiplier:  0.25,
-		CoyoteTimeFrames:      6,
-		JumpBufferFrames:      6,
+		CoyoteTimeFrames:      timing.FromDuration(100 * time.Millisecond), // 6 frames
+		JumpBufferFrames:      timing.FromDuration(100 * time.Millisecond), // 6 frames
 		JumpForce:             4,
 		JumpCutMultiplier:     0.5,
 		UpwardGravity:         4,
@@ -37,7 +39,7 @@ func NewConfig() *config.AppConfig {
 
 		DefaultVolume: DefaultVolume,
 
-		MainFontFace: MainFontFace,
+		MainFontFace:    MainFontFace,
 		ScreenFlipSpeed: 1.0 / 60.0,
 	}
 
