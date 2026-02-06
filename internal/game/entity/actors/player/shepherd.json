@@ -43,6 +43,11 @@
           }
         ]
       },
+      "land": {
+        "path": "assets/images/shepherd-24-land.png",
+        "loop": false,
+        "collision_rect": []
+      },
       "die": {
         "path": "assets/images/shepherd-24-die.png",
         "loop": false,
@@ -75,6 +80,18 @@
       "carry_falling": {
         "path": "assets/images/shepherd-24-carry-idle.png",
         "loop": true,
+        "collision_rect": [
+          {
+            "x": 7,
+            "y": 1,
+            "width": 14,
+            "height": 23
+          }
+        ]
+      },
+      "carry_landing": {
+        "path": "assets/images/shepherd-24-carry-land.png",
+        "loop": false,
         "collision_rect": [
           {
             "x": 7,

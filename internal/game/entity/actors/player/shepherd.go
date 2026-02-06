@@ -25,7 +25,8 @@ func shepherdStateTransitionLogic(c *actors.Character) bool {
 
 	isCarryingState := state == gamestates.CarryingIdle ||
 		state == gamestates.CarryingWalking ||
-		state == gamestates.CarryingFalling
+		state == gamestates.CarryingFalling ||
+		state == gamestates.CarryingLanding
 
 	if !isCarryingState {
 		return false // Let the engine handle other states
@@ -43,6 +44,15 @@ func shepherdStateTransitionLogic(c *actors.Character) bool {
 
 	// State machine for when the character is carrying something.
 	switch {
+	case state == gamestates.CarryingLanding:
+		isAnimationOver := c.IsAnimationFinished()
+		if c.IsWalking() {
+			setNewState(gamestates.CarryingWalking)
+		} else if isAnimationOver {
+			setNewState(gamestates.CarryingIdle)
+		}
+	case state == gamestates.CarryingFalling && !c.IsFalling():
+		setNewState(gamestates.CarryingLanding)
 	case state != gamestates.CarryingFalling && c.IsFalling():
 		setNewState(gamestates.CarryingFalling)
 	case state != gamestates.CarryingWalking && c.IsWalking():
@@ -57,7 +67,7 @@ func shepherdStateTransitionLogic(c *actors.Character) bool {
 }
 
 type ShepherdPlayer struct {
-	gameentitytypes.PlatformerCharacter
+	*gameentitytypes.PlatformerCharacter
 	gameentitytypes.SheepCarrier
 	baseSpeed int
 
@@ -81,7 +91,7 @@ func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEnti
 	character.SetStateTransitionHandler(shepherdStateTransitionLogic)
 
 	player := &ShepherdPlayer{
-		PlatformerCharacter: *character,
+		PlatformerCharacter: character,
 	}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	player.SetOwner(player)
@@ -151,7 +161,8 @@ func (p *ShepherdPlayer) IsCarryingSheep() bool {
 	state := p.State()
 	return state == gamestates.CarryingIdle ||
 		state == gamestates.CarryingWalking ||
-		state == gamestates.CarryingFalling
+		state == gamestates.CarryingFalling ||
+		state == gamestates.CarryingLanding
 }
 
 func (p *ShepherdPlayer) DropSheep() {

@@ -53,11 +53,21 @@ func (s *CarryingFallingState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
 }
 
+// CarryingLanding
+type CarryingLandingState struct {
+	actors.BaseState
+}
+
+func (s *CarryingLandingState) OnStart(currentCount int) {
+	s.BaseState.OnStart(currentCount)
+}
+
 var (
 	Dying           actors.ActorStateEnum
 	CarryingIdle    actors.ActorStateEnum
 	CarryingWalking actors.ActorStateEnum
 	CarryingFalling actors.ActorStateEnum
+	CarryingLanding actors.ActorStateEnum
 )
 
 func init() {
@@ -65,4 +75,5 @@ func init() {
 	CarryingIdle = actors.RegisterState("carry_idle", func(b actors.BaseState) actors.ActorState { return &CarryingIdleState{BaseState: b} })
 	CarryingWalking = actors.RegisterState("carry_walking", func(b actors.BaseState) actors.ActorState { return &CarryingWalkingState{BaseState: b} })
 	CarryingFalling = actors.RegisterState("carry_falling", func(b actors.BaseState) actors.ActorState { return &CarryingFallingState{BaseState: b} })
+	CarryingLanding = actors.RegisterState("carry_landing", func(b actors.BaseState) actors.ActorState { return &CarryingLandingState{BaseState: b} })
 }

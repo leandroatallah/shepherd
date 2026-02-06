@@ -13,7 +13,7 @@ import (
 )
 
 type DogPlayer struct {
-	gameentitytypes.PlatformerCharacter
+	*gameentitytypes.PlatformerCharacter
 
 	*gameplayermethods.PlayerDeathBehavior
 }
@@ -34,7 +34,7 @@ func NewDogPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, e
 	character.SetStateTransitionHandler(gameplayermethods.StandardStateTransitionLogic)
 
 	player := &DogPlayer{
-		PlatformerCharacter: *character,
+		PlatformerCharacter: character,
 	}
 	player.SetOwner(player)
 	// Ensure the original character pointer (referenced by physics bodies) also points to the player
