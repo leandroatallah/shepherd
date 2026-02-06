@@ -32,3 +32,12 @@ type SpriteData struct {
 	FrameRate       int                           `json:"frame_rate"`
 	FacingDirection animation.FacingDirectionEnum `json:"facing_direction"` // 0 - right, 1 - left
 }
+
+// ParticleData defines the configuration for a particle effect.
+type ParticleData struct {
+	Image       string  `json:"image"`
+	FrameWidth  int     `json:"frame_width"`
+	FrameHeight int     `json:"frame_height"`
+	FrameRate   int     `json:"frame_rate"` // Ticks per frame
+	Scale       float64 `json:"scale"`
+}
