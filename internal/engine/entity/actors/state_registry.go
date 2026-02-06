@@ -12,6 +12,7 @@ var (
 
 func RegisterState(name string, constructor StateConstructor) ActorStateEnum {
 	if val, ok := stateEnums[name]; ok {
+		stateConstructors[val] = constructor
 		return val
 	}
 

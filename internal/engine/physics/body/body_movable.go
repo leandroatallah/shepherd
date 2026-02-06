@@ -13,17 +13,17 @@ type MovableBody struct {
 
 	Ownership
 
-	vx16          int
-	vy16          int
-	accelerationX int
-	accelerationY int
-	speed         int
+	vx16                int
+	vy16                int
+	accelerationX       int
+	accelerationY       int
+	speed               int
 	maxSpeed            int
 	jumpForceMultiplier float64
 	horizontalInertia   float64
 	immobile            bool
-	freeze        bool
-	faceDirection animation.FacingDirectionEnum
+	freeze              bool
+	faceDirection       animation.FacingDirectionEnum
 }
 
 func NewMovableBody(body *Body) *MovableBody {

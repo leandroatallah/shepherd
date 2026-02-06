@@ -36,6 +36,7 @@ type Character struct {
 	skills []skill.Skill
 
 	StateTransitionHandler func(*Character) bool
+	OnStateChange          func(oldState, newState ActorStateEnum)
 	bodyphysics.Ownership
 }
 
@@ -107,6 +108,13 @@ func (c *Character) State() ActorStateEnum {
 	return c.state.State()
 }
 
+func (c *Character) IsAnimationFinished() bool {
+	if c.state == nil {
+		return true
+	}
+	return c.state.IsAnimationFinished()
+}
+
 func (c *Character) AddCollisionRect(state ActorStateEnum, rect body.Collidable) {
 	c.StateCollisionManager.AddCollisionRect(state, rect)
 }
@@ -122,9 +130,20 @@ func (c *Character) NewState(state ActorStateEnum) (ActorState, error) {
 // SetState set a new Character state and update current collision shapes.
 func (c *Character) SetState(state ActorState) {
 	if c.state == nil || c.state.State() != state.State() {
+		var oldState ActorStateEnum
+		if c.state != nil {
+			oldState = c.state.State()
+		} else {
+			oldState = -1 // Unknown/First state
+		}
+
 		c.state = state
 		c.state.OnStart(c.count)
 		c.StateCollisionManager.RefreshCollisions()
+
+		if c.OnStateChange != nil {
+			c.OnStateChange(oldState, c.state.State())
+		}
 	}
 }
 
@@ -244,10 +263,19 @@ func (c *Character) handleState() {
 
 	switch {
 	case state == Hurted:
-		isAnimationOver := c.state.(*HurtState).IsAnimationFinished()
+		isAnimationOver := c.state.IsAnimationFinished()
 		if isAnimationOver {
 			setNewState(Idle)
 		}
+	case state == Landing:
+		isAnimationOver := c.state.IsAnimationFinished()
+		if c.IsWalking() {
+			setNewState(Walking)
+		} else if isAnimationOver {
+			setNewState(Idle)
+		}
+	case state == Falling && !c.IsFalling():
+		setNewState(Landing)
 	case state != Falling && c.IsFalling():
 		setNewState(Falling)
 	case state != Walking && c.IsWalking():

@@ -27,6 +27,15 @@ func (s *FallState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
 }
 
+// Landing
+type LandingState struct {
+	BaseState
+}
+
+func (s *LandingState) OnStart(currentCount int) {
+	s.BaseState.OnStart(currentCount)
+}
+
 // Hurt
 type HurtState struct {
 	BaseState
@@ -37,9 +46,4 @@ type HurtState struct {
 func (s *HurtState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
 	s.durationLimit = 30 // 0.5 sec, duration of the hurt animation
-}
-
-func (s *HurtState) IsAnimationFinished() bool {
-	s.count++
-	return s.count > s.durationLimit
 }
