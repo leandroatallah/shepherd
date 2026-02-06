@@ -15,6 +15,8 @@ type JumpSkill struct {
 
 	coyoteTimeCounter int
 	jumpBufferCounter int
+
+	OnJump func(body body.MovableCollidable)
 }
 
 func NewJumpSkill() *JumpSkill {
@@ -52,6 +54,10 @@ func (s *JumpSkill) tryActivate(body body.MovableCollidable, model *physicsmovem
 		}
 
 		body.TryJump(force)
+
+		if s.OnJump != nil {
+			s.OnJump(body)
+		}
 
 		// Check against map boundaries if the actor has a physics space.
 		for _, other := range space.Bodies() {
@@ -100,6 +106,9 @@ func (s *JumpSkill) handleCoyoteAndJumpBuffering(body body.MovableCollidable, mo
 		}
 
 		body.TryJump(force)
+		if s.OnJump != nil {
+			s.OnJump(body)
+		}
 		model.SetOnGround(false)
 		s.jumpBufferCounter = 0
 		s.coyoteTimeCounter = 0
