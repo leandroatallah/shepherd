@@ -26,6 +26,7 @@ import (
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	"github.com/leandroatallah/firefly/internal/game/events"
+	"github.com/leandroatallah/firefly/internal/game/render/vfx"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
@@ -55,6 +56,7 @@ type PhasesScene struct {
 	screenFlipper  *scene.ScreenFlipper
 	sequencePlayer *sequences.SequencePlayer
 	pauseScreen    *pause.PauseScreen
+	vfxManager     *vfx.Manager
 }
 
 func NewPhasesScene(context *app.AppContext) *PhasesScene {
@@ -81,12 +83,31 @@ func NewPhasesScene(context *app.AppContext) *PhasesScene {
 		}
 	})
 
+	context.EventManager.Subscribe(events.PlayerJumpedType, func(e event.Event) {
+		if scene.vfxManager == nil {
+			return
+		}
+		if evt, ok := e.(*events.PlayerJumpedEvent); ok {
+			scene.vfxManager.SpawnJumpPuff(evt.X, evt.Y, 1)
+		}
+	})
+
+	context.EventManager.Subscribe(events.PlayerLandedType, func(e event.Event) {
+		if scene.vfxManager == nil {
+			return
+		}
+		if evt, ok := e.(*events.PlayerLandedEvent); ok {
+			scene.vfxManager.SpawnLandingPuff(evt.X, evt.Y, 1)
+		}
+	})
+
 	return &scene
 }
 
 func (s *PhasesScene) OnStart() {
 	s.TilemapScene.OnStart()
 	s.count = 0
+	s.vfxManager = vfx.NewManager()
 
 	// Create player and register to space and context
 	p, err := createPlayer(s.AppContext(), gameentitytypes.ShepherdPlayerType)
@@ -172,6 +193,10 @@ func (s *PhasesScene) Update() error {
 
 	if s.sequencePlayer != nil {
 		s.sequencePlayer.Update()
+	}
+
+	if s.vfxManager != nil {
+		s.vfxManager.Update()
 	}
 
 	if s.screenFlipper != nil {
@@ -269,6 +294,10 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	if s.ShowDrawScreenFlash > 0 {
 		DrawScreenFlash(screen)
 		s.ShowDrawScreenFlash--
+	}
+
+	if s.vfxManager != nil {
+		s.vfxManager.Draw(screen, s.Camera())
 	}
 
 	if s.pauseScreen.IsPaused() {
