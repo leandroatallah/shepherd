@@ -9,6 +9,23 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+const (
+	flippedHorizontallyFlag = 0x80000000
+	flippedVerticallyFlag   = 0x40000000
+	flippedDiagonallyFlag   = 0x20000000
+	flipFlagsMask           = flippedHorizontallyFlag | flippedVerticallyFlag | flippedDiagonallyFlag
+)
+
+// extractGIDAndFlags parses the raw GID to separate the tile ID and flip flags.
+func extractGIDAndFlags(rawID int) (int, bool, bool, bool) {
+	raw := uint32(rawID)
+	h := (raw & flippedHorizontallyFlag) != 0
+	v := (raw & flippedVerticallyFlag) != 0
+	d := (raw & flippedDiagonallyFlag) != 0
+	gid := int(raw &^ flipFlagsMask)
+	return gid, h, v, d
+}
+
 type Tilemap struct {
 	Height       int        `json:"height"`
 	Width        int        `json:"width"`
@@ -135,15 +152,18 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 	for _, obj := range layer.Objects {
 		x16 := int(math.Round(obj.X))
 		yValue := obj.Y
-		if obj.Gid > 0 {
+
+		gid, _, _, _ := extractGIDAndFlags(obj.Gid)
+
+		if gid > 0 {
 			yValue -= obj.Height
 		}
 		y16 := int(math.Round(yValue))
 		if firstgid == 0 {
-			firstgid = obj.Gid
+			firstgid = gid
 			ts = t.findTileset(firstgid)
 		}
-		itemType := tilesetSourceID(ts, obj.Gid)
+		itemType := tilesetSourceID(ts, gid)
 
 		var id string
 		for _, p := range obj.Properties {
@@ -187,7 +207,10 @@ func (t *Tilemap) GetEnemiesPositionID() []*EnemyPosition {
 	for _, obj := range layer.Objects {
 		x16 := int(math.Round(obj.X))
 		yValue := obj.Y
-		if obj.Gid > 0 {
+
+		gid, _, _, _ := extractGIDAndFlags(obj.Gid)
+
+		if gid > 0 {
 			yValue -= obj.Height
 		}
 		y16 := int(math.Round(yValue))

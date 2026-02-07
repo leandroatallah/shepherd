@@ -74,7 +74,40 @@ func tilesetSourceID(ts *Tileset, gid int) int {
 	return gid - ts.Firstgid
 }
 
+// applyFlips applies Tiled's flipping/rotation to the DrawImageOptions.
+// w and h are the tile width and height.
+func applyFlips(op *ebiten.DrawImageOptions, h, v, d bool, tileW, tileH float64) {
+	if d {
+		// Diagonal flip: Swap x and y axis
+		op.GeoM.SetElement(0, 0, 0)
+		op.GeoM.SetElement(0, 1, 1)
+		op.GeoM.SetElement(1, 0, 1)
+		op.GeoM.SetElement(1, 1, 0)
+	}
+
+	if h {
+		op.GeoM.Scale(-1, 1)
+		// Translate back to positive coordinates
+		// For standard tiles, let's use the dimension along the X axis.
+		wd := tileW
+		if d {
+			wd = tileH
+		}
+		op.GeoM.Translate(wd, 0)
+	}
+
+	if v {
+		op.GeoM.Scale(1, -1)
+		hd := tileH
+		if d {
+			hd = tileW
+		}
+		op.GeoM.Translate(0, hd)
+	}
+}
+
 // drawTileOpts returns a DrawImageOptions translated to the destination pixel coordinates.
+// Now it only handles translation. Flips should be applied before.
 func drawTileOpts(i, layerWidth, tileWidth, tileHeight int) *ebiten.DrawImageOptions {
 	x := i % layerWidth
 	y := i / layerWidth
@@ -91,7 +124,12 @@ func (t *Tilemap) ParseBase(layer *Layer, result *ebiten.Image) {
 		return
 	}
 
-	for i, tileID := range layer.Data {
+	for i, rawID := range layer.Data {
+		if rawID == 0 {
+			continue
+		}
+
+		tileID, flipH, flipV, flipD := extractGIDAndFlags(rawID)
 		if tileID == 0 {
 			continue
 		}
@@ -104,7 +142,17 @@ func (t *Tilemap) ParseBase(layer *Layer, result *ebiten.Image) {
 		srcRect := tilesetSourceRect(ts, tileID)
 
 		tile := ts.EbitenImage.SubImage(srcRect).(*ebiten.Image)
-		op := drawTileOpts(i, layer.Width, ts.Tilewidth, ts.Tileheight)
+		
+		op := &ebiten.DrawImageOptions{}
+		applyFlips(op, flipH, flipV, flipD, float64(ts.Tilewidth), float64(ts.Tileheight))
+		
+		// Then translate to position
+		x := i % layer.Width
+		y := i / layer.Width
+		dx := float64(x * ts.Tilewidth)
+		dy := float64(y * ts.Tileheight)
+		op.GeoM.Translate(dx, dy)
+		
 		result.DrawImage(tile, op)
 	}
 }
@@ -115,7 +163,12 @@ func (t *Tilemap) ParseItems(layer *Layer, result *ebiten.Image) {
 	}
 
 	for _, obj := range layer.Objects {
-		gid := obj.Gid
+		rawID := obj.Gid
+		if rawID == 0 {
+			continue
+		}
+		
+		gid, flipH, flipV, flipD := extractGIDAndFlags(rawID)
 		if gid == 0 {
 			continue
 		}
@@ -127,8 +180,11 @@ func (t *Tilemap) ParseItems(layer *Layer, result *ebiten.Image) {
 
 		srcRect := tilesetSourceRect(ts, gid)
 		tileImg := ts.EbitenImage.SubImage(srcRect).(*ebiten.Image)
+		
 		op := &ebiten.DrawImageOptions{}
+		applyFlips(op, flipH, flipV, flipD, float64(ts.Tilewidth), float64(ts.Tileheight))
 		op.GeoM.Translate(obj.X, obj.Y-obj.Height)
+		
 		result.DrawImage(tileImg, op)
 	}
 }
