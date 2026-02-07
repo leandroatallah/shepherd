@@ -88,7 +88,8 @@ func NewPhasesScene(context *app.AppContext) *PhasesScene {
 			return
 		}
 		if evt, ok := e.(*events.PlayerJumpedEvent); ok {
-			scene.vfxManager.SpawnJumpPuff(evt.X, evt.Y, 1)
+			yOffset := 1.0
+			scene.vfxManager.SpawnJumpPuff(evt.X, evt.Y+yOffset, 1)
 		}
 	})
 
@@ -97,7 +98,8 @@ func NewPhasesScene(context *app.AppContext) *PhasesScene {
 			return
 		}
 		if evt, ok := e.(*events.PlayerLandedEvent); ok {
-			scene.vfxManager.SpawnLandingPuff(evt.X, evt.Y, 1)
+			yOffset := 1.0
+			scene.vfxManager.SpawnLandingPuff(evt.X, evt.Y+yOffset, 1)
 		}
 	})
 

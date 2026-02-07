@@ -4,7 +4,6 @@ import (
 	"image"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/context"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
@@ -22,7 +21,11 @@ type PlatformerActorEntity interface {
 	context.ContextProvider
 
 	OnDie()
+	OnJump()
+	OnLand()
+	OnFall()
 	SetOnJump(func(image.Point))
+	SetOnFall(func(image.Point))
 }
 
 type PlatformerCharacter struct {
@@ -32,31 +35,52 @@ type PlatformerCharacter struct {
 	coinCount        int
 	movementBlockers int
 
-	OnJump func(image.Point)
-	OnLand func(image.Point)
+	jumpHandler func(image.Point)
+	landHandler func(image.Point)
+	fallHandler func(image.Point)
 }
 
 func (p *PlatformerCharacter) SetOnJump(f func(image.Point)) {
-	p.OnJump = f
+	p.jumpHandler = f
+}
+
+func (p *PlatformerCharacter) SetOnFall(f func(image.Point)) {
+	p.fallHandler = f
 }
 
 func (p *PlatformerCharacter) SetOnLand(f func(image.Point)) {
-	p.OnLand = f
+	p.landHandler = f
+}
+
+func (p *PlatformerCharacter) OnJump() {
+	if p.jumpHandler != nil {
+		rect := p.Position()
+		// Bottom center
+		pos := image.Point{X: rect.Min.X + rect.Dx()/2, Y: rect.Max.Y}
+		p.jumpHandler(pos)
+	}
+}
+
+func (p *PlatformerCharacter) OnFall() {
+	if p.fallHandler != nil {
+		rect := p.Position()
+		// Bottom center
+		pos := image.Point{X: rect.Min.X + rect.Dx()/2, Y: rect.Max.Y}
+		p.fallHandler(pos)
+	}
+}
+
+func (p *PlatformerCharacter) OnLand() {
+	if p.landHandler != nil {
+		rect := p.Position()
+		// Bottom center
+		pos := image.Point{X: rect.Min.X + rect.Dx()/2, Y: rect.Max.Y}
+		p.landHandler(pos)
+	}
 }
 
 func (p *PlatformerCharacter) AddSkill(s skill.Skill) {
 	p.Character.AddSkill(s)
-
-	if js, ok := s.(*skill.JumpSkill); ok {
-		js.OnJump = func(b body.MovableCollidable) {
-			if p.OnJump != nil {
-				rect := b.Position()
-				// Bottom center
-				pos := image.Point{X: rect.Min.X + rect.Dx()/2, Y: rect.Max.Y}
-				p.OnJump(pos)
-			}
-		}
-	}
 }
 
 func NewPlatformerCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *PlatformerCharacter {
@@ -65,42 +89,19 @@ func NewPlatformerCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Pl
 		Character: c,
 	}
 
-	pf.Character.OnStateChange = func(oldState, newState actors.ActorStateEnum) {
-		isLanding := (oldState == actors.Falling && newState == actors.Landing)
-
-		if !isLanding {
-			carryFalling, ok1 := actors.GetStateEnum("carry_falling")
-			carryLanding, ok2 := actors.GetStateEnum("carry_landing")
-			if ok1 && ok2 && oldState == carryFalling && newState == carryLanding {
-				isLanding = true
-			}
-		}
-
-		if isLanding {
-			if pf.OnLand != nil {
-				rect := pf.Position()
-				// Bottom center
-				pos := image.Point{X: rect.Min.X + rect.Dx()/2, Y: rect.Max.Y}
-				pf.OnLand(pos)
-			}
-		}
-	}
-
 	pf.SetOnJump(func(pos image.Point) {
 		if pf.AppContext() != nil {
-			yOffset := 1.0
 			pf.AppContext().EventManager.Publish(&events.PlayerJumpedEvent{
 				X: float64(pos.X),
-				Y: float64(pos.Y) + yOffset,
+				Y: float64(pos.Y),
 			})
 		}
 	})
 	pf.SetOnLand(func(pos image.Point) {
 		if pf.AppContext() != nil {
-			yOffset := 1.0
 			pf.AppContext().EventManager.Publish(&events.PlayerLandedEvent{
 				X: float64(pos.X),
-				Y: float64(pos.Y) + yOffset,
+				Y: float64(pos.Y),
 			})
 		}
 	})

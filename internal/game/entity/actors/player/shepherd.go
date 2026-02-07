@@ -26,7 +26,8 @@ func shepherdStateTransitionLogic(c *actors.Character) bool {
 	isCarryingState := state == gamestates.CarryingIdle ||
 		state == gamestates.CarryingWalking ||
 		state == gamestates.CarryingFalling ||
-		state == gamestates.CarryingLanding
+		state == gamestates.CarryingLanding ||
+		state == gamestates.CarryingJump
 
 	if !isCarryingState {
 		return false // Let the engine handle other states

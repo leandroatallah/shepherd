@@ -31,6 +31,18 @@
           }
         ]
       },
+      "jump": {
+        "path": "assets/images/shepherd-24-jump.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 7,
+            "y": 1,
+            "width": 14,
+            "height": 23
+          }
+        ]
+      },
       "fall": {
         "path": "assets/images/shepherd-24-fall.png",
         "loop": false,
@@ -77,9 +89,21 @@
           }
         ]
       },
+      "carry_jump": {
+        "path": "assets/images/shepherd-24-carry-jump.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 7,
+            "y": 1,
+            "width": 14,
+            "height": 23
+          }
+        ]
+      },
       "carry_falling": {
-        "path": "assets/images/shepherd-24-carry-idle.png",
-        "loop": true,
+        "path": "assets/images/shepherd-24-carry-fall.png",
+        "loop": false,
         "collision_rect": [
           {
             "x": 7,

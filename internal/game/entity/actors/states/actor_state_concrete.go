@@ -13,15 +13,7 @@ type DyingState struct {
 func (s *DyingState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
 
-	actor := s.GetActor()
-
-	// Try to find the root owner (e.g. ShepherdPlayer) if the actor is just a component (e.g. Character)
-	var root interface{} = actor
-	if lastOwner := actor.LastOwner(); lastOwner != nil {
-		root = lastOwner
-	}
-
-	if p, ok := root.(gameentitytypes.PlatformerActorEntity); ok {
+	if p, ok := s.GetRootOwner().(gameentitytypes.PlatformerActorEntity); ok {
 		p.OnDie()
 	}
 }
@@ -44,6 +36,19 @@ func (s *CarryingWalkingState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
 }
 
+// CarryingJump
+type CarryingJumpState struct {
+	actors.BaseState
+}
+
+func (s *CarryingJumpState) OnStart(currentCount int) {
+	s.BaseState.OnStart(currentCount)
+
+	if j, ok := s.GetRootOwner().(actors.Jumpable); ok {
+		j.OnJump()
+	}
+}
+
 // CarryingFalling
 type CarryingFallingState struct {
 	actors.BaseState
@@ -51,6 +56,10 @@ type CarryingFallingState struct {
 
 func (s *CarryingFallingState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
+
+	if f, ok := s.GetRootOwner().(actors.Fallable); ok {
+		f.OnFall()
+	}
 }
 
 // CarryingLanding
@@ -60,12 +69,17 @@ type CarryingLandingState struct {
 
 func (s *CarryingLandingState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
+
+	if l, ok := s.GetRootOwner().(actors.Landable); ok {
+		l.OnLand()
+	}
 }
 
 var (
 	Dying           actors.ActorStateEnum
 	CarryingIdle    actors.ActorStateEnum
 	CarryingWalking actors.ActorStateEnum
+	CarryingJump    actors.ActorStateEnum
 	CarryingFalling actors.ActorStateEnum
 	CarryingLanding actors.ActorStateEnum
 )
@@ -74,6 +88,7 @@ func init() {
 	Dying = actors.RegisterState("die", func(b actors.BaseState) actors.ActorState { return &DyingState{BaseState: b} })
 	CarryingIdle = actors.RegisterState("carry_idle", func(b actors.BaseState) actors.ActorState { return &CarryingIdleState{BaseState: b} })
 	CarryingWalking = actors.RegisterState("carry_walking", func(b actors.BaseState) actors.ActorState { return &CarryingWalkingState{BaseState: b} })
+	CarryingJump = actors.RegisterState("carry_jump", func(b actors.BaseState) actors.ActorState { return &CarryingJumpState{BaseState: b} })
 	CarryingFalling = actors.RegisterState("carry_falling", func(b actors.BaseState) actors.ActorState { return &CarryingFallingState{BaseState: b} })
 	CarryingLanding = actors.RegisterState("carry_landing", func(b actors.BaseState) actors.ActorState { return &CarryingLandingState{BaseState: b} })
 }
