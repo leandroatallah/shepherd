@@ -274,8 +274,15 @@ func (c *Character) handleState() {
 		} else if isAnimationOver {
 			setNewState(Idle)
 		}
+	case state == Jumping:
+		isAnimationOver := c.state.IsAnimationFinished()
+		if isAnimationOver {
+			setNewState(Idle)
+		}
 	case state == Falling && !c.IsFalling():
 		setNewState(Landing)
+	case c.IsGoingUp():
+		setNewState(Jumping)
 	case state != Falling && c.IsFalling():
 		setNewState(Falling)
 	case state != Walking && c.IsWalking():

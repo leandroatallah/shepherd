@@ -18,6 +18,19 @@ func (s *WalkState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
 }
 
+// Jumping
+type JumpState struct {
+	BaseState
+}
+
+func (s *JumpState) OnStart(currentCount int) {
+	s.BaseState.OnStart(currentCount)
+
+	if j, ok := s.GetRootOwner().(Jumpable); ok {
+		j.OnJump()
+	}
+}
+
 // Falling
 type FallState struct {
 	BaseState
@@ -25,6 +38,10 @@ type FallState struct {
 
 func (s *FallState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
+
+	if f, ok := s.GetRootOwner().(Fallable); ok {
+		f.OnFall()
+	}
 }
 
 // Landing
@@ -34,6 +51,10 @@ type LandingState struct {
 
 func (s *LandingState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
+
+	if l, ok := s.GetRootOwner().(Landable); ok {
+		l.OnLand()
+	}
 }
 
 // Hurt

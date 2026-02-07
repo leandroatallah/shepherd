@@ -33,6 +33,18 @@ type Damageable interface {
 	Hurt(damage int)
 }
 
+type Jumpable interface {
+	OnJump()
+}
+
+type Landable interface {
+	OnLand()
+}
+
+type Fallable interface {
+	OnFall()
+}
+
 // ActorEntity is the master interface for all game actors.
 // It is composed of smaller interfaces that define specific behaviors.
 type ActorEntity interface {
