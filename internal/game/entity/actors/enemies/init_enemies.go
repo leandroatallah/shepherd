@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	WolfEnemyType enemies.EnemyType = "WOLF"
-	BatEnemyType  enemies.EnemyType = "BAT"
+	WolfEnemyType  enemies.EnemyType = "WOLF"
+	BatEnemyType   enemies.EnemyType = "BAT"
+	SwarmEnemyType enemies.EnemyType = "SWARM"
 )
 
 func InitEnemyMap(ctx *app.AppContext) enemies.EnemyMap[gameentitytypes.PlatformerActorEntity] {
@@ -26,6 +27,13 @@ func InitEnemyMap(ctx *app.AppContext) enemies.EnemyMap[gameentitytypes.Platform
 		},
 		BatEnemyType: func(x, y int, id string) gameentitytypes.PlatformerActorEntity {
 			enemy, err := NewBatEnemy(ctx, x, y, id)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return enemy
+		},
+		SwarmEnemyType: func(x, y int, id string) gameentitytypes.PlatformerActorEntity {
+			enemy, err := NewSwarmEnemy(ctx, x, y, id)
 			if err != nil {
 				log.Fatal(err)
 			}
