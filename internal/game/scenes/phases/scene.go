@@ -319,6 +319,11 @@ func (s *PhasesScene) OnFinish() {
 }
 
 func (s *PhasesScene) endpointTrigger(eventID string) {
+	if eventID == "SPIKE" {
+		s.player.OnDie()
+		return
+	}
+
 	sheepCarrier, ok := s.player.(gameentitytypes.SheepCarrier)
 	if !ok {
 		return
