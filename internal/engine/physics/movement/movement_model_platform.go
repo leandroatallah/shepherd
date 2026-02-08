@@ -75,8 +75,30 @@ func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollid
 		}
 
 		body.SetVelocity(vx16, vy16)
+	} else {
+		// If inertia is disabled, check if we have acceleration pending from a state/command
+		accX, _ := body.Acceleration()
+		if accX != 0 {
+			vx16, vy16 := body.Velocity()
+			vx16 = accX
+			body.SetVelocity(vx16, vy16)
+		}
 	}
 
+	return body.Velocity()
+}
+
+func (m *PlatformMovementModel) UpdateVerticalVelocity(body body.MovableCollidable) (int, int) {
+	if m.gravityEnabled {
+		return body.Velocity()
+	}
+
+	_, accY := body.Acceleration()
+	if accY != 0 {
+		vx16, vy16 := body.Velocity()
+		vy16 = accY
+		body.SetVelocity(vx16, vy16)
+	}
 	return body.Velocity()
 }
 
@@ -123,6 +145,11 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 		vx16 = m.dashVelocityX
 	} else {
 		vx16, _ = m.UpdateHorizontalVelocity(body)
+	}
+
+	// Handle vertical movement if gravity is disabled
+	if !m.gravityEnabled {
+		_, vy16 = m.UpdateVerticalVelocity(body)
 	}
 
 	// Apply horizontal movement to the body and check for collisions.
