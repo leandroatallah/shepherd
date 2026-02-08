@@ -30,7 +30,7 @@
         ]
       },
       "die": {
-        "path": "assets/images/shepherd-24-die.png",
+        "path": "assets/images/sheep-24-die.png",
         "loop": false,
         "collision_rect": []
       }
