@@ -15,6 +15,7 @@ type PlatformMovementModel struct {
 	isScripted            bool
 	dashActive            bool
 	dashVelocityX         int
+	gravityEnabled        bool
 }
 
 // NewPlatformMovementModel creates a new PlatformMovementModel with default values.
@@ -22,6 +23,7 @@ func NewPlatformMovementModel(playerMovementBlocker PlayerMovementBlocker) *Plat
 	m := &PlatformMovementModel{
 		playerMovementBlocker: playerMovementBlocker,
 		maxFallSpeed:          config.Get().Physics.MaxFallSpeed,
+		gravityEnabled:        true,
 	}
 	return m
 }
@@ -39,7 +41,7 @@ func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollid
 		scaledAccX, _ := smoothDiagonalMovement(accX, 0)
 
 		// Apply air control multiplier if the player is in the air
-		if !m.onGround {
+		if !m.onGround && m.gravityEnabled {
 			scaledAccX = int(float64(scaledAccX) * cfg.Physics.AirControlMultiplier)
 		}
 
@@ -59,7 +61,7 @@ func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollid
 			friction := baseFriction
 
 			// Apply air friction multiplier if the player is in the air
-			if !m.onGround {
+			if !m.onGround && m.gravityEnabled {
 				friction = int(float64(baseFriction) * cfg.Physics.AirFrictionMultiplier)
 			}
 
@@ -80,6 +82,10 @@ func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollid
 
 func (m *PlatformMovementModel) handleGravity(b body.MovableCollidable) (int, int) {
 	vx16, vy16 := b.Velocity()
+
+	if !m.gravityEnabled {
+		return vx16, vy16
+	}
 
 	if m.onGround {
 		return vx16, vy16
@@ -143,7 +149,7 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 	if isGrounded {
 		m.onGround = true
 		// Set a small downward velocity to "stick" to the ground, ensuring it's less than the falling threshold.
-		if vy16 >= 0 {
+		if m.gravityEnabled && vy16 >= 0 {
 			vy16 = cfg.Physics.DownwardGravity - 1
 			body.SetVelocity(vx16, vy16)
 		}
@@ -152,8 +158,10 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 	}
 
 	if clampToPlayArea(body, space) {
-		vy16 = cfg.Physics.DownwardGravity - 1
-		body.SetVelocity(vx16, vy16)
+		if m.gravityEnabled {
+			vy16 = cfg.Physics.DownwardGravity - 1
+			body.SetVelocity(vx16, vy16)
+		}
 	}
 
 	// --- Final State Updates ---
@@ -185,6 +193,10 @@ func (m *PlatformMovementModel) SetOnGround(value bool) {
 func (m *PlatformMovementModel) SetDashActive(active bool, vx int) {
 	m.dashActive = active
 	m.dashVelocityX = vx
+}
+
+func (m *PlatformMovementModel) SetGravityEnabled(enabled bool) {
+	m.gravityEnabled = enabled
 }
 
 func (m *PlatformMovementModel) CheckGround(b body.MovableCollidable, space body.BodiesSpace) bool {

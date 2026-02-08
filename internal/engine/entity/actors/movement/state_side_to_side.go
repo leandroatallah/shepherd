@@ -14,6 +14,7 @@ type SideToSideMovementState struct {
 	waitDuration int
 	waitTimer    int
 	isWaiting    bool
+	ignoreLedges bool
 }
 
 // NewSideToSideMovementState creates a new SideToSideMovementState.
@@ -29,6 +30,15 @@ func WithWaitBeforeTurn(duration int) MovementStateOption {
 	return func(ms MovementState) {
 		if s, ok := ms.(*SideToSideMovementState); ok {
 			s.waitDuration = duration
+		}
+	}
+}
+
+// WithIgnoreLedges sets whether the actor should ignore ledges (e.g. for flying enemies).
+func WithIgnoreLedges(ignore bool) MovementStateOption {
+	return func(ms MovementState) {
+		if s, ok := ms.(*SideToSideMovementState); ok {
+			s.ignoreLedges = ignore
 		}
 	}
 }
@@ -75,28 +85,30 @@ func (s *SideToSideMovementState) shouldTurn(space body.BodiesSpace) bool {
 	actorPos := s.actor.Position()
 
 	// 1. Ledge detection
-	var groundCheckPoint image.Point
-	if s.movingRight {
-		// Check point is at the actor's bottom-right corner, plus one pixel down.
-		groundCheckPoint = image.Point{X: actorPos.Max.X, Y: actorPos.Max.Y + 1}
-	} else {
-		// Check point is at the actor's bottom-left corner, minus one pixel left, plus one pixel down.
-		groundCheckPoint = image.Point{X: actorPos.Min.X - 1, Y: actorPos.Max.Y + 1}
-	}
-
-	groundCheckRect := image.Rectangle{Min: groundCheckPoint, Max: groundCheckPoint.Add(image.Point{X: 1, Y: 1})}
-
-	hasGround := false
-	colliders := space.Query(groundCheckRect)
-	for _, c := range colliders {
-		if c.IsObstructive() && c.ID() != s.actor.ID() {
-			hasGround = true
-			break
+	if !s.ignoreLedges {
+		var groundCheckPoint image.Point
+		if s.movingRight {
+			// Check point is at the actor's bottom-right corner, plus one pixel down.
+			groundCheckPoint = image.Point{X: actorPos.Max.X, Y: actorPos.Max.Y + 1}
+		} else {
+			// Check point is at the actor's bottom-left corner, minus one pixel left, plus one pixel down.
+			groundCheckPoint = image.Point{X: actorPos.Min.X - 1, Y: actorPos.Max.Y + 1}
 		}
-	}
 
-	if !hasGround {
-		return true // Turn at ledge
+		groundCheckRect := image.Rectangle{Min: groundCheckPoint, Max: groundCheckPoint.Add(image.Point{X: 1, Y: 1})}
+
+		hasGround := false
+		colliders := space.Query(groundCheckRect)
+		for _, c := range colliders {
+			if c.IsObstructive() && c.ID() != s.actor.ID() {
+				hasGround = true
+				break
+			}
+		}
+
+		if !hasGround {
+			return true // Turn at ledge
+		}
 	}
 
 	// 2. Wall detection
@@ -108,8 +120,8 @@ func (s *SideToSideMovementState) shouldTurn(space body.BodiesSpace) bool {
 		// Check a 1-pixel-wide vertical slice right in front of the actor.
 		wallCheckRect = image.Rect(actorPos.Min.X-1, actorPos.Min.Y, actorPos.Min.X, actorPos.Max.Y)
 	}
-
-	colliders = space.Query(wallCheckRect)
+	
+	colliders := space.Query(wallCheckRect)
 	for _, c := range colliders {
 		if c.IsObstructive() && c.ID() != s.actor.ID() {
 			return true // Turn at wall
