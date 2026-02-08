@@ -10,6 +10,7 @@ import (
 
 const (
 	WolfEnemyType enemies.EnemyType = "WOLF"
+	BatEnemyType  enemies.EnemyType = "BAT"
 )
 
 func InitEnemyMap(ctx *app.AppContext) enemies.EnemyMap[gameentitytypes.PlatformerActorEntity] {
@@ -21,6 +22,13 @@ func InitEnemyMap(ctx *app.AppContext) enemies.EnemyMap[gameentitytypes.Platform
 			}
 			player, _ := ctx.ActorManager.GetPlayer()
 			enemy.SetTarget(player)
+			return enemy
+		},
+		BatEnemyType: func(x, y int, id string) gameentitytypes.PlatformerActorEntity {
+			enemy, err := NewBatEnemy(ctx, x, y, id)
+			if err != nil {
+				log.Fatal(err)
+			}
 			return enemy
 		},
 	}

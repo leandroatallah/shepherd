@@ -7,8 +7,10 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/context"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
+
 	"github.com/leandroatallah/firefly/internal/game/events"
 )
 
@@ -76,6 +78,12 @@ func (p *PlatformerCharacter) OnLand() {
 		// Bottom center
 		pos := image.Point{X: rect.Min.X + rect.Dx()/2, Y: rect.Max.Y}
 		p.landHandler(pos)
+	}
+}
+
+func (p *PlatformerCharacter) SetGravityEnabled(enabled bool) {
+	if model, ok := p.Character.MovementModel().(*physicsmovement.PlatformMovementModel); ok {
+		model.SetGravityEnabled(enabled)
 	}
 }
 
