@@ -129,7 +129,7 @@ func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
 
 type ItemPosition struct {
 	X, Y     int
-	ItemType int
+	ItemType string
 	ID       string
 }
 
@@ -156,25 +156,26 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 		gid, _, _, _ := extractGIDAndFlags(obj.Gid)
 
 		if gid > 0 {
-			yValue -= obj.Height
+			yValue -= (obj.Height * 1)
 		}
 		y16 := int(math.Round(yValue))
 		if firstgid == 0 {
 			firstgid = gid
 			ts = t.findTileset(firstgid)
 		}
-		itemType := tilesetSourceID(ts, gid)
-
+		itemType := fmt.Sprintf("%d", tilesetSourceID(ts, gid))
 		var id string
 		for _, p := range obj.Properties {
 			if p.Name == "body_id" {
 				id = p.Value
-				break
+			}
+			if p.Name == "item_type" {
+				itemType = p.Value
 			}
 		}
 
 		if id == "" {
-			id = fmt.Sprintf("ITEM_%d_%d", itemType, itemCount)
+			id = fmt.Sprintf("ITEM_%s_%d", itemType, itemCount)
 			itemCount++
 		}
 		// o.SetID(fmt.Sprintf("%v_%v", prefix, id))

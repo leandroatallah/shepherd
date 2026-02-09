@@ -86,29 +86,6 @@ func (s *TilemapScene) Audiomanager() *audio.AudioManager {
 	return s.AppContext().AudioManager
 }
 
-func (s *TilemapScene) InitItems(items map[int]items.ItemType, factory *items.ItemFactory) error {
-	itemsPos := s.tilemap.GetItemsPositionID()
-
-	for _, i := range itemsPos {
-		itemType, found := items[i.ItemType]
-		if !found {
-			return fmt.Errorf("Unable to find item by ID.")
-		}
-
-		item, err := factory.Create(itemType, i.X, i.Y, i.ID)
-		pos := item.Position()
-		item.SetPosition(pos.Min.X, pos.Min.Y-pos.Dy()/2) // Adjust Y position based on item height
-		if err != nil {
-			return err
-		}
-
-		item.SetID(fmt.Sprintf("ITEM_%v", i.ID))
-		s.PhysicsSpace().AddBody(item)
-	}
-
-	return nil
-}
-
 func (s *TilemapScene) SetPlayerStartPosition(p actors.ActorEntity) {
 	// Set player initial position from tilemap
 	if x, y, found := s.tilemap.GetPlayerStartPosition(); found {
@@ -153,6 +130,24 @@ func InitNPCs[T actors.ActorEntity](s *TilemapScene, factory *npcs.NpcFactory[T]
 		if s.AppContext().ActorManager != nil {
 			s.AppContext().ActorManager.Register(npc)
 		}
+	}
+
+	return nil
+}
+
+func InitItems[T items.Item](s *TilemapScene, factory *items.ItemFactory[T]) error {
+	itemsPos := s.Tilemap().GetItemsPositionID()
+
+	for _, i := range itemsPos {
+		item, err := factory.Create(items.ItemType(i.ItemType), i.X, i.Y, i.ID)
+		// pos := item.Position()
+		// item.SetPosition(pos.Min.X, pos.Min.Y-pos.Dy()) // Adjust Y position based on npc height
+		if err != nil {
+			return err
+		}
+
+		item.SetID(fmt.Sprintf("ITEM_%v", i.ID))
+		s.PhysicsSpace().AddBody(item)
 	}
 
 	return nil

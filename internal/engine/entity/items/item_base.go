@@ -86,7 +86,6 @@ func (b *BaseItem) SetTouchable(t body.Touchable) {
 	b.Touchable = t
 }
 
-
 func (b *BaseItem) Update(space body.BodiesSpace) error {
 	b.count++
 
@@ -137,6 +136,14 @@ func (b *BaseItem) State() ItemStateEnum {
 // SetState set a new Character state and update current collision shapes.
 func (b *BaseItem) SetState(state ItemState) {
 	b.state = state
+	b.count = 0
 	b.StateCollisionManager.RefreshCollisions()
 	b.state.OnStart()
+}
+
+func (b *BaseItem) IsAnimationFinished() bool {
+	if b.state == nil {
+		return true
+	}
+	return b.state.IsAnimationFinished()
 }

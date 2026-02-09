@@ -1,5 +1,7 @@
 package actors
 
+import "github.com/leandroatallah/firefly/internal/engine/entity"
+
 type ActorState interface {
 	State() ActorStateEnum
 	OnStart(currentCount int)
@@ -67,30 +69,5 @@ func (s *BaseState) IsAnimationFinished() bool {
 	s.tick++
 
 	character := s.GetActor().GetCharacter()
-	if character == nil {
-		return true
-	}
-
-	sprite := character.GetSpriteByState(s.State())
-	if sprite == nil || sprite.Image == nil {
-		return true
-	}
-
-	rect := character.Position()
-	if rect.Dx() == 0 {
-		return true
-	}
-
-	elementWidth := sprite.Image.Bounds().Dx()
-	frameCount := elementWidth / rect.Dx()
-
-	frameRate := character.FrameRate()
-	if frameRate == 0 {
-		frameRate = 1
-	}
-
-	// Calculate total duration in ticks
-	duration := frameCount * frameRate
-
-	return s.tick >= duration
+	return entity.IsAnimationFinished(s.tick, character, s.State())
 }
