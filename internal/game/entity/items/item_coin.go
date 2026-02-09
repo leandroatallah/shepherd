@@ -20,7 +20,7 @@ func NewCollectibleCoinItem(ctx *app.AppContext, x, y int, id string) (*Collecti
 		return nil, err
 	}
 
-	base, err := CreateAnimatedItem(id, spriteData)
+	base, err := CreateAnimatedItem(id, spriteData, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func NewCollectibleCoinItem(ctx *app.AppContext, x, y int, id string) (*Collecti
 	coinItem.SetAppContext(ctx)
 	coinItem.SetOwner(coinItem)
 
-	if err = SetItemBodies(coinItem, spriteData); err != nil {
+	if err = SetItemBodies(coinItem, spriteData, nil); err != nil {
 		return nil, fmt.Errorf("SetItemBodies: %w", err)
 	}
 	if err = SetItemStats(coinItem, statData); err != nil {

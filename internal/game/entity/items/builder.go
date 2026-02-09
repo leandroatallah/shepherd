@@ -11,10 +11,14 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
-func CreateAnimatedItem(id string, data schemas.SpriteData) (*items.BaseItem, error) {
+func CreateAnimatedItem(id string, data schemas.SpriteData, customStates map[string]animation.SpriteState) (*items.BaseItem, error) {
 	stateMap := map[string]animation.SpriteState{
 		"idle": items.Idle,
 	}
+	for k, v := range customStates {
+		stateMap[k] = v
+	}
+
 	assets, err := sprites.GetSpritesFromAssets(data.Assets, stateMap)
 	if err != nil {
 		return nil, err
@@ -32,7 +36,7 @@ type collisionRectSetter interface {
 	AddCollisionRect(state items.ItemStateEnum, rect body.Collidable)
 }
 
-func SetItemBodies(item items.Item, data schemas.SpriteData) error {
+func SetItemBodies(item items.Item, data schemas.SpriteData, customStates map[string]animation.SpriteState) error {
 	setter, ok := item.(collisionRectSetter)
 	if !ok {
 		return fmt.Errorf("item must implement collisionRectSetter")
@@ -40,6 +44,9 @@ func SetItemBodies(item items.Item, data schemas.SpriteData) error {
 
 	stateMap := map[string]animation.SpriteState{
 		"idle": items.Idle,
+	}
+	for k, v := range customStates {
+		stateMap[k] = v
 	}
 
 	idProvider := func(assetKey string, index int) string {

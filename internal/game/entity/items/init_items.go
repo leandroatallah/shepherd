@@ -8,13 +8,13 @@ import (
 )
 
 const (
-	CollectibleCoinType items.ItemType = iota
+	FallingPlatformType items.ItemType = "FALL_PLATFORM"
 )
 
-func InitItemMap(ctx *app.AppContext) items.ItemMap {
+func InitItemMap(ctx *app.AppContext) items.ItemMap[items.Item] {
 	itemMap := map[items.ItemType]func(x, y int, id string) items.Item{
-		CollectibleCoinType: func(x, y int, id string) items.Item {
-			item, err := NewCollectibleCoinItem(ctx, x, y, id)
+		FallingPlatformType: func(x, y int, id string) items.Item {
+			item, err := NewFallingPlatformItem(ctx, x, y, id)
 			if err != nil {
 				log.Fatal(err)
 			}
