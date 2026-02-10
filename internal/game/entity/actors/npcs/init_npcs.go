@@ -5,11 +5,13 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
+	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
 const (
 	SheepNpcType npcs.NpcType = "SHEEP"
+	DogNpcType   npcs.NpcType = "DOG"
 )
 
 func InitNpcMap(ctx *app.AppContext) npcs.NpcMap[gameentitytypes.PlatformerActorEntity] {
@@ -19,8 +21,15 @@ func InitNpcMap(ctx *app.AppContext) npcs.NpcMap[gameentitytypes.PlatformerActor
 			if err != nil {
 				log.Fatal(err)
 			}
-			player, _ := ctx.ActorManager.GetPlayer()
-			npc.SetTarget(player)
+			return npc
+		},
+		DogNpcType: func(x, y int, id string) gameentitytypes.PlatformerActorEntity {
+			npc, err := gameplayer.NewDogPlayer(ctx)
+			if err != nil {
+				log.Fatal(err)
+			}
+			npc.SetPosition(x, y)
+			npc.SetID(id)
 			return npc
 		},
 	}
