@@ -364,5 +364,14 @@ func (c *Character) AddSkill(s skill.Skill) {
 }
 
 func (c *Character) RemoveSkill(s skill.Skill) {
-	panic("implement me")
+	for i, skill := range c.skills {
+		if skill == s {
+			c.skills = append(c.skills[:i], c.skills[i+1:]...)
+			return
+		}
+	}
+}
+
+func (c *Character) ClearSkills() {
+	c.skills = nil
 }
