@@ -18,7 +18,6 @@ import (
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/pause"
-	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
@@ -47,6 +46,9 @@ type PhasesScene struct {
 	isConcludingPhase   bool
 	phaseCompleted      bool
 	phaseCompletedDelay int
+	reachedEndpoint     bool
+	hasEndpoints        bool
+	goal                PhaseGoal
 
 	// Reboot
 	isRebooting bool
@@ -186,6 +188,32 @@ func (s *PhasesScene) OnStart() {
 			s.sequencePlayer.Play(seq)
 		}
 	}
+
+	s.initGoal()
+}
+
+func (s *PhasesScene) initGoal() {
+	phase, _ := s.AppContext().PhaseManager.GetCurrentPhase()
+	switch phase.GoalType {
+	case "rescue_sheep":
+		s.goal = &RescueSheepGoal{}
+	case "reach_endpoint":
+		s.goal = &ReachEndpointGoal{}
+	case "sequence":
+		s.goal = &SequenceGoal{}
+	case "no_goal":
+		s.goal = &NoGoal{}
+	default:
+		s.goal = &NoGoal{}
+	}
+}
+
+func (s *PhasesScene) defaultCompletion() {
+	// TODO: All actors should be immobile.
+	s.player.SetImmobile(true)
+	s.Audiomanager().FadeOut(bgSound, time.Second)
+	s.isConcludingPhase = true
+	s.phaseCompletedDelay = timing.FromDuration(2 * time.Second)
 }
 
 func (s *PhasesScene) Update() error {
@@ -390,15 +418,12 @@ func (s *PhasesScene) checkPhaseCompleted() bool {
 		return true
 	}
 
-	if s.bodyCounter.sheep > s.bodyCounter.sheepRescued {
-		return false
+	if s.goal != nil && s.goal.IsCompleted(s) {
+		s.goal.OnCompletion(s)
+		return true
 	}
 
-	s.player.SetImmobile(true)
-	s.Audiomanager().FadeOut(bgSound, time.Second)
-	s.isConcludingPhase = true
-	s.phaseCompletedDelay = timing.FromDuration(2 * time.Second)
-	return true
+	return false
 }
 
 func (s *PhasesScene) completePhase() {
