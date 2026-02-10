@@ -27,6 +27,12 @@ func GetPhases() []phases.Phase {
 			TilemapPath: "assets/tilemap/shepherd-phase-2.tmj",
 			NextPhaseID: 1,
 			GoalType:    "rescue_sheep",
+			// Find a NPC by ID "DOG_NPC" and set its behavior to "follow_player"
+			ActorBehaviors: map[string]phases.ActorBehavior{
+				"DOG_NPC": {
+					Type: "follow_player",
+				},
+			},
 		},
 		{
 			ID:          4,

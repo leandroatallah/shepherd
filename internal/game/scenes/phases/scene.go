@@ -12,12 +12,14 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	"github.com/leandroatallah/firefly/internal/engine/event"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/pause"
+	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
@@ -190,6 +192,7 @@ func (s *PhasesScene) OnStart() {
 	}
 
 	s.initGoal()
+	s.applyActorBehaviors()
 }
 
 func (s *PhasesScene) initGoal() {
@@ -205,6 +208,35 @@ func (s *PhasesScene) initGoal() {
 		s.goal = &NoGoal{}
 	default:
 		s.goal = &NoGoal{}
+	}
+}
+
+func (s *PhasesScene) applyActorBehaviors() {
+	phase, _ := s.AppContext().PhaseManager.GetCurrentPhase()
+	if phase.ActorBehaviors == nil {
+		return
+	}
+
+	space := s.PhysicsSpace()
+	for _, b := range space.Bodies() {
+		if behavior, ok := phase.ActorBehaviors[b.ID()]; ok {
+			s.applyBehavior(b, behavior)
+		}
+	}
+}
+
+// TODO: Decouple actor behavior from scene
+func (s *PhasesScene) applyBehavior(b body.Body, behavior phases.ActorBehavior) {
+	switch behavior.Type {
+	case "follow_player":
+		if actor, ok := b.(gameentitytypes.PlatformerActorEntity); ok {
+			// Set Dog player movement to follow the player
+			actor.GetCharacter().ClearSkills()
+			actor.GetCharacter().SetMovementState(
+				movement.Follow,
+				s.player,
+			)
+		}
 	}
 }
 
