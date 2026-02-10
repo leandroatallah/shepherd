@@ -18,6 +18,7 @@ import (
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/pause"
+	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
@@ -351,14 +352,9 @@ func (s *PhasesScene) playBackgroundMusic() {
 }
 
 func (s *PhasesScene) initTilemap() {
-	// Set items map to factory creation process
-	itemsMap := map[int]items.ItemType{
-		0: gameitems.CollectibleCoinType,
-	}
-
 	// Set items position from tilemap
 	f := items.NewItemFactory(gameitems.InitItemMap(s.AppContext()))
-	s.InitItems(itemsMap, f)
+	scene.InitItems(&s.TilemapScene, f)
 
 	// Set enemies position from tilemap
 	enemyFactory := enemies.NewEnemyFactory(gameenemies.InitEnemyMap(s.AppContext()))
