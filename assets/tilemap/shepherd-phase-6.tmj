@@ -125,7 +125,7 @@
          "name":"Camera",
          "objects":[
                 {
-                 "height":224,
+                 "height":208,
                  "id":67,
                  "name":"",
                  "rotation":0,
@@ -133,7 +133,7 @@
                  "visible":true,
                  "width":352,
                  "x":0,
-                 "y":224
+                 "y":240
                 }, 
                 {
                  "height":256,
@@ -147,7 +147,7 @@
                  "y":192
                 }, 
                 {
-                 "height":224,
+                 "height":240,
                  "id":69,
                  "name":"",
                  "rotation":0,
@@ -178,7 +178,43 @@
          "draworder":"topdown",
          "id":3,
          "name":"Items",
-         "objects":[],
+         "objects":[
+                {
+                 "gid":179,
+                 "height":16,
+                 "id":76,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"item_type",
+                         "type":"string",
+                         "value":"FALL_PLATFORM"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":80,
+                 "y":384
+                }, 
+                {
+                 "gid":179,
+                 "height":16,
+                 "id":79,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"item_type",
+                         "type":"string",
+                         "value":"FALL_PLATFORM"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":96,
+                 "y":384
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -210,7 +246,7 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":48,
+                 "x":32,
                  "y":288
                 }, 
                 {
@@ -272,7 +308,7 @@
                 {
                  "gid":174,
                  "height":16,
-                 "id":46,
+                 "id":70,
                  "name":"",
                  "properties":[
                         {
@@ -284,26 +320,44 @@
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":224,
-                 "y":80
+                 "x":240,
+                 "y":352
                 }, 
                 {
-                 "gid":174,
+                 "gid":176,
                  "height":16,
-                 "id":47,
+                 "id":71,
                  "name":"",
                  "properties":[
                         {
                          "name":"enemy_type",
                          "type":"string",
-                         "value":"WOLF"
+                         "value":"SWARM"
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":16,
-                 "x":256,
-                 "y":208
+                 "x":112,
+                 "y":256
+                }, 
+                {
+                 "gid":175,
+                 "height":16,
+                 "id":72,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"enemy_type",
+                         "type":"string",
+                         "value":"BAT"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":128,
+                 "y":368
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -312,7 +366,7 @@
          "y":0
         }],
  "nextlayerid":15,
- "nextobjectid":70,
+ "nextobjectid":80,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

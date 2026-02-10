@@ -152,12 +152,12 @@
                         {
                          "name":"body_id",
                          "type":"string",
-                         "value":"SHEEP_1"
+                         "value":"DOG_NPC"
                         }, 
                         {
                          "name":"npc_type",
                          "type":"string",
-                         "value":"SHEEP"
+                         "value":"DOG"
                         }],
                  "rotation":0,
                  "type":"",
