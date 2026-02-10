@@ -23,6 +23,7 @@ const (
 	Patrol
 	Avoid
 	SideToSide
+	Follow
 )
 
 type BaseMovementState struct {

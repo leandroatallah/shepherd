@@ -32,6 +32,8 @@ func NewMovementState(
 		movementState = NewPatrolMovementState(b)
 	case SideToSide:
 		movementState = NewSideToSideMovementState(b)
+	case Follow:
+		movementState = NewFollowMovementState(b)
 	default:
 		// Check registry
 		constructor, err := GetMovementStateConstructor(state)
