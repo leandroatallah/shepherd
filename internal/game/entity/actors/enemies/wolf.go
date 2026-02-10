@@ -49,7 +49,12 @@ func NewWolfEnemy(ctx *app.AppContext, x, y int, id string) (*WolfEnemy, error) 
 	}
 	enemy.SetMovementModel(model)
 	enemy.SetTouchable(enemy)
-	enemy.Character.SetMovementState(movement.SideToSide, nil, movement.WithWaitBeforeTurn(60))
+	enemy.Character.SetMovementState(
+		movement.SideToSide,
+		nil,
+		movement.WithWaitBeforeTurn(60),
+		movement.WithLimitToRoom(true),
+	)
 
 	return enemy, nil
 }
