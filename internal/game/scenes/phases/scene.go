@@ -31,10 +31,11 @@ import (
 )
 
 const (
-	bgSound = "assets/audio/Sketchbook.ogg"
+	bgSound = "assets/audio/Goblins_Den_Regular.ogg"
 )
 
 type PhasesScene struct {
+	// TODO: Should it be converted to pointer?
 	scene.TilemapScene
 	count       int
 	player      gameentitytypes.PlatformerActorEntity
@@ -343,7 +344,7 @@ func (s *PhasesScene) playBackgroundMusic() {
 	if s.count == 60 {
 		if am := s.AppContext().AudioManager; !am.IsPlaying(bgSound) {
 			am.PlayMusic(bgSound)
-			am.SetVolume(0.25)
+			am.SetVolume(1)
 		}
 	}
 
