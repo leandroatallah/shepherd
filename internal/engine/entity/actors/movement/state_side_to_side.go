@@ -19,6 +19,7 @@ type SideToSideMovementState struct {
 	waitTimer      int
 	isWaiting      bool
 	ignoreLedges   bool
+	limitToRoom    bool
 }
 
 // NewSideToSideMovementState creates a new SideToSideMovementState.
@@ -52,6 +53,15 @@ func WithIgnoreLedges(ignore bool) MovementStateOption {
 	return func(ms MovementState) {
 		if s, ok := ms.(*SideToSideMovementState); ok {
 			s.ignoreLedges = ignore
+		}
+	}
+}
+
+// WithLimitToRoom sets whether the actor should limit movement to the current room (camera bounds).
+func WithLimitToRoom(limit bool) MovementStateOption {
+	return func(ms MovementState) {
+		if s, ok := ms.(*SideToSideMovementState); ok {
+			s.limitToRoom = limit
 		}
 	}
 }
@@ -183,6 +193,35 @@ func (s *SideToSideMovementState) shouldTurn(space body.BodiesSpace) bool {
 	for _, c := range colliders {
 		if c.IsObstructive() && c.ID() != s.actor.ID() {
 			return true // Turn at wall
+		}
+	}
+
+	// 3. Room limit detection
+	if s.limitToRoom {
+		if provider := space.GetTilemapDimensionsProvider(); provider != nil {
+			if bounds, ok := provider.GetCameraBounds(); ok {
+				if s.vertical {
+					if s.movingPositive {
+						if actorPos.Max.Y >= bounds.Max.Y {
+							return true
+						}
+					} else {
+						if actorPos.Min.Y <= bounds.Min.Y {
+							return true
+						}
+					}
+				} else {
+					if s.movingPositive {
+						if actorPos.Max.X >= bounds.Max.X {
+							return true
+						}
+					} else {
+						if actorPos.Min.X <= bounds.Min.X {
+							return true
+						}
+					}
+				}
+			}
 		}
 	}
 

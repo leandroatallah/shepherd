@@ -74,6 +74,11 @@ func (c *Controller) SetBounds(bounds *image.Rectangle) {
 	c.bounds = bounds
 }
 
+// Bounds returns the current camera movement restrictions.
+func (c *Controller) Bounds() *image.Rectangle {
+	return c.bounds
+}
+
 func (c *Controller) SetCenter(x, y float64) {
 	c.centerX = x
 	c.centerY = y

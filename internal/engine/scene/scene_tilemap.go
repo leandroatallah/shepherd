@@ -2,6 +2,7 @@ package scene
 
 import (
 	"fmt"
+	"image"
 	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
@@ -76,6 +77,13 @@ func (s *TilemapScene) GetTilemapHeight() int {
 		return s.tilemap.Layers[0].Height * s.tilemap.Tileheight
 	}
 	return config.Get().ScreenHeight
+}
+
+func (s *TilemapScene) GetCameraBounds() (image.Rectangle, bool) {
+	if s.cam == nil || s.cam.Bounds() == nil {
+		return image.Rectangle{}, false
+	}
+	return *s.cam.Bounds(), true
 }
 
 func (s *TilemapScene) Tilemap() *tilemap.Tilemap {
