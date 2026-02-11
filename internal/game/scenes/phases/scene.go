@@ -12,6 +12,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	sequencestypes "github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
@@ -199,16 +200,16 @@ func (s *PhasesScene) OnStart() {
 func (s *PhasesScene) initGoal() {
 	phase, _ := s.AppContext().PhaseManager.GetCurrentPhase()
 	switch phase.GoalType {
-	case "rescue_sheep":
+	case RescueSheepType:
 		s.goal = &RescueSheepGoal{scene: s}
-	case "reach_endpoint":
+	case ReactEndpointType:
 		s.goal = &ReachEndpointGoal{scene: s}
-	case "sequence":
+	case SequenceGoalType:
 		s.goal = &phases.SequenceGoal{
 			Player:         s.sequencePlayer,
 			OnCompleteFunc: s.defaultCompletion,
 		}
-	case "no_goal":
+	case NoGoalType:
 		s.goal = &phases.NoGoal{}
 	default:
 		s.goal = &phases.NoGoal{}
@@ -230,8 +231,13 @@ func (s *PhasesScene) applyActorBehaviors() {
 }
 
 func (s *PhasesScene) defaultCompletion() {
-	// TODO: All actors should be immobile.
-	s.player.SetImmobile(true)
+	// Freeze all actors
+	if s.AppContext().ActorManager != nil {
+		s.AppContext().ActorManager.ForEach(func(actor actors.ActorEntity) {
+			actor.SetImmobile(true)
+			actor.SetFreeze(true)
+		})
+	}
 	s.Audiomanager().FadeOut(bgSound, time.Second)
 	s.isConcludingPhase = true
 	s.phaseCompletedDelay = timing.FromDuration(2 * time.Second)
@@ -433,7 +439,6 @@ func (s *PhasesScene) checkReboot() bool {
 	return false
 }
 
-// TODO: Define phase objective. For now, it checks if all sheeps were rescued.
 func (s *PhasesScene) checkPhaseCompleted() bool {
 	if s.isConcludingPhase {
 		return true
