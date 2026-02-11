@@ -38,8 +38,8 @@ const (
 )
 
 type PhasesScene struct {
-	// TODO: Should it be converted to pointer?
-	scene.TilemapScene
+	*scene.TilemapScene
+
 	count       int
 	player      gameentitytypes.PlatformerActorEntity
 	mainText    *font.FontText
@@ -74,7 +74,7 @@ func NewPhasesScene(context *app.AppContext) *PhasesScene {
 	}
 	tilemapScene := scene.NewTilemapScene(context)
 	scene := PhasesScene{
-		TilemapScene: *tilemapScene,
+		TilemapScene: tilemapScene,
 		mainText:     mainText,
 		bodyCounter:  &BodyCounter{},
 	}
@@ -409,15 +409,15 @@ func (s *PhasesScene) playBackgroundMusic() {
 func (s *PhasesScene) initTilemap() {
 	// Set items position from tilemap
 	f := items.NewItemFactory(gameitems.InitItemMap(s.AppContext()))
-	scene.InitItems(&s.TilemapScene, f)
+	scene.InitItems(s.TilemapScene, f)
 
 	// Set enemies position from tilemap
 	enemyFactory := enemies.NewEnemyFactory(gameenemies.InitEnemyMap(s.AppContext()))
-	scene.InitEnemies(&s.TilemapScene, enemyFactory)
+	scene.InitEnemies(s.TilemapScene, enemyFactory)
 
 	// Set NPCs position from tilemap
 	npcFactory := npcs.NewNpcFactory(gamenpcs.InitNpcMap(s.AppContext()))
-	scene.InitNPCs(&s.TilemapScene, npcFactory)
+	scene.InitNPCs(s.TilemapScene, npcFactory)
 
 	s.SetPlayerStartPosition(s.player)
 }
