@@ -18,8 +18,8 @@ type EventCommand struct {
 	eventManager *event.Manager
 }
 
-func (c *EventCommand) Init(appContext *app.AppContext) {
-	c.eventManager = appContext.EventManager
+func (c *EventCommand) Init(appContext any) {
+	c.eventManager = appContext.(*app.AppContext).EventManager
 	if c.eventManager != nil {
 		evt := event.GenericEvent{
 			EventType: c.EventType,
@@ -41,8 +41,8 @@ type DialogueCommand struct {
 	dialogueManager *speech.Manager
 }
 
-func (c *DialogueCommand) Init(appContext *app.AppContext) {
-	c.dialogueManager = appContext.DialogueManager
+func (c *DialogueCommand) Init(appContext any) {
+	c.dialogueManager = appContext.(*app.AppContext).DialogueManager
 	c.dialogueManager.ShowMessages(c.Lines, c.Position, c.Speed)
 }
 
@@ -57,7 +57,7 @@ type DelayCommand struct {
 	timer  int
 }
 
-func (c *DelayCommand) Init(appContext *app.AppContext) {
+func (c *DelayCommand) Init(appContext any) {
 	c.timer = 0
 }
 
@@ -76,8 +76,8 @@ type MoveActorCommand struct {
 	isDone      bool
 }
 
-func (c *MoveActorCommand) Init(appContext *app.AppContext) {
-	actor, found := appContext.ActorManager.Find(c.TargetID)
+func (c *MoveActorCommand) Init(appContext any) {
+	actor, found := appContext.(*app.AppContext).ActorManager.Find(c.TargetID)
 	if !found {
 		fmt.Printf("MoveActorCommand: Actor with ID '%s' not found.\n", c.TargetID)
 		c.isDone = true

@@ -1,12 +1,15 @@
 package sequences
 
-import "github.com/leandroatallah/firefly/internal/engine/app"
+import (
+	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
+)
 
 // SequencePlayer manages the execution of a sequence.
 type SequencePlayer struct {
 	app.AppContextHolder
 
-	currentSequence     Sequence
+	currentSequence     sequences.Sequence
 	currentCommandIndex int
 	isPlaying           bool
 }
@@ -19,7 +22,7 @@ func NewSequencePlayer(appContext *app.AppContext) *SequencePlayer {
 }
 
 // Play starts executing a sequence.
-func (p *SequencePlayer) Play(sequence Sequence) {
+func (p *SequencePlayer) Play(sequence sequences.Sequence) {
 	if p.isPlaying {
 		return // Do not play if another sequence is already in progress
 	}
@@ -27,7 +30,7 @@ func (p *SequencePlayer) Play(sequence Sequence) {
 	p.currentCommandIndex = -1 // Will be incremented to 0 by advanceToNextCommand
 	p.isPlaying = true
 
-	if sequence.BlockPlayerMovement {
+	if sequence.(Sequence).BlockPlayerMovement {
 		if player, found := p.AppContext().ActorManager.GetPlayer(); found {
 			player.BlockMovement()
 		}
@@ -46,12 +49,12 @@ func (p *SequencePlayer) Update() {
 		return
 	}
 
-	if p.currentCommandIndex >= len(p.currentSequence.Commands) {
+	if p.currentCommandIndex >= len(p.currentSequence.(Sequence).Commands) {
 		p.endSequence()
 		return
 	}
 
-	currentCommand := p.currentSequence.Commands[p.currentCommandIndex]
+	currentCommand := p.currentSequence.(Sequence).Commands[p.currentCommandIndex]
 	if currentCommand.Update() {
 		p.advanceToNextCommand()
 	}
@@ -60,18 +63,18 @@ func (p *SequencePlayer) Update() {
 // advanceToNextCommand moves to the next command in the queue and initializes it.
 func (p *SequencePlayer) advanceToNextCommand() {
 	p.currentCommandIndex++
-	if p.currentCommandIndex >= len(p.currentSequence.Commands) {
+	if p.currentCommandIndex >= len(p.currentSequence.(Sequence).Commands) {
 		p.endSequence()
 		return
 	}
 
-	nextCommand := p.currentSequence.Commands[p.currentCommandIndex]
+	nextCommand := p.currentSequence.(Sequence).Commands[p.currentCommandIndex]
 	nextCommand.Init(p.AppContext())
 }
 
 func (p *SequencePlayer) endSequence() {
 	p.isPlaying = false
-	if p.currentSequence.BlockPlayerMovement {
+	if p.currentSequence.(Sequence).BlockPlayerMovement {
 		if player, found := p.AppContext().ActorManager.GetPlayer(); found {
 			player.UnblockMovement()
 		}

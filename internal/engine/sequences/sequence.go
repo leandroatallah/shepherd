@@ -4,24 +4,12 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
 )
-
-// Command is an action to be executed in a sequence.
-// It can be initialized, and it is updated every frame until it is done.
-type Command interface {
-	// Init is called once when the command begins.
-	// It can be used to set up initial state and get resources from the app context.
-	Init(appContext *app.AppContext)
-
-	// Update is called every frame.
-	// It should return true when the command is finished.
-	Update() bool
-}
 
 // Sequence is a list of commands to be executed in order, with additional properties.
 type Sequence struct {
-	Commands            []Command
+	Commands            []sequences.Command
 	BlockPlayerMovement bool
 }
 
@@ -55,7 +43,7 @@ type SequenceData struct {
 }
 
 // ToCommand converts the generic CommandData into a specific Command implementation.
-func (cd *CommandData) ToCommand() Command {
+func (cd *CommandData) ToCommand() sequences.Command {
 	switch cd.Type {
 	case "dialogue":
 		speed := cd.SpeechSpeed
@@ -92,7 +80,7 @@ func NewSequenceFromJSON(filePath string) (Sequence, error) {
 		return Sequence{}, err
 	}
 
-	var commands []Command
+	var commands []sequences.Command
 	for _, cd := range sequenceData.Commands {
 		cmd := cd.ToCommand()
 		if cmd != nil {
