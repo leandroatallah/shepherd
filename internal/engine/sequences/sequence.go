@@ -9,8 +9,12 @@ import (
 
 // Sequence is a list of commands to be executed in order, with additional properties.
 type Sequence struct {
-	Commands            []sequences.Command
+	commands            []sequences.Command
 	BlockPlayerMovement bool
+}
+
+func (s *Sequence) Commands() []sequences.Command {
+	return s.commands
 }
 
 // CommandData is a wrapper used for parsing commands from JSON.
@@ -69,15 +73,15 @@ func (cd *CommandData) ToCommand() sequences.Command {
 }
 
 // NewSequenceFromJSON loads a sequence from a JSON file path.
-func NewSequenceFromJSON(filePath string) (Sequence, error) {
+func NewSequenceFromJSON(filePath string) (*Sequence, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return Sequence{}, err
+		return &Sequence{}, err
 	}
 
 	var sequenceData SequenceData
 	if err := json.Unmarshal(data, &sequenceData); err != nil {
-		return Sequence{}, err
+		return &Sequence{}, err
 	}
 
 	var commands []sequences.Command
@@ -88,8 +92,8 @@ func NewSequenceFromJSON(filePath string) (Sequence, error) {
 		}
 	}
 
-	return Sequence{
-		Commands:            commands,
+	return &Sequence{
+		commands:            commands,
 		BlockPlayerMovement: sequenceData.BlockPlayerMovement,
 	}, nil
 }

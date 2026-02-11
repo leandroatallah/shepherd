@@ -13,7 +13,7 @@ type Command interface {
 }
 
 type Sequence interface {
-	// TODO: Add at least one generic method
+	Commands() []Command
 }
 
 type Player interface {
