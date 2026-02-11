@@ -1,12 +1,14 @@
 package phases
 
+type GoalType string
+
 type Phase struct {
 	ID             int
 	Name           string
 	TilemapPath    string
 	NextPhaseID    int
 	SequencePath   string
-	GoalType       string
+	GoalType       GoalType
 	ActorBehaviors map[string]ActorBehavior
 }
 

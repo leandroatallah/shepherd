@@ -20,6 +20,4 @@ type Player interface {
 	IsPlaying() bool
 	Play(sequence Sequence)
 	Update()
-	// advanceToNextCommand()
-	// endSequence()
 }
