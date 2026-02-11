@@ -10,9 +10,9 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	sequencestypes "github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	"github.com/leandroatallah/firefly/internal/engine/event"
@@ -50,7 +50,7 @@ type PhasesScene struct {
 	phaseCompletedDelay int
 	reachedEndpoint     bool
 	hasEndpoints        bool
-	goal                PhaseGoal
+	goal                phases.Goal
 
 	// Reboot
 	isRebooting bool
@@ -59,8 +59,9 @@ type PhasesScene struct {
 	// UI effects
 	ShowDrawScreenFlash int
 
-	screenFlipper  *scene.ScreenFlipper
-	sequencePlayer *sequences.SequencePlayer
+	screenFlipper *scene.ScreenFlipper
+	// sequencePlayer *sequences.SequencePlayer
+	sequencePlayer sequencestypes.Player
 	pauseScreen    *pause.PauseScreen
 	vfxManager     *vfx.Manager
 }
@@ -199,15 +200,18 @@ func (s *PhasesScene) initGoal() {
 	phase, _ := s.AppContext().PhaseManager.GetCurrentPhase()
 	switch phase.GoalType {
 	case "rescue_sheep":
-		s.goal = &RescueSheepGoal{}
+		s.goal = &RescueSheepGoal{scene: s}
 	case "reach_endpoint":
-		s.goal = &ReachEndpointGoal{}
+		s.goal = &ReachEndpointGoal{scene: s}
 	case "sequence":
-		s.goal = &SequenceGoal{}
+		s.goal = &phases.SequenceGoal{
+			Player:         s.sequencePlayer,
+			OnCompleteFunc: s.defaultCompletion,
+		}
 	case "no_goal":
-		s.goal = &NoGoal{}
+		s.goal = &phases.NoGoal{}
 	default:
-		s.goal = &NoGoal{}
+		s.goal = &phases.NoGoal{}
 	}
 }
 
@@ -220,22 +224,7 @@ func (s *PhasesScene) applyActorBehaviors() {
 	space := s.PhysicsSpace()
 	for _, b := range space.Bodies() {
 		if behavior, ok := phase.ActorBehaviors[b.ID()]; ok {
-			s.applyBehavior(b, behavior)
-		}
-	}
-}
-
-// TODO: Decouple actor behavior from scene
-func (s *PhasesScene) applyBehavior(b body.Body, behavior phases.ActorBehavior) {
-	switch behavior.Type {
-	case "follow_player":
-		if actor, ok := b.(gameentitytypes.PlatformerActorEntity); ok {
-			// Set Dog player movement to follow the player
-			actor.GetCharacter().ClearSkills()
-			actor.GetCharacter().SetMovementState(
-				movement.Follow,
-				s.player,
-			)
+			ApplyActorBehavior(s, b, behavior)
 		}
 	}
 }
@@ -450,8 +439,8 @@ func (s *PhasesScene) checkPhaseCompleted() bool {
 		return true
 	}
 
-	if s.goal != nil && s.goal.IsCompleted(s) {
-		s.goal.OnCompletion(s)
+	if s.goal != nil && s.goal.IsCompleted() {
+		s.goal.OnCompletion()
 		return true
 	}
 
