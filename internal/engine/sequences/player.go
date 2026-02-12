@@ -43,6 +43,10 @@ func (p *SequencePlayer) IsPlaying() bool {
 	return p.isPlaying
 }
 
+func (p *SequencePlayer) IsOver() bool {
+	return p.currentCommandIndex >= len(p.currentSequence.Commands())
+}
+
 // Update should be called every frame. It updates the current command.
 func (p *SequencePlayer) Update() {
 	if !p.isPlaying {

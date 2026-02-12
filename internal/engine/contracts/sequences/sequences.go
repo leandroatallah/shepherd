@@ -18,6 +18,7 @@ type Sequence interface {
 
 type Player interface {
 	IsPlaying() bool
+	IsOver() bool
 	Play(sequence Sequence)
 	Update()
 }
