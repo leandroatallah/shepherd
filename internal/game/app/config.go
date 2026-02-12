@@ -15,6 +15,7 @@ const (
 	ScreenHeight  = 224
 	DefaultVolume = 0.5
 	MainFontFace  = "assets/fonts/pressstart2p.ttf"
+	SmallFontFace = "assets/fonts/tiny5.ttf"
 )
 
 func NewConfig() *config.AppConfig {
@@ -40,6 +41,7 @@ func NewConfig() *config.AppConfig {
 		DefaultVolume: DefaultVolume,
 
 		MainFontFace:    MainFontFace,
+		SmallFontFace:   SmallFontFace,
 		ScreenFlipSpeed: 1.0 / 60.0,
 	}
 

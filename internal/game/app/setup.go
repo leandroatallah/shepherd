@@ -34,13 +34,21 @@ func Setup(assets fs.FS) error {
 	actorManager := actors.NewManager()
 
 	// Initialize Dialogue Manager
-	fontText, err := font.NewFontText(cfg.MainFontFace)
+	fontMain, err := font.NewFontText(cfg.MainFontFace)
 	if err != nil {
 		return err
 	}
-	speechFont := speech.NewSpeechFont(fontText, 8, 14)
-	speechBubble := gamespeech.NewSpeechBubble(speechFont)
-	dialogueManager := speech.NewManager(speechBubble)
+	fontSmall, err := font.NewFontText(cfg.SmallFontFace)
+	if err != nil {
+		return err
+	}
+
+	speechFontMain := speech.NewSpeechFont(fontMain, 8, 14)
+	speechFontSmall := speech.NewSpeechFont(fontSmall, 8, 12)
+
+	speechBubble := gamespeech.NewSpeechBubble(speechFontMain)
+	speechStory := gamespeech.NewStorySpeech(speechFontSmall)
+	dialogueManager := speech.NewManager(speechBubble, speechStory)
 
 	// Load audio assets
 	loadAudioAssetsFromFS(assets, audioManager)
