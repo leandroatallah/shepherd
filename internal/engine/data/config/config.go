@@ -36,7 +36,9 @@ type AppConfig struct {
 
 	DefaultVolume float64
 
-	MainFontFace string
+	MainFontFace  string
+	SmallFontFace string
+
 	CamDebug     bool
 	CollisionBox bool
 	NoSound      bool
