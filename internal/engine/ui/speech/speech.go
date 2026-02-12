@@ -1,6 +1,10 @@
 package speech
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"image/color"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 type Speech interface {
 	ID() string
@@ -9,6 +13,7 @@ type Speech interface {
 	Visible() bool
 	Text(msg string) string
 	ResetText()
+	SetID(id string)
 	SetSpellingDelay(d int)
 	IsSpellingComplete() bool
 	CompleteSpelling()
@@ -17,6 +22,8 @@ type Speech interface {
 	Draw(screen *ebiten.Image, text string)
 	SetPosition(pos string)
 	SetSpeed(speed int)
+	SetColor(c color.Color)
+	Color() color.Color
 }
 
 type SpeechBase struct {
@@ -29,6 +36,7 @@ type SpeechBase struct {
 	spellingDelay int
 	position      string
 	speed         int
+	color         color.Color
 }
 
 func NewSpeechBase(fontSource *SpeechFont) *SpeechBase {
@@ -36,6 +44,7 @@ func NewSpeechBase(fontSource *SpeechFont) *SpeechBase {
 		FontSource: fontSource,
 		position:   "bottom",
 		speed:      4,
+		color:      color.Black,
 	}
 }
 
@@ -70,8 +79,12 @@ func (s *SpeechBase) Hide() {
 	s.visible = false
 }
 
-func (s *SpeechBase) Visile() bool {
+func (s *SpeechBase) Visible() bool {
 	return s.visible
+}
+
+func (s *SpeechBase) SetID(id string) {
+	s.id = id
 }
 
 func (s *SpeechBase) SetSpellingDelay(d int) {
@@ -106,6 +119,14 @@ func (s *SpeechBase) CompleteSpelling() {
 func (s *SpeechBase) ResetText() {
 	s.spellingCount = 0
 	s.count = 0
+}
+
+func (s *SpeechBase) SetColor(c color.Color) {
+	s.color = c
+}
+
+func (s *SpeechBase) Color() color.Color {
+	return s.color
 }
 
 func (s *SpeechBase) Image(screen *ebiten.Image) *ebiten.Image {
