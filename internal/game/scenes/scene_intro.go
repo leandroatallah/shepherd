@@ -5,13 +5,12 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/scene"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
+	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
-	"github.com/leandroatallah/firefly/internal/engine/audio"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
@@ -42,7 +41,6 @@ type IntroScene struct {
 	duration       int
 	introAnimation introAnimation
 	fadeOverlay    *ebiten.Image
-	audiomanager   *audio.AudioManager
 }
 
 func NewIntroScene(context *app.AppContext) *IntroScene {
