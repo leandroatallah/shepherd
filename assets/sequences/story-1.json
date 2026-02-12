@@ -1,0 +1,22 @@
+{
+  "commands": [
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
+      "command": "dialogue",
+      "lines": [
+        "In a quiet land of hills and stone,",
+        "A shepherd lived with his dog \nand a small flock of sheep.",
+        "Days passed in silence. \nNights passed in trust."
+      ],
+      "position": "top",
+      "speech_speed": 1
+    },
+    {
+      "command": "delay",
+      "frames": 60
+    }
+  ]
+}
