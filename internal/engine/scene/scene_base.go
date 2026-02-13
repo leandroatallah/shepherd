@@ -3,10 +3,13 @@
 package scene
 
 import (
+	"time"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/physics/space"
+	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 )
 
 type BaseScene struct {
@@ -15,6 +18,13 @@ type BaseScene struct {
 	count          int
 	space          *space.Space
 	IsKeysDisabled bool
+
+	scheduledActions []scheduledAction
+}
+
+type scheduledAction struct {
+	targetFrame uint64
+	action      func()
 }
 
 func NewScene() *BaseScene {
@@ -24,7 +34,23 @@ func NewScene() *BaseScene {
 func (s *BaseScene) Draw(screen *ebiten.Image) {}
 
 func (s *BaseScene) Update() error {
+	// Update scheduled actions
+	for i := 0; i < len(s.scheduledActions); i++ {
+		if s.AppContext().FrameCount >= s.scheduledActions[i].targetFrame {
+			s.scheduledActions[i].action()
+			s.scheduledActions = append(s.scheduledActions[:i], s.scheduledActions[i+1:]...)
+			i--
+		}
+	}
 	return nil
+}
+
+func (s *BaseScene) Schedule(delay time.Duration, action func()) {
+	target := s.AppContext().FrameCount + uint64(timing.FromDuration(delay))
+	s.scheduledActions = append(s.scheduledActions, scheduledAction{
+		targetFrame: target,
+		action:      action,
+	})
 }
 
 func (s *BaseScene) OnStart() {
