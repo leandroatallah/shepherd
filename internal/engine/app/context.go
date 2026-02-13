@@ -31,6 +31,9 @@ type AppContext struct {
 	Assets          fs.FS
 	Config          *config.AppConfig
 	Space           body.BodiesSpace
+
+	// Global frame counter
+	FrameCount uint64
 }
 
 // AppContextHolder is a reusable component for embedding app context

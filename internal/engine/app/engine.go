@@ -25,6 +25,8 @@ func NewGame(ctx *AppContext) *Game {
 }
 
 func (g *Game) Update() error {
+	g.AppContext.FrameCount++
+
 	if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
 		g.debugVisible = !g.debugVisible
 	}
