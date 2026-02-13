@@ -9,7 +9,7 @@ type Phase struct {
 	NextPhaseID    int
 	SequencePath   string
 	GoalType       GoalType
-	ActorBehaviors map[string]ActorBehavior
+	ActorBehaviors map[string][]ActorBehavior
 }
 
 type ActorBehavior struct {
