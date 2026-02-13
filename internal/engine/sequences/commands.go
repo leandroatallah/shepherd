@@ -74,6 +74,10 @@ type MoveActorCommand struct {
 
 	targetActor actors.ActorEntity
 	isDone      bool
+
+	lastX         float64
+	stuckFrames   int
+	initWaitCount int
 }
 
 func (c *MoveActorCommand) Init(appContext any) {
@@ -88,6 +92,10 @@ func (c *MoveActorCommand) Init(appContext any) {
 	if model := actor.MovementModel(); model != nil {
 		model.SetIsScripted(true)
 	}
+
+	c.lastX = float64(actor.Position().Min.X)
+	c.stuckFrames = 0
+	c.initWaitCount = 0
 }
 
 func (c *MoveActorCommand) Update() bool {
@@ -96,12 +104,36 @@ func (c *MoveActorCommand) Update() bool {
 	}
 
 	currentX := float64(c.targetActor.Position().Min.X)
+
+	// Stuck detection: if we haven't moved significantly for a while, finish the command.
+	// We wait a few frames (initWaitCount) to allow physics to kick in.
+	if c.initWaitCount < 10 {
+		c.initWaitCount++
+	} else {
+		if math.Abs(currentX-c.lastX) < 0.1 {
+			c.stuckFrames++
+		} else {
+			c.stuckFrames = 0
+		}
+	}
+	c.lastX = currentX
+
+	const stuckThreshold = 60 // 1 second at 60fps
+	if c.stuckFrames >= stuckThreshold {
+		c.isDone = true
+	}
+
+	speed := c.Speed
+	if speed == 0 {
+		speed = float64(c.targetActor.Speed())
+	}
+
 	distance := c.EndX - currentX
 
 	const arrivalThreshold = 20.0
 	const brakingDistance = 10.0 // This value may need tuning depending on friction and speed
 
-	if math.Abs(distance) < arrivalThreshold {
+	if c.isDone || math.Abs(distance) < arrivalThreshold {
 		c.isDone = true
 		// Restore player control before finishing the command.
 		if model := c.targetActor.MovementModel(); model != nil {
@@ -116,9 +148,9 @@ func (c *MoveActorCommand) Update() bool {
 	} else {
 		// Apply force to move towards the target.
 		if distance > 0 {
-			c.targetActor.OnMoveRight(int(c.Speed))
+			c.targetActor.OnMoveRight(int(speed))
 		} else {
-			c.targetActor.OnMoveLeft(int(c.Speed))
+			c.targetActor.OnMoveLeft(int(speed))
 		}
 	}
 
