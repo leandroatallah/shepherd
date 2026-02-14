@@ -12,12 +12,29 @@ func ApplyActorBehavior(s *PhasesScene, b body.Body, behavior phases.ActorBehavi
 	switch behavior.Type {
 	case "follow_player":
 		if actor, ok := b.(gameentitytypes.PlatformerActorEntity); ok {
-			// Set Dog player movement to follow the player
 			actor.GetCharacter().ClearSkills()
 			actor.GetCharacter().SetMovementState(
 				movement.Follow,
 				s.player,
 			)
 		}
+	case "set_speed":
+		var spd int
+		if v, ok := behavior.Config["speed"]; ok {
+			switch s := v.(type) {
+			case float64:
+				spd = int(s)
+			case int:
+				spd = s
+			}
+		}
+		if spd > 0 {
+			if movable, ok := b.(body.Movable); ok {
+				movable.SetSpeed(spd)
+				movable.SetMaxSpeed(spd)
+			}
+		}
+	case "delay":
+		return
 	}
 }

@@ -3,6 +3,8 @@ package gamescenephases
 import (
 	"image/color"
 	"log"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -191,10 +193,68 @@ func (s *PhasesScene) applyActorBehaviors() {
 		return
 	}
 
+	queryBehaviors := map[string][]phases.ActorBehavior{}
+	for behaviorID := range phase.ActorBehaviors {
+		if strings.HasPrefix(behaviorID, "@query:") {
+			queryID := strings.Replace(behaviorID, "@query:", "", 1)
+			queryBehaviors[queryID] = phase.ActorBehaviors[behaviorID]
+		}
+	}
+
 	space := s.PhysicsSpace()
 	for _, b := range space.Bodies() {
-		if behavior, ok := phase.ActorBehaviors[b.ID()]; ok {
-			ApplyActorBehavior(s, b, behavior)
+		var list []phases.ActorBehavior
+
+		// body_id behaviors first
+		if behaviors, ok := phase.ActorBehaviors[b.ID()]; ok {
+			list = append(list, behaviors...)
+		} else {
+			// alias/query fallback
+			for queryID, behaviors := range queryBehaviors {
+				re, err := regexp.Compile(queryID)
+				if err != nil {
+					log.Fatal(err)
+				}
+				if re.MatchString(b.ID()) {
+					list = append(list, behaviors...)
+				}
+			}
+		}
+
+		if len(list) == 0 {
+			continue
+		}
+
+		// Compute total delay first so all actions wait for it
+		delayFrames := 0
+		for _, behavior := range list {
+			if behavior.Type != "delay" {
+				continue
+			}
+			if v, ok := behavior.Config["frames"]; ok {
+				switch f := v.(type) {
+				case float64:
+					delayFrames += int(f)
+				case int:
+					delayFrames += f
+				}
+			}
+		}
+
+		for _, behavior := range list {
+			if behavior.Type == "delay" {
+				continue
+			}
+			beh := behavior
+			body := b
+			if delayFrames <= 0 {
+				ApplyActorBehavior(s, body, beh)
+				continue
+			}
+			delay := time.Second * time.Duration(delayFrames) / time.Duration(timing.TPS)
+			s.Schedule(delay, func() {
+				ApplyActorBehavior(s, body, beh)
+			})
 		}
 	}
 }
