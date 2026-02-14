@@ -1,15 +1,16 @@
 package events
 
 const (
-	PlayerReachedFirstPointType = "player_reached_first_point"
-	PlayerJumpedType            = "player_jumped"
-	PlayerLandedType            = "player_landed"
+	StoryTransitionTwoType  = "transition_story_two"
+	StoryTransitionFourType = "transition_story_four"
+	PlayerJumpedType        = "player_jumped"
+	PlayerLandedType        = "player_landed"
 )
 
-type PlayerReachedFirstPointEvent struct{}
+type StoryTransitionTwoEvent struct{}
 
-func (e *PlayerReachedFirstPointEvent) Type() string {
-	return PlayerReachedFirstPointType
+func (e *StoryTransitionTwoEvent) Type() string {
+	return StoryTransitionTwoType
 }
 
 type PlayerJumpedEvent struct {

@@ -66,14 +66,37 @@ func (s *StoryScene) Update() error {
 func (s *StoryScene) NextScene() {
 	s.isRedirecting = true
 	s.shouldRedirect = false
-	s.AppContext().SceneManager.NavigateTo(scenestypes.ScenePhases, transition.NewFader(), true)
+
+	// Advance phase first
+	s.AppContext().PhaseManager.AdvanceToNextPhase()
+
+	// Now get the NEW current phase to see where to go
+	nextPhase, err := s.AppContext().PhaseManager.GetCurrentPhase()
+	targetScene := scenestypes.ScenePhases
+	if err == nil {
+		targetScene = nextPhase.SceneType
+	}
+
+	s.AppContext().SceneManager.NavigateTo(targetScene, transition.NewFader(), true)
 }
 
 func (s *StoryScene) OnStart() {
 	// TODO: Use a constant
 	s.AppContext().DialogueManager.SetActiveSpeech("story")
 
-	sequence, err := sequences.NewSequenceFromJSON("assets/sequences/story-1.json")
+	// Load sequence path from current phase
+	phase, err := s.AppContext().PhaseManager.GetCurrentPhase()
+	if err != nil {
+		log.Fatalf("failed to get current phase: %v", err)
+	}
+
+	if phase.SequencePath == "" {
+		log.Printf("No sequence path defined for phase %d", phase.ID)
+		s.shouldRedirect = true
+		return
+	}
+
+	sequence, err := sequences.NewSequenceFromJSON(phase.SequencePath)
 	if err != nil {
 		log.Fatal(err)
 	}

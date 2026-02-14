@@ -16,7 +16,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
-	"github.com/leandroatallah/firefly/internal/engine/event"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/pause"
@@ -28,7 +27,6 @@ import (
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
-	"github.com/leandroatallah/firefly/internal/game/events"
 	"github.com/leandroatallah/firefly/internal/game/render/vfx"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
@@ -67,51 +65,22 @@ type PhasesScene struct {
 	vfxManager     *vfx.Manager
 }
 
-func NewPhasesScene(context *app.AppContext) *PhasesScene {
+func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
 	mainText, err := font.NewFontText(config.Get().MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}
-	tilemapScene := scene.NewTilemapScene(context)
-	scene := PhasesScene{
+	tilemapScene := scene.NewTilemapScene(ctx)
+	scene := &PhasesScene{
 		TilemapScene: tilemapScene,
 		mainText:     mainText,
 		bodyCounter:  &BodyCounter{},
 	}
-	scene.SetAppContext(context)
+	scene.SetAppContext(ctx)
 
-	// Subscribe events
-	context.EventManager.Subscribe(events.CharacterDiedEventType, func(e event.Event) {
-		scene.Reboot()
-	})
-	context.EventManager.Subscribe(events.PlayerReachedFirstPointType, func(e event.Event) {
-		if genEvt, ok := e.(event.GenericEvent); ok {
-			msg := genEvt.Payload["message"].(string)
-			log.Println(msg)
-		}
-	})
+	subscribeEvents(ctx, scene)
 
-	context.EventManager.Subscribe(events.PlayerJumpedType, func(e event.Event) {
-		if scene.vfxManager == nil {
-			return
-		}
-		if evt, ok := e.(*events.PlayerJumpedEvent); ok {
-			yOffset := 1.0
-			scene.vfxManager.SpawnJumpPuff(evt.X, evt.Y+yOffset, 1)
-		}
-	})
-
-	context.EventManager.Subscribe(events.PlayerLandedType, func(e event.Event) {
-		if scene.vfxManager == nil {
-			return
-		}
-		if evt, ok := e.(*events.PlayerLandedEvent); ok {
-			yOffset := 1.0
-			scene.vfxManager.SpawnLandingPuff(evt.X, evt.Y+yOffset, 1)
-		}
-	})
-
-	return &scene
+	return scene
 }
 
 func (s *PhasesScene) OnStart() {
@@ -277,7 +246,10 @@ func (s *PhasesScene) Update() error {
 		s.completePhase()
 	}
 
-	s.TilemapScene.Update() // Update the camera if in follow mode
+	// This calls TilemapScene.Update -> BaseScene.Update (handling Schedule)
+	if err := s.TilemapScene.Update(); err != nil {
+		return err
+	}
 
 	s.playBackgroundMusic()
 
@@ -459,8 +431,15 @@ func (s *PhasesScene) completePhase() {
 
 	if s.phaseCompletedDelay == 0 {
 		s.AppContext().PhaseManager.AdvanceToNextPhase()
+		nextPhase, err := s.AppContext().PhaseManager.GetCurrentPhase()
+
+		targetScene := scenestypes.ScenePhases
+		if err == nil {
+			targetScene = nextPhase.SceneType
+		}
+
 		s.AppContext().SceneManager.NavigateTo(
-			scenestypes.ScenePhases,
+			targetScene,
 			transition.NewFader(),
 			true,
 		)
