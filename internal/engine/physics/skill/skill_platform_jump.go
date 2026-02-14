@@ -34,6 +34,9 @@ func (s *JumpSkill) ActivationKey() ebiten.Key {
 
 // HandleInput checks for the dash activation key.
 func (s *JumpSkill) HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
+	if model != nil && model.IsInputBlocked() {
+		return
+	}
 	if inpututil.IsKeyJustPressed(s.activationKey) {
 		s.tryActivate(body, model, space)
 	}

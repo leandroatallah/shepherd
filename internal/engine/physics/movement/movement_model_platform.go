@@ -208,6 +208,11 @@ func (m *PlatformMovementModel) SetIsScripted(isScripted bool) {
 	m.isScripted = isScripted
 }
 
+// IsInputBlocked reports whether player input should be ignored.
+func (m *PlatformMovementModel) IsInputBlocked() bool {
+	return m.playerMovementBlocker != nil && m.playerMovementBlocker.IsMovementBlocked()
+}
+
 func (m *PlatformMovementModel) OnGround() bool {
 	return m.onGround
 }

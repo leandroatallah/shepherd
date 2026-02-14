@@ -30,7 +30,10 @@ func (s *HorizontalMovementSkill) ActivationKey() ebiten.Key {
 	return s.activationKey
 }
 
-func (s *HorizontalMovementSkill) HandleInput(body body.MovableCollidable, _ *physicsmovement.PlatformMovementModel, _ body.BodiesSpace) {
+func (s *HorizontalMovementSkill) HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, _ body.BodiesSpace) {
+	if model != nil && model.IsInputBlocked() {
+		return
+	}
 	if body.Immobile() {
 		_, vy16 := body.Velocity()
 		_, accY := body.Acceleration()
