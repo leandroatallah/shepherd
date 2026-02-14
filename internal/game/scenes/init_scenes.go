@@ -15,6 +15,9 @@ func InitSceneMap(context *app.AppContext) navigation.SceneMap {
 		scenestypes.SceneMenu: func() navigation.Scene {
 			return NewMenuScene(context)
 		},
+		scenestypes.SceneStory: func() navigation.Scene {
+			return NewStoryScene(context)
+		},
 		scenestypes.ScenePhases: func() navigation.Scene {
 			return gamescenephases.NewPhasesScene(context)
 		},

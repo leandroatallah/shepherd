@@ -6,9 +6,9 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
@@ -21,7 +21,8 @@ const (
 type MenuScene struct {
 	scene.BaseScene
 
-	fontText *font.FontText
+	isNavigating bool
+	fontText     *font.FontText
 }
 
 func NewMenuScene(context *app.AppContext) *MenuScene {
@@ -43,8 +44,9 @@ func (s *MenuScene) OnStart() {
 }
 
 func (s *MenuScene) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.AppContext().SceneManager.NavigateTo(scenestypes.ScenePhases, transition.NewFader(), true)
+	if !s.isNavigating && ebiten.IsKeyPressed(ebiten.KeyEnter) {
+		s.isNavigating = true
+		s.AppContext().SceneManager.NavigateTo(scenestypes.SceneStory, transition.NewFader(), true)
 	}
 
 	return nil

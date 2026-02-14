@@ -67,7 +67,7 @@ func (s *IntroScene) Draw(screen *ebiten.Image) {
 
 func (s *IntroScene) Update() error {
 	// Force skip
-	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
+	if s.introAnimation != over && ebiten.IsKeyPressed(ebiten.KeyEnter) {
 		s.NextScene()
 	}
 

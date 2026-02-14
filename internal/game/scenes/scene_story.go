@@ -41,6 +41,10 @@ func (s *StoryScene) Draw(screen *ebiten.Image) {
 func (s *StoryScene) Update() error {
 	s.count++
 
+	if err := s.BaseScene.Update(); err != nil {
+		return err
+	}
+
 	if s.shouldRedirect {
 		s.NextScene()
 	}

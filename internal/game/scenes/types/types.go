@@ -8,4 +8,5 @@ const (
 	ScenePhases
 	SceneSummary
 	ScenePhaseReboot
+	SceneStory
 )
