@@ -4,21 +4,49 @@ This module contains the core, reusable game engine components for the Firefly p
 
 ## Core Components
 
-- `app/`: Manages the main engine loop, context, and initialization.
-- `contracts/`: Defines the Go interfaces (contracts) for key engine components like bodies, animations, and scenes. This promotes a decoupled architecture.
+- `app/`: Manages the main engine loop, context, and initialization (`engine.go`, `context.go`).
+- `contracts/`: Defines the Go interfaces (contracts) for key engine components like animations, bodies, configuration, context, navigation, sequences, and tilemap layers. This promotes a decoupled architecture.
 - `data/`: Handles data loading, management, and configuration schemas (e.g., from JSON files).
+  - `config/`: Engine-specific configuration structures.
+- `event/`: Provides a basic event handling system for inter-component communication.
+- `input/`: Manages user input from keyboard, mouse, or gamepads.
 - `sequences/`: Manages scripted event sequences, commands, and cutscenes.
+- `utils/`: Contains various utility functions (e.g., for fixed-point arithmetic `fp16/`, timing `timing/`).
 
 ## Game Object Management
 
-- `entity/`: Provides the foundational structures for all in-game objects, primarily `actors` (like characters) and `items`.
-- `physics/`: Implements the physics simulation, including movement models (platformer, top-down), collision detection, and physical body representations.
-- `scene/`: Manages game scenes, scene transitions, and the overall scene lifecycle. It includes a phase manager to handle different states within a single scene.
+- `entity/`: Provides the foundational structures for all in-game objects.
+  - `actors/`: Base structures and logic for character-like entities.
+  - `items/`: Base structures and logic for collectible or interactive items.
+  - `animation_utils.go`: Helper functions for animation logic.
+- `physics/`: Implements the physics simulation.
+  - `body/`: Defines physical body interfaces and implementations.
+  - `movement/`: Provides movement models (e.g., platformer physics).
+  - `skill/`: Manages physics-related skills or abilities.
+  - `space/`: Handles collision detection and spatial partitioning.
+- `scene/`: Manages game scenes, scene transitions, and the overall scene lifecycle.
+  - `scene_manager.go`: Orchestrates scene loading, updating, and drawing.
+  - `scene_base.go`: Provides a common base for all scenes.
+  - `scene_factory.go`: Responsible for creating new scene instances.
+  - `transition/`: Handles scene transitions (e.g., fades).
+  - `pause/`: Implements pause menu functionality.
+  - `phases/`: Manages different states or phases within a single scene.
+  - `camera_config.go`: Defines camera behavior for scenes.
+  - `screen_flipper.go`: Manages screen flipping effects.
+  - `scene_tilemap.go`: Handles tilemap-based scene elements.
 
 ## Presentation
 
-- `assets/`: Handles the loading and management of game assets, including images, fonts, and audio files.
+- `assets/`: Handles the loading and management of game assets.
+  - `imagemanager/`: Manages loading and caching of images.
+  - `font/`: Handles font loading and text rendering.
 - `audio/`: Provides the core audio playback functionality.
-- `input/`: Manages user input from keyboard, mouse, or gamepads.
-- `render/`: Responsible for all rendering tasks, including the game camera, sprites, and tilemaps.
-- `ui/`: Provides building blocks for user interface elements like HUDs and dialogue systems.
+- `render/`: Responsible for all rendering tasks.
+  - `camera/`: Controls the game camera's position and zoom.
+  - `particles/`: Manages particle effects.
+  - `sprites/`: Handles sprite rendering.
+  - `tilemap/`: Renders tilemaps.
+  - `screenutil/`: Utility functions for screen rendering.
+- `ui/`: Provides building blocks for user interface elements.
+  - `hud/`: Base components for Heads-Up Displays.
+  - `speech/`: Components for speech bubbles and dialogue systems.
