@@ -7,10 +7,10 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
 )
 
-// Sequence is a list of commands to be executed in order, with additional properties.
 type Sequence struct {
 	commands            []sequences.Command
 	BlockPlayerMovement bool
+	blockSequenceFlags  []bool
 }
 
 func (s *Sequence) Commands() []sequences.Command {
@@ -34,6 +34,10 @@ type CommandData struct {
 	TargetID string  `json:"target_id,omitempty"`
 	EndX     float64 `json:"end_x,omitempty"`
 	Speed    float64 `json:"speed,omitempty"`
+
+	// Per-command control over whether this command blocks the sequence timeline.
+	// If omitted, commands are treated as blocking (current default behavior).
+	BlockSequence *bool `json:"block_sequence,omitempty"`
 
 	// Fields for "event"
 	EventType string                 `json:"event_type,omitempty"`
@@ -63,6 +67,10 @@ func (cd *CommandData) ToCommand() sequences.Command {
 			EndX:     cd.EndX,
 			Speed:    cd.Speed,
 		}
+	case "set_speed":
+		return &SetSpeedCommand{TargetID: cd.TargetID, Speed: cd.Speed}
+	case "follow_player":
+		return &FollowPlayerCommand{TargetID: cd.TargetID}
 	case "event":
 		return &EventCommand{
 			EventType: cd.EventType,
@@ -85,15 +93,22 @@ func NewSequenceFromJSON(filePath string) (*Sequence, error) {
 	}
 
 	var commands []sequences.Command
+	var flags []bool
 	for _, cd := range sequenceData.Commands {
 		cmd := cd.ToCommand()
 		if cmd != nil {
 			commands = append(commands, cmd)
+			block := true
+			if cd.BlockSequence != nil {
+				block = *cd.BlockSequence
+			}
+			flags = append(flags, block)
 		}
 	}
 
 	return &Sequence{
 		commands:            commands,
 		BlockPlayerMovement: sequenceData.BlockPlayerMovement,
+		blockSequenceFlags:  flags,
 	}, nil
 }

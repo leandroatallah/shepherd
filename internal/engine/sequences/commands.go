@@ -3,9 +3,13 @@ package sequences
 import (
 	"fmt"
 	"math"
+	"regexp"
+	"strings"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/event"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
@@ -156,3 +160,71 @@ func (c *MoveActorCommand) Update() bool {
 
 	return false
 }
+
+// resolveActorTargets returns actors matching a target ID or a @query: regex pattern
+func resolveActorTargets(ctx *app.AppContext, targetID string) []actors.ActorEntity {
+	targets := []actors.ActorEntity{}
+	if strings.HasPrefix(targetID, "@query:") {
+		pattern := strings.TrimPrefix(targetID, "@query:")
+		re, err := regexp.Compile(pattern)
+		if err != nil {
+			return targets
+		}
+		for _, b := range ctx.Space.Bodies() {
+			if re.MatchString(b.ID()) {
+				if a, ok := ctx.ActorManager.Find(b.ID()); ok {
+					targets = append(targets, a)
+				}
+			}
+		}
+		return targets
+	}
+	if a, ok := ctx.ActorManager.Find(targetID); ok {
+		targets = append(targets, a)
+	}
+	return targets
+}
+
+// SetSpeedCommand sets speed and max speed for one or more targets
+type SetSpeedCommand struct {
+	TargetID string
+	Speed    float64
+}
+
+func (c *SetSpeedCommand) Init(appContext any) {
+	ctx := appContext.(*app.AppContext)
+	if c.Speed <= 0 {
+		return
+	}
+	for _, a := range resolveActorTargets(ctx, c.TargetID) {
+		if m, ok := any(a).(body.Movable); ok {
+			spd := int(c.Speed)
+			m.SetSpeed(spd)
+			m.SetMaxSpeed(spd)
+		}
+	}
+}
+
+func (c *SetSpeedCommand) Update() bool { return true }
+
+// FollowPlayerCommand sets movement state to Follow targeting the player
+type FollowPlayerCommand struct {
+	TargetID string
+}
+
+func (c *FollowPlayerCommand) Init(appContext any) {
+	ctx := appContext.(*app.AppContext)
+	player, ok := ctx.ActorManager.GetPlayer()
+	if !ok {
+		return
+	}
+	for _, a := range resolveActorTargets(ctx, c.TargetID) {
+		ch := a.GetCharacter()
+		if ch != nil {
+			ch.ClearSkills()
+			a.SetMovementState(movement.Follow, player)
+		}
+	}
+}
+
+func (c *FollowPlayerCommand) Update() bool { return true }
