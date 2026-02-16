@@ -2,6 +2,7 @@ package app
 
 import (
 	"io/fs"
+	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/assets/imagemanager"
 	"github.com/leandroatallah/firefly/internal/engine/audio"
@@ -47,4 +48,31 @@ func (c *AppContextHolder) SetAppContext(appContext any) {
 
 func (c *AppContextHolder) AppContext() *AppContext {
 	return c.appContext
+}
+
+func (c *AppContext) GoToCurrentPhaseScene(t navigation.Transition, freshInstance bool) {
+	if c.PhaseManager == nil || c.SceneManager == nil {
+		return
+	}
+
+	phase, err := c.PhaseManager.GetCurrentPhase()
+	if err != nil {
+		log.Printf("failed to get current phase: %v", err)
+		return
+	}
+
+	c.SceneManager.NavigateTo(phase.SceneType, t, freshInstance)
+}
+
+func (c *AppContext) CompleteCurrentPhase(t navigation.Transition, freshInstance bool) {
+	if c.PhaseManager == nil {
+		return
+	}
+
+	if err := c.PhaseManager.AdvanceToNextPhase(); err != nil {
+		log.Printf("failed to advance to next phase: %v", err)
+		return
+	}
+
+	c.GoToCurrentPhaseScene(t, freshInstance)
 }
