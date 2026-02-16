@@ -80,6 +80,54 @@ func (sf *ScreenFlipper) Update() {
 	sf.checkTrigger()
 }
 
+func (sf *ScreenFlipper) SnapToCurrentRoom() {
+	if sf.player == nil || sf.cam == nil || sf.tilemap == nil {
+		return
+	}
+
+	sf.ensureRooms()
+	if len(sf.rooms) == 0 {
+		return
+	}
+
+	if sf.currentRoom == nil {
+		sf.updateCurrentRoom()
+	}
+	if sf.currentRoom == nil {
+		return
+	}
+
+	sf.cam.SetBounds(sf.currentRoom)
+
+	px, py := sf.player.GetPositionMin()
+	w, h := sf.player.GetShape().Width(), sf.player.GetShape().Height()
+	centerX := float64(px) + float64(w)/2
+	centerY := float64(py) + float64(h)/2
+
+	halfW := sf.screenWidth / 2
+	halfH := sf.screenHeight / 2
+
+	minCamX := float64(sf.currentRoom.Min.X) + halfW
+	maxCamX := float64(sf.currentRoom.Max.X) - halfW
+	minCamY := float64(sf.currentRoom.Min.Y) + halfH
+	maxCamY := float64(sf.currentRoom.Max.Y) - halfH
+
+	if centerX < minCamX {
+		centerX = minCamX
+	}
+	if centerX > maxCamX {
+		centerX = maxCamX
+	}
+	if centerY < minCamY {
+		centerY = minCamY
+	}
+	if centerY > maxCamY {
+		centerY = maxCamY
+	}
+
+	sf.cam.SetCenter(centerX, centerY)
+}
+
 func (sf *ScreenFlipper) checkTrigger() {
 	if sf.player == nil || sf.cam == nil || sf.tilemap == nil {
 		return
