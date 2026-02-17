@@ -112,21 +112,8 @@ func (s *PhasesScene) OnStart() {
 
 	s.PhysicsSpace().Bodies()
 
-	// Init camera target
 	s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFollow})
 	s.Camera().SetFollowTarget(s.player)
-
-	// Set initial camera position to the screen where the player is
-	cfg := config.Get()
-	px, py := s.player.GetPositionMin()
-	pw, ph := s.player.GetShape().Width(), s.player.GetShape().Height()
-	pcx := px + pw/2
-	pcy := py + ph/2
-
-	camX := (pcx/cfg.ScreenWidth)*cfg.ScreenWidth + cfg.ScreenWidth/2
-	camY := (pcy/cfg.ScreenHeight)*cfg.ScreenHeight + cfg.ScreenHeight/2
-
-	s.Camera().SetCenter(float64(camX), float64(camY))
 
 	// Init collisions bodies and touch trigger for endpoints
 	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), func(id string) body.Touchable {
@@ -150,6 +137,7 @@ func (s *PhasesScene) OnStart() {
 	s.screenFlipper.OnFlipFinish = func() {
 		s.player.SetImmobile(false)
 	}
+	s.screenFlipper.SnapToCurrentRoom()
 
 	s.pauseScreen = pause.NewPauseScreen(ebiten.KeyEnter, 250*time.Millisecond)
 
