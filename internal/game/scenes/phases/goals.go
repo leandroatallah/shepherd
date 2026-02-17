@@ -1,5 +1,9 @@
 package gamescenephases
 
+import (
+	"time"
+)
+
 // RescueSheepGoal: Complete when all sheep are rescued
 type RescueSheepGoal struct {
 	scene *PhasesScene
@@ -10,6 +14,8 @@ func (g *RescueSheepGoal) IsCompleted() bool {
 }
 
 func (g *RescueSheepGoal) OnCompletion() {
+	g.scene.freezeAllActors()
+	g.scene.Audiomanager().FadeOut(bgSound, time.Second)
 	g.scene.defaultCompletion()
 }
 
@@ -23,5 +29,7 @@ func (g *ReachEndpointGoal) IsCompleted() bool {
 }
 
 func (g *ReachEndpointGoal) OnCompletion() {
+	g.scene.freezeAllActors()
+	g.scene.Audiomanager().FadeOut(bgSound, time.Second)
 	g.scene.defaultCompletion()
 }

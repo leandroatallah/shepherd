@@ -3,8 +3,6 @@ package gamescenephases
 import (
 	"image/color"
 	"log"
-	"regexp"
-	"strings"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -44,6 +42,7 @@ type PhasesScene struct {
 	player      gameentitytypes.PlatformerActorEntity
 	mainText    *font.FontText
 	bodyCounter *BodyCounter
+	allowPause  bool
 
 	// Complete phase
 	isConcludingPhase   bool
@@ -99,6 +98,13 @@ func (s *PhasesScene) OnStart() {
 	s.AppContext().ActorManager.Register(s.player)
 	s.PhysicsSpace().AddBody(s.player)
 
+	// Optionally block input for the current player of this phase
+	if phase, err := s.AppContext().PhaseManager.GetCurrentPhase(); err == nil && phase.BlockPlayerMovement {
+		if p, ok := s.AppContext().ActorManager.GetPlayer(); ok {
+			p.BlockMovement()
+		}
+	}
+
 	s.initTilemap()
 
 	// After init bodies, set body counter
@@ -129,12 +135,10 @@ func (s *PhasesScene) OnStart() {
 		}, s.player)
 	})
 
-	// Init screen flipper
 	s.screenFlipper = scene.NewScreenFlipper(s.Camera(), s.player, s.Tilemap(), s.AppContext())
 	tileWidth := s.Tilemap().Tilewidth
 	s.screenFlipper.PlayerPushDistance = float64(tileWidth / 2)
 	s.screenFlipper.FlipStrategy = func(dx, dy int) scene.FlipType {
-		// Vertical movement is instant
 		if dy != 0 {
 			return scene.FlipTypeInstant
 		}
@@ -147,15 +151,12 @@ func (s *PhasesScene) OnStart() {
 		s.player.SetImmobile(false)
 	}
 
-	// Init pause screen
 	s.pauseScreen = pause.NewPauseScreen(ebiten.KeyEnter, 250*time.Millisecond)
 
-	// Init sequence player
-	s.sequencePlayer = sequences.NewSequencePlayer(s.AppContext())
-
-	// Check if we need to run a sequence for this phase
 	phase, err := s.AppContext().PhaseManager.GetCurrentPhase()
 	if err == nil && phase.SequencePath != "" {
+		s.sequencePlayer = sequences.NewSequencePlayer(s.AppContext())
+		s.allowPause = phase.GoalType != SequenceGoalType
 		seq, err := sequences.NewSequenceFromJSON(phase.SequencePath)
 		if err != nil {
 			log.Printf("Failed to load sequence: %v", err)
@@ -201,10 +202,11 @@ func (s *PhasesScene) defaultCompletion() {
 }
 
 func (s *PhasesScene) Update() error {
-	s.pauseScreen.Update()
-
-	if s.pauseScreen.IsPaused() {
-		return nil
+	if s.pauseScreen != nil && s.allowPause {
+		s.pauseScreen.Update()
+		if s.pauseScreen.IsPaused() {
+			return nil
+		}
 	}
 
 	if s.sequencePlayer != nil {
@@ -332,6 +334,10 @@ func (s *PhasesScene) Reboot() {
 
 func (s *PhasesScene) OnFinish() {
 	s.TilemapScene.OnFinish()
+	// Ensure we remove any movement block applied at phase start (for whichever actor is the current player)
+	if p, ok := s.AppContext().ActorManager.GetPlayer(); ok {
+		p.UnblockMovement()
+	}
 	s.AppContext().ActorManager.Unregister(s.player)
 }
 
@@ -340,6 +346,8 @@ func (s *PhasesScene) endpointTrigger(eventID string) {
 		s.player.OnDie()
 		return
 	}
+
+	s.reachedEndpoint = true
 
 	sheepCarrier, ok := s.player.(gameentitytypes.SheepCarrier)
 	if !ok {
@@ -418,19 +426,7 @@ func (s *PhasesScene) completePhase() {
 	}
 
 	if s.phaseCompletedDelay == 0 {
-		s.AppContext().PhaseManager.AdvanceToNextPhase()
-		nextPhase, err := s.AppContext().PhaseManager.GetCurrentPhase()
-
-		targetScene := scenestypes.ScenePhases
-		if err == nil {
-			targetScene = nextPhase.SceneType
-		}
-
-		s.AppContext().SceneManager.NavigateTo(
-			targetScene,
-			transition.NewFader(),
-			true,
-		)
+		s.AppContext().CompleteCurrentPhase(transition.NewFader(), true)
 		s.phaseCompleted = true
 		return
 	}
@@ -439,7 +435,7 @@ func (s *PhasesScene) completePhase() {
 }
 
 func (s *PhasesScene) drawPause(screen *ebiten.Image) {
-	if !s.pauseScreen.IsPaused() {
+	if !s.allowPause || s.pauseScreen == nil || !s.pauseScreen.IsPaused() {
 		return
 	}
 
