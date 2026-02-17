@@ -8,7 +8,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body" // ADDED THIS
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
-	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
 	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
@@ -85,10 +84,6 @@ func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEnti
 	if err != nil {
 		return nil, err
 	}
-	character.AddSkill(skill.NewJumpSkill())
-	character.AddSkill(skill.NewHorizontalMovementSkill())
-
-	// Set the custom state transition logic for the player
 	character.SetStateTransitionHandler(shepherdStateTransitionLogic)
 
 	player := &ShepherdPlayer{

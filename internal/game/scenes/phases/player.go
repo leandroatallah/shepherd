@@ -2,6 +2,7 @@ package gamescenephases
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
 	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
@@ -20,6 +21,9 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (g
 	if err != nil {
 		return nil, err
 	}
+
+	p.GetCharacter().AddSkill(skill.NewJumpSkill())
+	p.GetCharacter().AddSkill(skill.NewHorizontalMovementSkill())
 
 	return p, nil
 }
