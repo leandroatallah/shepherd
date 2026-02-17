@@ -1,0 +1,18 @@
+{
+  "commands": [
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
+      "command": "dialogue",
+      "lines": ["Not one will be lost. \nNot one will be left behind."],
+      "position": "top",
+      "speech_speed": 1
+    },
+    {
+      "command": "delay",
+      "frames": 240
+    }
+  ]
+}

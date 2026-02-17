@@ -6,14 +6,13 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
-	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
-	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/audio"
-	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
+	"github.com/leandroatallah/firefly/internal/engine/scene"
+	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 )
 
 type SummaryScene struct {
@@ -42,8 +41,7 @@ func (s *SummaryScene) Draw(screen *ebiten.Image) {
 
 func (s *SummaryScene) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		s.AppContext().PhaseManager.AdvanceToNextPhase()
-		s.AppContext().SceneManager.NavigateTo(scenestypes.ScenePhases, transition.NewFader(), true)
+		s.AppContext().CompleteCurrentPhase(transition.NewFader(), true)
 	}
 
 	return nil

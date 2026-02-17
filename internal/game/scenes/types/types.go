@@ -9,4 +9,5 @@ const (
 	SceneSummary
 	ScenePhaseReboot
 	SceneStory
+	ScenePhaseTitle
 )

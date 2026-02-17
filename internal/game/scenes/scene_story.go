@@ -10,7 +10,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
-	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 type StoryScene struct {
@@ -67,17 +66,7 @@ func (s *StoryScene) NextScene() {
 	s.isRedirecting = true
 	s.shouldRedirect = false
 
-	// Advance phase first
-	s.AppContext().PhaseManager.AdvanceToNextPhase()
-
-	// Now get the NEW current phase to see where to go
-	nextPhase, err := s.AppContext().PhaseManager.GetCurrentPhase()
-	targetScene := scenestypes.ScenePhases
-	if err == nil {
-		targetScene = nextPhase.SceneType
-	}
-
-	s.AppContext().SceneManager.NavigateTo(targetScene, transition.NewFader(), true)
+	s.AppContext().CompleteCurrentPhase(transition.NewFader(), true)
 }
 
 func (s *StoryScene) OnStart() {

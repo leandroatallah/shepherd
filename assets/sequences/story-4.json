@@ -1,0 +1,27 @@
+{
+  "commands": [
+    { "command": "delay", "frames": 60 },
+    { "command": "set_speed", "target_id": "DOG_NPC", "speed": 3 },
+    { "command": "follow_player", "target_id": "DOG_NPC" },
+    { "command": "set_speed", "target_id": "player", "speed": 4 },
+    {
+      "command": "move_actor",
+      "target_id": "player",
+      "end_x": 380
+    },
+    {
+      "command": "move_actor",
+      "target_id": "player",
+      "end_x": 340
+    },
+    { "command": "delay", "frames": 120 },
+    {
+      "command": "move_actor",
+      "target_id": "player",
+      "end_x": 460,
+      "block_sequence": false
+    },
+    { "command": "delay", "frames": 60 }
+  ],
+  "block_player_movement": true
+}

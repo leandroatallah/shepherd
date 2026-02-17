@@ -16,7 +16,7 @@
     },
     {
       "command": "event",
-      "event_type": "player_reached_first_point",
+      "event_type": "transition_story_one",
       "payload": {
         "message": "Player reached the first point."
       }

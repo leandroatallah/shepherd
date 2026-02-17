@@ -57,7 +57,7 @@ func Setup(assets fs.FS) error {
 	for _, p := range GetPhases() {
 		phaseManager.AddPhase(p)
 	}
-	phaseManager.SetCurrentPhase(3)
+	phaseManager.SetCurrentPhase(1)
 
 	appContext := &app.AppContext{
 		AudioManager:    audioManager,
@@ -83,7 +83,7 @@ func Setup(assets fs.FS) error {
 	game := app.NewGame(appContext)
 
 	// Set initial game scene
-	game.AppContext.SceneManager.NavigateTo(scenestypes.ScenePhases, nil, false)
+	game.AppContext.SceneManager.NavigateTo(scenestypes.SceneIntro, nil, false)
 
 	if err := ebiten.RunGame(game); err != nil {
 		return err

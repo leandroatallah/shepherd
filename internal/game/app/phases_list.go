@@ -3,65 +3,70 @@ package gamesetup
 import (
 	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	gamescenephases "github.com/leandroatallah/firefly/internal/game/scenes/phases"
+	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 func GetPhases() []phases.Phase {
 	return []phases.Phase{
 		{
 			ID:           1,
-			Name:         "Phase 1",
-			TilemapPath:  "assets/tilemap/shepherd-phase-0.tmj",
+			Name:         "Story Intro - Part 1",
 			NextPhaseID:  2,
-			SequencePath: "assets/sequences/sample.json",
-			GoalType:     gamescenephases.RescueSheepType,
+			SequencePath: "assets/sequences/story-1.json",
+			GoalType:     gamescenephases.SequenceGoalType,
+			SceneType:    scenestypes.SceneStory,
 		},
 		{
-			ID:          2,
-			Name:        "Phase 2",
-			TilemapPath: "assets/tilemap/shepherd-phase-1.tmj",
-			NextPhaseID: 1,
-			GoalType:    gamescenephases.RescueSheepType,
+			ID:                  2,
+			Name:                "Story Intro - Part 2",
+			TilemapPath:         "assets/tilemap/shepherd-phase-story-intro-part-2.tmj",
+			NextPhaseID:         3,
+			GoalType:            gamescenephases.SequenceGoalType,
+			SceneType:           scenestypes.ScenePhases,
+			SequencePath:        "assets/sequences/story-2.json",
+			BlockPlayerMovement: true,
 		},
 		{
-			ID:          3,
-			Name:        "Phase 3",
-			TilemapPath: "assets/tilemap/shepherd-phase-2.tmj",
-			NextPhaseID: 1,
-			GoalType:    gamescenephases.NoGoalType,
-			// Find a NPC by ID "DOG_NPC" and set its behavior to "follow_player"
-			ActorBehaviors: map[string]phases.ActorBehavior{
-				"DOG_NPC": {
-					Type: "follow_player",
-				},
-			},
+			ID:           3,
+			Name:         "Story Intro - Part 3",
+			NextPhaseID:  4,
+			SequencePath: "assets/sequences/story-3.json",
+			GoalType:     gamescenephases.SequenceGoalType,
+			SceneType:    scenestypes.SceneStory,
 		},
 		{
-			ID:          4,
-			Name:        "Phase 4",
-			TilemapPath: "assets/tilemap/shepherd-phase-3.tmj",
-			NextPhaseID: 1,
-			GoalType:    gamescenephases.RescueSheepType,
+			ID:                  4,
+			Name:                "Story Intro - Part 4",
+			TilemapPath:         "assets/tilemap/shepherd-phase-4.tmj",
+			NextPhaseID:         5,
+			GoalType:            gamescenephases.SequenceGoalType,
+			SceneType:           scenestypes.ScenePhases,
+			SequencePath:        "assets/sequences/story-4.json",
+			BlockPlayerMovement: true,
 		},
 		{
-			ID:          5,
-			Name:        "Phase 5",
-			TilemapPath: "assets/tilemap/shepherd-phase-4.tmj",
-			NextPhaseID: 1,
-			GoalType:    gamescenephases.RescueSheepType,
+			ID:           5,
+			Name:         "Story Intro - Part 5",
+			NextPhaseID:  6,
+			SequencePath: "assets/sequences/story-5.json",
+			GoalType:     gamescenephases.SequenceGoalType,
+			SceneType:    scenestypes.SceneStory,
 		},
 		{
 			ID:          6,
-			Name:        "Phase 6",
-			TilemapPath: "assets/tilemap/shepherd-phase-5.tmj",
-			NextPhaseID: 1,
-			GoalType:    gamescenephases.RescueSheepType,
+			Name:        "Story Intro - Part 6",
+			Title:       "Phase title",
+			NextPhaseID: 7,
+			GoalType:    gamescenephases.NoGoalType,
+			SceneType:   scenestypes.ScenePhaseTitle,
 		},
 		{
 			ID:          7,
-			Name:        "Phase 7",
-			TilemapPath: "assets/tilemap/shepherd-phase-6.tmj",
+			Name:        "Area 1 - Stage 1",
+			TilemapPath: "assets/tilemap/shepherd-phase-0.tmj",
 			NextPhaseID: 1,
-			GoalType:    gamescenephases.RescueSheepType,
+			GoalType:    gamescenephases.ReactEndpointType,
+			SceneType:   scenestypes.ScenePhases,
 		},
 	}
 }

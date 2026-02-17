@@ -1,0 +1,31 @@
+{
+  "commands": [
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
+      "command": "dialogue",
+      "lines": [
+        "Then came the storm. \nWind tore the sky apart.",
+        "Paths vanished. \nDarkness moved where it should not."
+      ],
+      "position": "top",
+      "speech_speed": 1
+    },
+    {
+      "command": "dialogue",
+      "lines": [
+        "When the calm returned, \nthe flock was gone.",
+        "The land itself turned hostile, \nas if it rejected what was gentle.",
+        "Now the shepherd must walk again."
+      ],
+      "position": "top",
+      "speech_speed": 1
+    },
+    {
+      "command": "delay",
+      "frames": 60
+    }
+  ]
+}
