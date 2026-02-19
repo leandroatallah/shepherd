@@ -5,6 +5,7 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/jsonutil"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
@@ -15,7 +16,7 @@ type CollectibleCoinItem struct {
 }
 
 func NewCollectibleCoinItem(ctx *app.AppContext, x, y int, id string) (*CollectibleCoinItem, error) {
-	spriteData, statData, err := items.ParseJsonItem("internal/game/entity/items/coin.json")
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData]("internal/game/entity/items/coin.json")
 	if err != nil {
 		return nil, err
 	}

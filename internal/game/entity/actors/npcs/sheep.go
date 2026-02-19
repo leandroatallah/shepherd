@@ -5,7 +5,9 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/jsonutil"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
@@ -21,27 +23,29 @@ type Sheep struct {
 
 // TODO: Use composition to reduce repeated actions in different places
 func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
-	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/npcs/sheep.json")
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[actors.StatData]("internal/game/entity/actors/npcs/sheep.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	character, err := CreateAnimatedCharacter(ctx, spriteData)
+	stateMap, err := builder.BuildStateMap(spriteData)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
+	rect := builder.BodyRectFromSpriteData(spriteData)
+	character := gameentitytypes.NewPlatformerCharacter(stateMap, spriteData, rect)
+	character.SetAppContext(ctx)
 	character.SetPosition(x, y)
+
 	sheep := &Sheep{PlatformerCharacter: character}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	sheep.SetOwner(sheep)
 
-	if err = SetNpcStats(sheep, statData); err != nil {
+	if err = builder.ConfigureCharacter(sheep, spriteData, statData, stateMap, "NPC"); err != nil {
 		return nil, err
 	}
-	if err = SetNpcBodies(sheep, spriteData, id); err != nil {
-		return nil, err
-	}
+	sheep.SetID(id)
 
 	model, err := physicsmovement.NewMovementModel(physicsmovement.Platform, nil)
 	if err != nil {

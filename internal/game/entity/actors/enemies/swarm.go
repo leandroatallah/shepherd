@@ -5,8 +5,9 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/jsonutil"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
@@ -21,25 +22,26 @@ type SwarmEnemy struct {
 
 // TODO: Use composition to reduce repeated actions in different places
 func NewSwarmEnemy(ctx *app.AppContext, x, y int, id string) (*SwarmEnemy, error) {
-	spriteData, statData, err := enemies.ParseJsonEnemy("internal/game/entity/actors/enemies/swarm.json")
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[actors.StatData]("internal/game/entity/actors/enemies/swarm.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	character, err := CreateAnimatedCharacter(ctx, spriteData)
+	stateMap, err := builder.BuildStateMap(spriteData)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
+	rect := builder.BodyRectFromSpriteData(spriteData)
+	character := gameentitytypes.NewPlatformerCharacter(stateMap, spriteData, rect)
+	character.SetAppContext(ctx)
 	character.SetPosition(x, y)
+
 	enemy := &SwarmEnemy{PlatformerCharacter: character}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	enemy.SetOwner(enemy)
 
-	if err = SetEnemyStats(enemy, statData); err != nil {
-		return nil, err
-	}
-	if err = SetEnemyBodies(enemy, spriteData, id); err != nil {
+	if err = builder.ConfigureCharacter(enemy, spriteData, statData, stateMap, "ENEMY"); err != nil {
 		return nil, err
 	}
 

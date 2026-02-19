@@ -7,6 +7,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/jsonutil"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 )
@@ -32,7 +33,7 @@ type FallingPlatformItem struct {
 }
 
 func NewFallingPlatformItem(ctx *app.AppContext, x, y int, id string) (*FallingPlatformItem, error) {
-	spriteData, statData, err := items.ParseJsonItem("internal/game/entity/items/fall_platform.json")
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData]("internal/game/entity/items/fall_platform.json")
 	if err != nil {
 		return nil, err
 	}

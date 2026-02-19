@@ -4,7 +4,9 @@ import (
 	"image"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/context"
+	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
@@ -91,7 +93,11 @@ func (p *PlatformerCharacter) AddSkill(s skill.Skill) {
 	p.Character.AddSkill(s)
 }
 
-func NewPlatformerCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *PlatformerCharacter {
+func NewPlatformerCharacter(stateMap map[string]animation.SpriteState, spriteData schemas.SpriteData, bodyRect *bodyphysics.Rect) *PlatformerCharacter {
+	s, err := sprites.GetSpritesFromAssets(spriteData.Assets, stateMap)
+	if err != nil {
+		return nil
+	}
 	c := actors.NewCharacter(s, bodyRect)
 	pf := &PlatformerCharacter{
 		Character: c,
@@ -113,6 +119,10 @@ func NewPlatformerCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Pl
 			})
 		}
 	})
+
+	c.SetFaceDirection(spriteData.FacingDirection)
+	c.SetFrameRate(spriteData.FrameRate)
 	c.SetOwner(pf)
+
 	return pf
 }

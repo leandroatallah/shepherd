@@ -5,8 +5,10 @@ import (
 	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body" // ADDED THIS
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/jsonutil"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
@@ -75,15 +77,20 @@ type ShepherdPlayer struct {
 }
 
 func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, error) {
-	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/player/shepherd.json")
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[actors.StatData]("internal/game/entity/actors/player/shepherd.json")
 	if err != nil {
 		return nil, err
 	}
 
-	character, err := CreateAnimatedCharacter(ctx, spriteData)
+	stateMap, err := builder.BuildStateMap(spriteData)
 	if err != nil {
 		return nil, err
 	}
+
+	// Create player instance
+	rect := builder.BodyRectFromSpriteData(spriteData)
+	character := gameentitytypes.NewPlatformerCharacter(stateMap, spriteData, rect)
+	character.SetAppContext(ctx)
 	character.SetStateTransitionHandler(shepherdStateTransitionLogic)
 
 	player := &ShepherdPlayer{
@@ -94,18 +101,18 @@ func NewShepherdPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEnti
 	// Ensure the original character pointer (referenced by physics bodies) also points to the player
 	character.SetOwner(player)
 
-	if err = SetPlayerBodies(player, spriteData); err != nil {
-		return nil, fmt.Errorf("SetPlayerBodies: %w", err)
-	}
-	if err = SetPlayerStats(player, statData); err != nil {
-		return nil, fmt.Errorf("SetPlayerStats: %w", err)
+	player.SetID("player")
+
+	if err = builder.ConfigureCharacter(player, spriteData, statData, stateMap, "PLAYER"); err != nil {
+		return nil, err
 	}
 	player.baseSpeed = player.Speed()
 
-	// Pass player itself
-	if err = SetMovementModel(player, physicsmovement.Platform); err != nil {
+	model, err := physicsmovement.NewMovementModel(physicsmovement.Platform, player)
+	if err != nil {
 		return nil, fmt.Errorf("SetMovementModel: %w", err)
 	}
+	player.SetMovementModel(model)
 
 	character.StateCollisionManager.RefreshCollisions()
 
