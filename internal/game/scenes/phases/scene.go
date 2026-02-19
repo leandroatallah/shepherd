@@ -15,6 +15,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
@@ -40,7 +41,7 @@ type PhasesScene struct {
 	*scene.TilemapScene
 
 	count       int
-	player      gameentitytypes.PlatformerActorEntity
+	player      platformer.PlatformerActorEntity
 	mainText    *font.FontText
 	bodyCounter *BodyCounter
 	allowPause  bool
@@ -239,7 +240,7 @@ func (s *PhasesScene) Update() error {
 	for _, i := range space.Bodies() {
 		switch b := i.(type) {
 		// ActorEntity case should came first. It can be confused with body.Obstacle
-		case gameentitytypes.PlatformerActorEntity:
+		case platformer.PlatformerActorEntity:
 			if err := b.Update(space); err != nil {
 				return err
 			}
@@ -277,7 +278,7 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	space := s.PhysicsSpace()
 	for _, b := range space.Bodies() {
 		switch sb := b.(type) {
-		case gameentitytypes.PlatformerActorEntity:
+		case platformer.PlatformerActorEntity:
 			opts := sb.ImageOptions()
 			sb.UpdateImageOptions()
 			s.Camera().Draw(sb.Image(), opts, screen)

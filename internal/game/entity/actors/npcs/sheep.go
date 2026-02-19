@@ -9,6 +9,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
@@ -16,7 +17,7 @@ import (
 )
 
 type Sheep struct {
-	*gameentitytypes.PlatformerCharacter
+	*platformer.PlatformerCharacter
 	*gameplayermethods.PlayerDeathBehavior
 }
 
@@ -33,7 +34,7 @@ func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
 	}
 
 	rect := builder.BodyRectFromSpriteData(spriteData)
-	character := gameentitytypes.NewPlatformerCharacter(stateMap, spriteData, rect)
+	character := platformer.NewPlatformerCharacter(stateMap, spriteData, rect)
 	character.SetAppContext(ctx)
 	character.SetPosition(x, y)
 

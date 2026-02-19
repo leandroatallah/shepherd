@@ -2,15 +2,15 @@ package gameplayermethods
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 	"github.com/leandroatallah/firefly/internal/game/entity/actors/events"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
 type PlayerDeathBehavior struct {
-	player gameentitytypes.PlatformerActorEntity
+	player platformer.PlatformerActorEntity
 }
 
-func NewPlayerDeathBehavior(p gameentitytypes.PlatformerActorEntity) *PlayerDeathBehavior {
+func NewPlayerDeathBehavior(p platformer.PlatformerActorEntity) *PlayerDeathBehavior {
 	tm := &PlayerDeathBehavior{
 		player: p,
 	}

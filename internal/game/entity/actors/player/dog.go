@@ -7,19 +7,19 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/data/jsonutil"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
 type DogPlayer struct {
-	*gameentitytypes.PlatformerCharacter
+	*platformer.PlatformerCharacter
 
 	*gameplayermethods.PlayerDeathBehavior
 }
 
-func NewDogPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, error) {
+func NewDogPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, error) {
 	spriteData, statData, err := jsonutil.ParseSpriteAndStats[actors.StatData]("internal/game/entity/actors/player/dog.json")
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func NewDogPlayer(ctx *app.AppContext) (gameentitytypes.PlatformerActorEntity, e
 	}
 
 	rect := builder.BodyRectFromSpriteData(spriteData)
-	character := gameentitytypes.NewPlatformerCharacter(stateMap, spriteData, rect)
+	character := platformer.NewPlatformerCharacter(stateMap, spriteData, rect)
 	character.SetAppContext(ctx)
 	character.SetStateTransitionHandler(gameplayermethods.StandardStateTransitionLogic)
 

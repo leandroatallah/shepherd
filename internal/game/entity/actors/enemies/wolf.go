@@ -9,15 +9,15 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
 	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
 type WolfEnemy struct {
-	*gameentitytypes.PlatformerCharacter
+	*platformer.PlatformerCharacter
 }
 
 // TODO: Use composition to reduce repeated actions in different places
@@ -33,7 +33,7 @@ func NewWolfEnemy(ctx *app.AppContext, x, y int, id string) (*WolfEnemy, error) 
 	}
 
 	rect := builder.BodyRectFromSpriteData(spriteData)
-	character := gameentitytypes.NewPlatformerCharacter(stateMap, spriteData, rect)
+	character := platformer.NewPlatformerCharacter(stateMap, spriteData, rect)
 	character.SetAppContext(ctx)
 	character.SetPosition(x, y)
 
@@ -78,11 +78,11 @@ func (e *WolfEnemy) OnTouch(other body.Collidable) {
 	owner := other.LastOwner()
 	switch owner.(type) {
 	case *gameplayer.ShepherdPlayer, *gameplayer.DogPlayer, *gamenpcs.Sheep:
-		if owner.(gameentitytypes.PlatformerActorEntity).State() == gamestates.Dying {
+		if owner.(platformer.PlatformerActorEntity).State() == gamestates.Dying {
 			return
 		}
 
-		if alive, ok := owner.(gameentitytypes.AlivePlayer); ok {
+		if alive, ok := owner.(platformer.AlivePlayer); ok {
 			alive.Hurt(1)
 		}
 	}

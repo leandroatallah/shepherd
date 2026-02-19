@@ -2,7 +2,7 @@ package gamestates
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 )
 
 // Dying
@@ -13,7 +13,7 @@ type DyingState struct {
 func (s *DyingState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
 
-	if p, ok := s.GetRootOwner().(gameentitytypes.PlatformerActorEntity); ok {
+	if p, ok := s.GetRootOwner().(platformer.PlatformerActorEntity); ok {
 		p.OnDie()
 	}
 }

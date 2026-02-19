@@ -10,7 +10,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 )
 
 const (
@@ -20,12 +20,12 @@ const (
 
 type StatusBar struct {
 	heartImg *ebiten.Image
-	player   gameentitytypes.PlatformerActorEntity
+	player   platformer.PlatformerActorEntity
 	score    int
 	mainText *font.FontText
 }
 
-func NewStatusBar(player gameentitytypes.PlatformerActorEntity, score int) (*StatusBar, error) {
+func NewStatusBar(player platformer.PlatformerActorEntity, score int) (*StatusBar, error) {
 	heart, _, err := ebitenutil.NewImageFromFile("assets/images/heart.png")
 	if err != nil {
 		return nil, err
