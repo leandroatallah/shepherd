@@ -17,6 +17,8 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
+	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/pause"
 	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
@@ -27,7 +29,6 @@ import (
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
-	"github.com/leandroatallah/firefly/internal/game/render/vfx"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
@@ -87,7 +88,7 @@ func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
 func (s *PhasesScene) OnStart() {
 	s.TilemapScene.OnStart()
 	s.count = 0
-	s.vfxManager = vfx.NewManager()
+	s.vfxManager = vfx.NewManager("assets/particles/vfx.json")
 
 	// Create player and register to space and context
 	p, err := createPlayer(s.AppContext(), gameentitytypes.ShepherdPlayerType)
@@ -301,7 +302,7 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	}
 
 	if s.ShowDrawScreenFlash > 0 {
-		DrawScreenFlash(screen)
+		screenutil.DrawScreenFlash(screen)
 		s.ShowDrawScreenFlash--
 	}
 
