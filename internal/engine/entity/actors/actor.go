@@ -6,6 +6,12 @@ import (
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 )
 
+type StatData struct {
+	Health   int `json:"health"`
+	Speed    int `json:"speed"`
+	MaxSpeed int `json:"max_speed"`
+}
+
 type Controllable interface {
 	OnMoveLeft(force int)
 	OnMoveRight(force int)
