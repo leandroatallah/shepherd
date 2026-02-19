@@ -2,8 +2,8 @@ package gameplayermethods
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/game/entity/actors/events"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
-	"github.com/leandroatallah/firefly/internal/game/events"
 )
 
 type PlayerDeathBehavior struct {

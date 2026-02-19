@@ -8,12 +8,11 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/context"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/events"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
-
-	"github.com/leandroatallah/firefly/internal/game/events"
 )
 
 type AlivePlayer interface {
@@ -105,7 +104,7 @@ func NewPlatformerCharacter(stateMap map[string]animation.SpriteState, spriteDat
 
 	pf.SetOnJump(func(pos image.Point) {
 		if pf.AppContext() != nil {
-			pf.AppContext().EventManager.Publish(&events.PlayerJumpedEvent{
+			pf.AppContext().EventManager.Publish(&events.ActorJumpedEvent{
 				X: float64(pos.X),
 				Y: float64(pos.Y),
 			})
@@ -113,7 +112,7 @@ func NewPlatformerCharacter(stateMap map[string]animation.SpriteState, spriteDat
 	})
 	pf.SetOnLand(func(pos image.Point) {
 		if pf.AppContext() != nil {
-			pf.AppContext().EventManager.Publish(&events.PlayerLandedEvent{
+			pf.AppContext().EventManager.Publish(&events.ActorLandedEvent{
 				X: float64(pos.X),
 				Y: float64(pos.Y),
 			})
