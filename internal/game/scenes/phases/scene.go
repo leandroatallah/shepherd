@@ -215,7 +215,7 @@ func (s *PhasesScene) Update() error {
 	}
 
 	if config.Get().CamDebug {
-		s.CamDebug()
+		s.Camera().CamDebug()
 	}
 
 	if s.checkReboot() {
