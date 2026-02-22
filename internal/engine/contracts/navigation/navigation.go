@@ -32,6 +32,7 @@ type SceneManager interface {
 	// SetFactory(factory SceneFactory)
 	SwitchTo(scene Scene)
 	Update() error
+	CurrentScene() Scene
 }
 
 type Transition interface {

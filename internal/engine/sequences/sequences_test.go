@@ -1,6 +1,8 @@
 package sequences
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
@@ -78,5 +80,58 @@ func TestSequencePlayerPlaysBlockingCommandsToCompletion(t *testing.T) {
 	}
 	if !player.IsOver() {
 		t.Fatalf("expected player to report IsOver after completion")
+	}
+}
+
+func TestCallSequenceCommandLoadsAndPlaysNestedSequence(t *testing.T) {
+	// Create a temporary nested sequence file
+	tmpDir := t.TempDir()
+	nestedSeqPath := filepath.Join(tmpDir, "nested.json")
+	nestedSeqContent := `{
+		"commands": [
+			{ "command": "delay", "frames": 2 }
+		],
+		"block_player_movement": false
+	}`
+	if err := os.WriteFile(nestedSeqPath, []byte(nestedSeqContent), 0644); err != nil {
+		t.Fatalf("failed to create nested sequence file: %v", err)
+	}
+
+	ctx := &app.AppContext{}
+	cmd := &CallSequenceCommand{Path: nestedSeqPath}
+
+	cmd.Init(ctx)
+
+	if cmd.isComplete {
+		t.Fatalf("expected command not to be complete immediately after Init")
+	}
+	if cmd.nestedSequence == nil {
+		t.Fatalf("expected nested sequence to be loaded")
+	}
+	if cmd.sequencePlayer == nil {
+		t.Fatalf("expected sequence player to be created")
+	}
+	if !cmd.sequencePlayer.IsPlaying() {
+		t.Fatalf("expected sequence player to be playing after Init")
+	}
+
+	// Update until complete
+	for i := 0; i < 10 && !cmd.isComplete; i++ {
+		cmd.Update()
+	}
+
+	if !cmd.isComplete {
+		t.Fatalf("expected command to complete after nested sequence finishes")
+	}
+}
+
+func TestCallSequenceCommandHandlesInvalidPath(t *testing.T) {
+	ctx := &app.AppContext{}
+	cmd := &CallSequenceCommand{Path: "nonexistent.json"}
+
+	cmd.Init(ctx)
+
+	if !cmd.isComplete {
+		t.Fatalf("expected command to be complete immediately when path is invalid")
 	}
 }

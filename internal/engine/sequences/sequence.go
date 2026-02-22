@@ -42,6 +42,23 @@ type CommandData struct {
 	// Fields for "event"
 	EventType string                 `json:"event_type,omitempty"`
 	Payload   map[string]interface{} `json:"payload,omitempty"`
+
+	// Fields for "camera_zoom"
+	Zoom        float64 `json:"zoom,omitempty"`
+	Duration    int     `json:"duration,omitempty"`
+	Delay       int     `json:"delay,omitempty"`
+	OutDuration int     `json:"out_duration,omitempty"`
+
+	// Fields for "camera_move"
+	X      float64 `json:"x,omitempty"`
+	Y      float64 `json:"y,omitempty"`
+	Smooth bool    `json:"smooth,omitempty"`
+
+	// Fields for "camera_reset"
+	DefaultZoom float64 `json:"default_zoom,omitempty"`
+
+	// Fields for "call_sequence"
+	Path string `json:"path,omitempty"`
 }
 
 // SequenceData is a wrapper used for parsing a full sequence from JSON.
@@ -75,6 +92,30 @@ func (cd *CommandData) ToCommand() sequences.Command {
 		return &EventCommand{
 			EventType: cd.EventType,
 			Payload:   cd.Payload,
+		}
+	case "camera_zoom":
+		return &CameraZoomCommand{
+			Zoom:        cd.Zoom,
+			Duration:    cd.Duration,
+			Delay:       cd.Delay,
+			OutDuration: cd.OutDuration,
+			TargetID:    cd.TargetID,
+		}
+	case "camera_move":
+		return &CameraMoveCommand{
+			X:        cd.X,
+			Y:        cd.Y,
+			Duration: cd.Duration,
+			Smooth:   cd.Smooth,
+		}
+	case "camera_reset":
+		return &CameraResetCommand{
+			DefaultZoom: cd.DefaultZoom,
+			Duration:    cd.Duration,
+		}
+	case "call_sequence":
+		return &CallSequenceCommand{
+			Path: cd.Path,
 		}
 	}
 	return nil

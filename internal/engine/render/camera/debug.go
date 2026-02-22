@@ -5,7 +5,6 @@ import (
 )
 
 func (c *Controller) CamDebug() {
-
 	if ebiten.IsKeyPressed(ebiten.KeyR) {
 		c.Kamera().Angle += 0.02
 	}
