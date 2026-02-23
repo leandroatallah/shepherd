@@ -21,6 +21,8 @@ func SetCharacterBodies(
 	stateMap map[string]animation.SpriteState,
 	idPrefix string,
 ) error {
+	character.SetID(idPrefix)
+
 	setter, ok := character.(collisionRectSetter)
 	if !ok {
 		return fmt.Errorf("character must implement collisionRectSetter")

@@ -45,7 +45,6 @@ func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
 	if err = builder.ConfigureCharacter(sheep, spriteData, statData, stateMap, "NPC"); err != nil {
 		return nil, err
 	}
-	sheep.SetID(id)
 
 	model, err := physicsmovement.NewMovementModel(physicsmovement.Platform, nil)
 	if err != nil {
