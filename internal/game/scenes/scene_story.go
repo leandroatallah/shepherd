@@ -7,6 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	sequencestype "github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
@@ -66,7 +67,7 @@ func (s *StoryScene) NextScene() {
 	s.isRedirecting = true
 	s.shouldRedirect = false
 
-	s.AppContext().CompleteCurrentPhase(transition.NewFader(), true)
+	s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
 }
 
 func (s *StoryScene) OnStart() {

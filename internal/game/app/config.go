@@ -40,9 +40,11 @@ func NewConfig() *config.AppConfig {
 
 		DefaultVolume: DefaultVolume,
 
-		MainFontFace:    MainFontFace,
-		SmallFontFace:   SmallFontFace,
-		ScreenFlipSpeed: 1.0 / 60.0,
+		MainFontFace:       MainFontFace,
+		SmallFontFace:      SmallFontFace,
+		ScreenFlipSpeed:    1.0 / 60.0,
+		FadeHoldDuration:   0,
+		FadeVisibleDuration: 0,
 	}
 
 	flag.BoolVar(&cfg.CamDebug, "cam-debug", false, "Enable camera debug")

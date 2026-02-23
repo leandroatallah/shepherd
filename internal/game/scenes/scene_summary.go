@@ -41,7 +41,7 @@ func (s *SummaryScene) Draw(screen *ebiten.Image) {
 
 func (s *SummaryScene) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		s.AppContext().CompleteCurrentPhase(transition.NewFader(), true)
+		s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
 	}
 
 	return nil

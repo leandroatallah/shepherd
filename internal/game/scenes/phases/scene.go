@@ -188,7 +188,7 @@ func (s *PhasesScene) freezeAllActors() {
 
 func (s *PhasesScene) defaultCompletion() {
 	s.isConcludingPhase = true
-	s.phaseCompletedDelay = timing.FromDuration(2 * time.Second)
+	s.phaseCompletedDelay = timing.FromDuration(time.Second)
 }
 
 func (s *PhasesScene) Update() error {
@@ -388,7 +388,7 @@ func (s *PhasesScene) checkReboot() bool {
 	if s.rebootDelay == 0 {
 		s.AppContext().SceneManager.NavigateTo(
 			scenestypes.ScenePhaseReboot,
-			transition.NewFader(),
+			transition.NewFader(0, 0),
 			true,
 		)
 	}
@@ -416,7 +416,7 @@ func (s *PhasesScene) completePhase() {
 	}
 
 	if s.phaseCompletedDelay == 0 {
-		s.AppContext().CompleteCurrentPhase(transition.NewFader(), true)
+		s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
 		s.phaseCompleted = true
 		return
 	}

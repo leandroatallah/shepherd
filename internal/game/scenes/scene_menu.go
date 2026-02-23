@@ -46,7 +46,7 @@ func (s *MenuScene) OnStart() {
 func (s *MenuScene) Update() error {
 	if !s.isNavigating && ebiten.IsKeyPressed(ebiten.KeyEnter) {
 		s.isNavigating = true
-		s.AppContext().SceneManager.NavigateTo(scenestypes.SceneStory, transition.NewFader(), true)
+		s.AppContext().SceneManager.NavigateTo(scenestypes.SceneStory, transition.NewFader(0, config.Get().FadeVisibleDuration), true)
 	}
 
 	return nil

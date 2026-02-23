@@ -77,7 +77,7 @@ func (s *PhaseTitleScene) Update() error {
 		return err
 	}
 	if s.showTitle && inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		s.AppContext().CompleteCurrentPhase(transition.NewFader(), true)
+		s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
 	}
 	return nil
 }

@@ -37,7 +37,7 @@ func (s *PhaseRebootScene) Update() error {
 	s.count++
 
 	if s.count > navigateBackDelay && !s.redirected {
-		s.AppContext().SceneManager.NavigateBack(transition.NewFader())
+		s.AppContext().SceneManager.NavigateBack(transition.NewFader(0, config.Get().FadeVisibleDuration))
 		s.redirected = true
 	}
 
