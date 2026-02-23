@@ -127,6 +127,20 @@ func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
 	return px, py, true
 }
 
+// HasPlayerStartPosition checks if a layer named "PlayerStart" exists in the tilemap and has at least one object.
+func (t *Tilemap) HasPlayerStartPosition() bool {
+	if t == nil {
+		return false
+	}
+
+	layer, found := t.FindLayerByName("PlayerStart")
+	if !found {
+		return false
+	}
+
+	return len(layer.Objects) > 0
+}
+
 type ItemPosition struct {
 	X, Y     int
 	ItemType string
