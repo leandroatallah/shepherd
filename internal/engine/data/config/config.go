@@ -1,5 +1,7 @@
 package config
 
+import "time"
+
 type PhysicsConfig struct {
 	// SpeedMultiplier is a global multiplier for all actor speeds.
 	SpeedMultiplier float64
@@ -44,7 +46,9 @@ type AppConfig struct {
 	NoSound      bool
 
 	// Transition
-	ScreenFlipSpeed float64
+	ScreenFlipSpeed      float64
+	FadeHoldDuration     time.Duration   // black screen before scene change
+	FadeVisibleDuration  time.Duration   // black screen after scene change (before fade in)
 }
 
 var cfg AppConfig
