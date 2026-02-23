@@ -36,17 +36,20 @@ type AudioManager struct {
 	audioContext *audio.Context
 	audioPlayers map[string]*audio.Player
 	volume       float64
+	noSound      bool
 }
 
 func NewAudioManager() *AudioManager {
 	initialVolume := 1.0
-	if config.Get().NoSound {
+	noSound := config.Get().NoSound
+	if noSound {
 		initialVolume = 0.0
 	}
 	return &AudioManager{
 		audioContext: audio.NewContext(sampleRate),
 		audioPlayers: make(map[string]*audio.Player),
 		volume:       initialVolume,
+		noSound:      noSound,
 	}
 }
 
@@ -127,6 +130,9 @@ func (am *AudioManager) Add(name string, data []byte) {
 }
 
 func (am *AudioManager) PlayMusic(name string) *audio.Player {
+	if am.noSound {
+		return nil
+	}
 	player, ok := am.audioPlayers[name]
 	if !ok {
 		log.Printf("audio player not found: %s", name)
@@ -147,6 +153,9 @@ func (am *AudioManager) PauseMusic(name string) {
 }
 
 func (am *AudioManager) PlaySound(name string) *audio.Player {
+	if am.noSound {
+		return nil
+	}
 	player, ok := am.audioPlayers[name]
 	if !ok {
 		log.Printf("audio player not found: %s", name)
@@ -159,6 +168,9 @@ func (am *AudioManager) PlaySound(name string) *audio.Player {
 }
 
 func (am *AudioManager) SetVolume(volume float64) {
+	if am.noSound {
+		return
+	}
 	am.volume = volume
 	for _, player := range am.audioPlayers {
 		player.SetVolume(am.volume)
@@ -176,6 +188,9 @@ func (am *AudioManager) PauseAll() {
 }
 
 func (am *AudioManager) FadeOutAll(duration time.Duration) {
+	if am.noSound {
+		return
+	}
 	initialVolume := am.volume
 	if initialVolume == 0 {
 		return
@@ -206,6 +221,9 @@ func (am *AudioManager) FadeOutAll(duration time.Duration) {
 }
 
 func (am *AudioManager) FadeOut(name string, duration time.Duration) {
+	if am.noSound {
+		return
+	}
 	player, ok := am.audioPlayers[name]
 	if !ok {
 		log.Printf("audio player not found: %s", name)

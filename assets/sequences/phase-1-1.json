@@ -1,0 +1,17 @@
+{
+  "commands": [
+    {
+      "command": "call_sequence",
+      "path": "dog-follows-player.json"
+    },
+    {
+      "command": "camera_zoom",
+      "zoom": 1.5,
+      "duration": 0,
+      "delay": 60,
+      "out_duration": 40,
+      "target_id": "player"
+    }
+  ],
+  "block_player_movement": true
+}
