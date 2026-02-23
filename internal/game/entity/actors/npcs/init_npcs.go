@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	SheepNpcType npcs.NpcType = "SHEEP"
-	DogNpcType   npcs.NpcType = "DOG"
+	SheepNpcType    npcs.NpcType = "SHEEP"
+	ShepherdNpcType npcs.NpcType = "SHEPHERD"
+	DogNpcType      npcs.NpcType = "DOG"
 )
 
 func InitNpcMap(ctx *app.AppContext) npcs.NpcMap[platformer.PlatformerActorEntity] {
@@ -21,6 +22,15 @@ func InitNpcMap(ctx *app.AppContext) npcs.NpcMap[platformer.PlatformerActorEntit
 			if err != nil {
 				log.Fatal(err)
 			}
+			return npc
+		},
+		ShepherdNpcType: func(x, y int, id string) platformer.PlatformerActorEntity {
+			npc, err := gameplayer.NewShepherdPlayer(ctx)
+			if err != nil {
+				log.Fatal(err)
+			}
+			npc.SetPosition(x, y)
+			npc.SetID(id)
 			return npc
 		},
 		DogNpcType: func(x, y int, id string) platformer.PlatformerActorEntity {

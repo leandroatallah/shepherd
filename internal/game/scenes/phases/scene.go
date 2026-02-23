@@ -91,18 +91,20 @@ func (s *PhasesScene) OnStart() {
 	s.count = 0
 	s.vfxManager = vfx.NewManager("assets/particles/vfx.json")
 
+	ctx := s.AppContext()
+
 	// Create player and register to space and context
-	p, err := createPlayer(s.AppContext(), gameentitytypes.ShepherdPlayerType)
+	p, err := createPlayer(ctx, gameentitytypes.ShepherdPlayerType)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s.player = p
-	s.AppContext().ActorManager.Register(s.player)
+	ctx.ActorManager.Register(s.player)
 	s.PhysicsSpace().AddBody(s.player)
 
 	// Optionally block input for the current player of this phase
-	if phase, err := s.AppContext().PhaseManager.GetCurrentPhase(); err == nil && phase.BlockPlayerMovement {
-		if p, ok := s.AppContext().ActorManager.GetPlayer(); ok {
+	if phase, err := ctx.PhaseManager.GetCurrentPhase(); err == nil && phase.BlockPlayerMovement {
+		if p, ok := ctx.ActorManager.GetPlayer(); ok {
 			p.BlockMovement()
 		}
 	}
@@ -124,7 +126,7 @@ func (s *PhasesScene) OnStart() {
 		}, s.player)
 	})
 
-	s.screenFlipper = scene.NewScreenFlipper(s.Camera(), s.player, s.Tilemap(), s.AppContext())
+	s.screenFlipper = scene.NewScreenFlipper(s.Camera(), s.player, s.Tilemap(), ctx)
 	tileWidth := s.Tilemap().Tilewidth
 	s.screenFlipper.PlayerPushDistance = float64(tileWidth / 2)
 	s.screenFlipper.FlipStrategy = func(dx, dy int) scene.FlipType {
@@ -143,9 +145,9 @@ func (s *PhasesScene) OnStart() {
 
 	s.pauseScreen = pause.NewPauseScreen(ebiten.KeyEnter, 250*time.Millisecond)
 
-	phase, err := s.AppContext().PhaseManager.GetCurrentPhase()
+	phase, err := ctx.PhaseManager.GetCurrentPhase()
 	if err == nil && phase.SequencePath != "" {
-		s.sequencePlayer = sequences.NewSequencePlayer(s.AppContext())
+		s.sequencePlayer = sequences.NewSequencePlayer(ctx)
 		s.allowPause = phase.GoalType != SequenceGoalType
 		seq, err := sequences.NewSequenceFromJSON(phase.SequencePath)
 		if err != nil {
