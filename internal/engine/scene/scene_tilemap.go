@@ -97,8 +97,8 @@ func (s *TilemapScene) Audiomanager() *audio.AudioManager {
 func (s *TilemapScene) SetPlayerStartPosition(p actors.ActorEntity) {
 	// Set player initial position from tilemap
 	if x, y, found := s.tilemap.GetPlayerStartPosition(); found {
-		// Update Y position based on player height
-		y -= p.Position().Dy() / 2
+		// Adjust Y so actor's base aligns with obstacle top
+		y -= p.Position().Dy() - s.tilemap.Tileheight
 		p.SetPosition(x, y)
 	}
 }
@@ -109,7 +109,8 @@ func InitEnemies[T actors.ActorEntity](s *TilemapScene, factory *enemies.EnemyFa
 	for _, e := range enemiesPos {
 		enemy, err := factory.Create(enemies.EnemyType(e.EnemyType), e.X, e.Y, e.ID)
 		pos := enemy.Position()
-		enemy.SetPosition(pos.Min.X, pos.Min.Y-pos.Dy()/2) // Adjust Y position based on enemy height
+		// Adjust Y so enemy's base aligns with obstacle top
+		enemy.SetPosition(pos.Min.X, pos.Min.Y-(pos.Dy()-s.tilemap.Tileheight))
 		if err != nil {
 			return err
 		}
@@ -129,7 +130,8 @@ func InitNPCs[T actors.ActorEntity](s *TilemapScene, factory *npcs.NpcFactory[T]
 	for _, n := range npcsPos {
 		npc, err := factory.Create(npcs.NpcType(n.NpcType), n.X, n.Y, n.ID)
 		pos := npc.Position()
-		npc.SetPosition(pos.Min.X, pos.Min.Y-pos.Dy()/2) // Adjust Y position based on npc height
+		// Adjust Y so npc's base aligns with obstacle top
+		npc.SetPosition(pos.Min.X, pos.Min.Y-(pos.Dy()-s.tilemap.Tileheight))
 		if err != nil {
 			return err
 		}

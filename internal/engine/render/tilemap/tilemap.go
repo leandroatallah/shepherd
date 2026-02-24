@@ -141,6 +141,43 @@ func (t *Tilemap) HasPlayerStartPosition() bool {
 	return len(layer.Objects) > 0
 }
 
+// GetCameraStartPosition searches for a layer named "Camera" in the tilemap's object layers.
+// It assumes there is only one object in this layer and returns its x, y coordinates.
+func (t *Tilemap) GetCameraStartPosition() (x, y int, found bool) {
+	if t == nil {
+		return 0, 0, false
+	}
+
+	layer, found := t.FindLayerByName("Camera")
+	if !found {
+		return 0, 0, false
+	}
+
+	if len(layer.Objects) == 0 {
+		return 0, 0, false
+	}
+
+	obj := layer.Objects[0]
+	px := int(math.Round(obj.X))
+	py := int(math.Round(obj.Y))
+
+	return px, py, true
+}
+
+// HasCameraStartPosition checks if a layer named "Camera" exists in the tilemap and has at least one object.
+func (t *Tilemap) HasCameraStartPosition() bool {
+	if t == nil {
+		return false
+	}
+
+	layer, found := t.FindLayerByName("Camera")
+	if !found {
+		return false
+	}
+
+	return len(layer.Objects) > 0
+}
+
 type ItemPosition struct {
 	X, Y     int
 	ItemType string

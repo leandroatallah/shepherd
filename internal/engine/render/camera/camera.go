@@ -85,6 +85,15 @@ func (c *Controller) SetCenter(x, y float64) {
 	c.Kamera().SetCenter(x, y)
 }
 
+// SetPositionTopLeft positions the camera so that (x, y) appears at the top-left corner of the screen.
+func (c *Controller) SetPositionTopLeft(x, y float64) {
+	centerX := x + c.screenWidth/2
+	centerY := y + c.screenHeight/2
+	c.centerX = centerX
+	c.centerY = centerY
+	c.Kamera().SetCenter(centerX, centerY)
+}
+
 func (c *Controller) SetFollowTarget(b body.Body) {
 	c.followTarget = b
 	x, y := b.GetPositionMin()
