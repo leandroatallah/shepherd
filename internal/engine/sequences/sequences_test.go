@@ -135,3 +135,43 @@ func TestCallSequenceCommandHandlesInvalidPath(t *testing.T) {
 		t.Fatalf("expected command to be complete immediately when path is invalid")
 	}
 }
+
+func TestSequencePlayerBlockedByParentPreventsUnblock(t *testing.T) {
+	ctx := &app.AppContext{}
+
+	// Create sequence with block_player_movement: true
+	seqContent := `{
+		"commands": [
+			{ "command": "delay", "frames": 1 }
+		],
+		"block_player_movement": true
+	}`
+	tmpDir := t.TempDir()
+	seqPath := filepath.Join(tmpDir, "blocking.json")
+	if err := os.WriteFile(seqPath, []byte(seqContent), 0644); err != nil {
+		t.Fatalf("failed to create sequence file: %v", err)
+	}
+
+	seq, err := NewSequenceFromJSON(seqPath)
+	if err != nil {
+		t.Fatalf("failed to load sequence: %v", err)
+	}
+
+	// Create player and mark as blocked by parent
+	player := NewSequencePlayer(ctx)
+	player.blockedByParent = true
+
+	// Play sequence - should NOT block/unblock because already blocked by parent
+	player.Play(seq)
+
+	// Run sequence to completion
+	for i := 0; i < 10 && player.IsPlaying(); i++ {
+		player.Update()
+	}
+
+	// Verify sequence ended
+	if player.IsPlaying() {
+		t.Fatalf("expected sequence to complete")
+	}
+	// blockedByParent prevents UnblockMovement from being called
+}

@@ -40,6 +40,9 @@ func (c *CallSequenceCommand) Init(appContext any) {
 		c.sequencePlayer = NewSequencePlayer(ctx)
 	}
 
+	// Mark that this player is blocked by parent sequence
+	c.sequencePlayer.blockedByParent = true
+
 	c.sequencePlayer.Play(c.nestedSequence)
 	c.isComplete = false
 }

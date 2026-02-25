@@ -16,6 +16,7 @@ type SequencePlayer struct {
 	hasActiveCommands bool
 	lastBlockingIndex int
 	blockingEnded     bool
+	blockedByParent   bool
 
 	backgroundCommands []sequences.Command
 }
@@ -52,7 +53,7 @@ func (p *SequencePlayer) Play(sequence sequences.Sequence) {
 
 	p.isPlaying = p.lastBlockingIndex >= 0
 
-	if seq, ok := sequence.(*Sequence); ok && seq.BlockPlayerMovement && p.lastBlockingIndex >= 0 {
+	if seq, ok := sequence.(*Sequence); ok && seq.BlockPlayerMovement && p.lastBlockingIndex >= 0 && !p.blockedByParent {
 		if player, found := p.AppContext().ActorManager.GetPlayer(); found {
 			player.BlockMovement()
 		}
@@ -150,7 +151,7 @@ func (p *SequencePlayer) endBlockingPhase() {
 	p.blockingEnded = true
 	p.isPlaying = false
 
-	if seq, ok := p.currentSequence.(*Sequence); ok && seq.BlockPlayerMovement {
+	if seq, ok := p.currentSequence.(*Sequence); ok && seq.BlockPlayerMovement && !p.blockedByParent {
 		if player, found := p.AppContext().ActorManager.GetPlayer(); found {
 			player.UnblockMovement()
 		}
