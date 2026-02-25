@@ -2,8 +2,6 @@ package gamesetup
 
 import (
 	"io/fs"
-	"log"
-	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"

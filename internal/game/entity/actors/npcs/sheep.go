@@ -42,7 +42,7 @@ func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
 	// Set the owner on the embedded character so LastOwner() works correctly
 	sheep.SetOwner(sheep)
 
-	if err = builder.ConfigureCharacter(sheep, spriteData, statData, stateMap, "NPC"); err != nil {
+	if err = builder.ConfigureCharacter(sheep, spriteData, statData, stateMap, id); err != nil {
 		return nil, err
 	}
 

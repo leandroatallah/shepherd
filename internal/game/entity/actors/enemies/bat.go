@@ -41,7 +41,7 @@ func NewBatEnemy(ctx *app.AppContext, x, y int, id string) (*BatEnemy, error) {
 	// Set the owner on the embedded character so LastOwner() works correctly
 	enemy.SetOwner(enemy)
 
-	if err = builder.ConfigureCharacter(enemy, spriteData, statData, stateMap, "ENEMY"); err != nil {
+	if err = builder.ConfigureCharacter(enemy, spriteData, statData, stateMap, id); err != nil {
 		return nil, err
 	}
 

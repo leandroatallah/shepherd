@@ -102,9 +102,7 @@ func NewShepherdPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, e
 	// Ensure the original character pointer (referenced by physics bodies) also points to the player
 	character.SetOwner(player)
 
-	player.SetID("player")
-
-	if err = builder.ConfigureCharacter(player, spriteData, statData, stateMap, "PLAYER"); err != nil {
+	if err = builder.ConfigureCharacter(player, spriteData, statData, stateMap, "player"); err != nil {
 		return nil, err
 	}
 	player.baseSpeed = player.Speed()

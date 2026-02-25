@@ -42,10 +42,8 @@ func NewDogPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, error)
 	// Ensure the original character pointer (referenced by physics bodies) also points to the player
 	character.SetOwner(player)
 
-	player.SetID("player")
-
 	// FIX: Long Parameter List
-	if err = builder.ConfigureCharacter(player, spriteData, statData, stateMap, "PLAYER"); err != nil {
+	if err = builder.ConfigureCharacter(player, spriteData, statData, stateMap, "player"); err != nil {
 		return nil, err
 	}
 	model, err := physicsmovement.NewMovementModel(physicsmovement.Platform, player)
