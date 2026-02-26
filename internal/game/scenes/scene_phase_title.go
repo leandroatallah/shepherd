@@ -73,7 +73,7 @@ func (s *PhaseTitleScene) Update() error {
 			s.Schedule(4*time.Second, func() {
 				s.showTitle = true
 				am.SetVolume(1.0)
-				am.PlayMusic(TitleSound)
+				am.PlayMusic(TitleSound, true)  // Loop title music
 			})
 		}
 	}

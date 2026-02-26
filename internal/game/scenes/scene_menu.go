@@ -43,7 +43,7 @@ func NewMenuScene(context *app.AppContext) *MenuScene {
 func (s *MenuScene) OnStart() {
 	am := s.AppContext().SceneManager.AudioManager()
 	am.SetVolume(1)
-	am.PlayMusic(TitleSound)
+	am.PlayMusic(TitleSound, true)  // Loop menu music
 }
 
 func (s *MenuScene) Update() error {
