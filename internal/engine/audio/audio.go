@@ -132,16 +132,11 @@ func (am *AudioManager) Add(name string, data []byte) {
 	am.audioPlayers[name] = p
 }
 
-func (am *AudioManager) PlayMusic(name string) *audio.Player {
+func (am *AudioManager) PlayMusic(name string, loop bool) *audio.Player {
 	if am.noSound {
 		return nil
 	}
-	player, ok := am.audioPlayers[name]
-	if !ok {
-		log.Printf("audio player not found: %s", name)
-		return nil
-	}
-
+	
 	// Cancel any ongoing fades
 	if cancel, ok := am.fadeCancel[name]; ok {
 		cancel()
@@ -151,9 +146,39 @@ func (am *AudioManager) PlayMusic(name string) *audio.Player {
 		cancel()
 		delete(am.fadeCancel, "_all")
 	}
-
+	
+	player, ok := am.audioPlayers[name]
+	if !ok {
+		log.Printf("audio player not found: %s", name)
+		return nil
+	}
+	
 	player.SetVolume(am.volume)
+	player.Rewind()
 	player.Play()
+	
+	// Start loop goroutine if loop is enabled
+	if loop {
+		go func() {
+			for {
+				// Wait for music to finish
+				for player.IsPlaying() {
+					time.Sleep(100 * time.Millisecond)
+					// Check if fade started
+					if _, exists := am.fadeCancel[name]; exists {
+						return
+					}
+					if _, exists := am.fadeCancel["_all"]; exists {
+						return
+					}
+				}
+				// Rewind and play again
+				player.Rewind()
+				player.Play()
+			}
+		}()
+	}
+	
 	return player
 }
 

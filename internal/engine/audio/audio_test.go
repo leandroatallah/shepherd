@@ -22,13 +22,13 @@ func getTestAudioManager() *AudioManager {
 }
 
 func TestNewAudioManagerRespectsNoSound(t *testing.T) {
-	// Testa a lógica de inicialização de volume quando NoSound=true
-	// Nota: Não podemos chamar NewAudioManager() múltiplas vezes nos testes
-	// porque ebiten/audio.NewContext entra em panic se já existir um contexto.
-	// Este teste verifica o comportamento através do manager singleton.
+	// Tests the volume initialization logic when NoSound=true
+	// Note: We cannot call NewAudioManager() multiple times in tests
+	// because ebiten/audio.NewContext panics if a context already exists.
+	// This test verifies the behavior through the singleton manager.
 	config.Set(&config.AppConfig{NoSound: true})
 	am := getTestAudioManager()
-	// Após o singleton ser criado com NoSound=false, testamos que SetVolume funciona
+	// After the singleton is created with NoSound=false, we test that SetVolume works
 	am.SetVolume(0.0)
 	if am.Volume() != 0 {
 		t.Fatalf("expected volume 0 after SetVolume(0), got %f", am.Volume())
@@ -38,7 +38,7 @@ func TestNewAudioManagerRespectsNoSound(t *testing.T) {
 func TestPlayAndSetVolumeAndPauseAllNoPlayers(t *testing.T) {
 	am := getTestAudioManager()
 
-	if am.PlayMusic("missing") != nil {
+	if am.PlayMusic("missing", false) != nil {
 		t.Fatalf("expected nil player for missing key")
 	}
 
