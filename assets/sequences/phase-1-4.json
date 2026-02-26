@@ -1,0 +1,8 @@
+{
+  "commands": [
+    {
+      "command": "play_music",
+      "path": "assets/audio/Goblins_Dance_Battle.ogg"
+    }
+  ]
+}

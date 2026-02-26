@@ -1,0 +1,13 @@
+{
+  "commands": [
+    { "command": "set_speed", "target_id": "DOG_NPC", "speed": 5.5 },
+    {
+      "command": "follow_player",
+      "target_id": "DOG_NPC"
+    },
+    {
+      "command": "play_music",
+      "path": "assets/audio/Goblins_Dance_Battle.ogg"
+    }
+  ]
+}

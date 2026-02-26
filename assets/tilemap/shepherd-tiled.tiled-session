@@ -3,13 +3,13 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "shepherd-phase-6.tmj",
+    "activeFile": "shepherd-phase-1-2.tmj",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
         "": {
-            "scaleInDock": 2.452,
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "/Users/leandroatallah/www/go/ebiten/firefly/assets/tilemap/sample-phase-1.tmj": {
@@ -74,16 +74,57 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "shepherd-phase-0-0.tmj": {
+            "expandedObjectLayers": [
+                6,
+                11,
+                8,
+                4
+            ],
+            "scale": 1.4838,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 262.5016848631891,
+                "y": 262.83865750101086
+            }
+        },
+        "shepherd-phase-0-0.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-0-0.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-0-0.tmj#tileset-1bit": {
+            "scaleInDock": 2.9391
+        },
+        "shepherd-phase-0-1.tmj": {
+            "scale": 3.15578125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.86532653364358,
+                "y": 111.85819676189533
+            }
+        },
+        "shepherd-phase-0-1.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-0-1.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-0-1.tmj#tileset-1bit": {
+            "scaleInDock": 1
+        },
         "shepherd-phase-0.tmj": {
             "expandedObjectLayers": [
-                8,
-                6
+                6,
+                11,
+                8
             ],
-            "scale": 1.5504,
-            "selectedLayer": 2,
+            "scale": 0.8811,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 157.7012383900929,
-                "y": 163.1836945304438
+                "x": 262.7397571217796,
+                "y": 98.74021109976172
             }
         },
         "shepherd-phase-0.tmj#sample-enemies": {
@@ -97,17 +138,176 @@
             "scaleInDock": 2.9391,
             "scaleInEditor": 1
         },
-        "shepherd-phase-1.tmj": {
+        "shepherd-phase-000.tmj": {
             "expandedObjectLayers": [
-                8,
-                6,
                 4
             ],
-            "scale": 1.4595,
+            "scale": 3.15578125,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 159.7068871614596,
+                "y": 111.69975738971135
+            }
+        },
+        "shepherd-phase-000.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-000.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-000.tmj#tileset-1bit": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-001.tmj": {
+            "scale": 2.62734375,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 159.85727029438002,
+                "y": 100.29140648230745
+            }
+        },
+        "shepherd-phase-001.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-001.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-001.tmj#tileset-1bit": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-1.tmj": {
+            "expandedObjectLayers": [
+                4,
+                6,
+                8
+            ],
+            "scale": 1.96,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 160.71428571428572,
+                "y": 135.4591836734694
+            }
+        },
+        "shepherd-phase-1-1.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-1.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-1.tmj#tileset-1bit": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-2--3.tmj": {
+            "expandedObjectLayers": [
+                8,
+                4
+            ],
+            "scale": 1.8503,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 229.15202940063767,
+                "y": 186.18602388801813
+            }
+        },
+        "shepherd-phase-1-2--3.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-2--3.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-2--3.tmj#tileset-1bit": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-2.tmj": {
+            "expandedObjectLayers": [
+                4,
+                13,
+                8
+            ],
+            "scale": 1.8503,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 229.1520294006377,
+                "y": 186.18602388801813
+            }
+        },
+        "shepherd-phase-1-2.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-2.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-2.tmj#tileset-1bit": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-3--2.tmj": {
+            "expandedObjectLayers": [
+                4
+            ],
+            "scale": 1.7224,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 210.75243845796564,
+                "y": 100.15095215977703
+            }
+        },
+        "shepherd-phase-1-3--2.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-3--2.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-3--2.tmj#tileset-1bit": {
+            "scaleInDock": 1.4667
+        },
+        "shepherd-phase-1-3.tmj": {
+            "expandedObjectLayers": [
+                8
+            ],
+            "scale": 1.7224,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 251.97398978169997,
+                "y": 183.17464003715747
+            }
+        },
+        "shepherd-phase-1-3.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-3.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-3.tmj#tileset-1bit": {
+            "scaleInDock": 1.4667
+        },
+        "shepherd-phase-1-4.tmj": {
+            "scale": 2.933125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.89772000852332,
+                "y": 111.99659066695077
+            }
+        },
+        "shepherd-phase-1-4.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-4.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-4.tmj#tileset-1bit": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1.tmj": {
+            "expandedObjectLayers": [
+                6,
+                8,
+                4
+            ],
+            "scale": 2.2052,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 159.9862966769442,
-                "y": 111.6820829051045
+                "x": 160.75639397787046,
+                "y": 143.75113368401958
             }
         },
         "shepherd-phase-1.tmj#sample-enemies": {
@@ -124,11 +324,11 @@
                 8,
                 6
             ],
-            "scale": 2.4031,
-            "selectedLayer": 1,
+            "scale": 1.7227,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 172.0694103449711,
-                "y": 139.40327077524864
+                "x": 212.74743135775236,
+                "y": 113.19440413304699
             }
         },
         "shepherd-phase-2.tmj#sample-enemies": {
@@ -146,15 +346,15 @@
         },
         "shepherd-phase-3.tmj": {
             "expandedObjectLayers": [
-                8,
                 6,
-                13
+                13,
+                8
             ],
             "scale": 2.224,
-            "selectedLayer": 4,
+            "selectedLayer": 6,
             "viewCenter": {
                 "x": 217.40107913669064,
-                "y": 128.59712230215828
+                "y": 115.10791366906476
             }
         },
         "shepherd-phase-3.tmj#sample-enemies": {
@@ -171,18 +371,17 @@
         },
         "shepherd-phase-4.tmj": {
             "expandedObjectLayers": [
-                14,
-                8,
                 6,
+                8,
                 4,
-                3,
+                14,
                 13
             ],
-            "scale": 2.1581,
-            "selectedLayer": 3,
+            "scale": 3.7623,
+            "selectedLayer": 7,
             "viewCenter": {
-                "x": 479.8202122237153,
-                "y": 112.13567489921687
+                "x": 214.7622464981527,
+                "y": 193.36576030619565
             }
         },
         "shepherd-phase-4.tmj#sample-enemies": {
@@ -192,23 +391,23 @@
             "scaleInDock": 1
         },
         "shepherd-phase-4.tmj#tileset-1bit": {
-            "scaleInDock": 1.5426
+            "scaleInDock": 1.4813
         },
         "shepherd-phase-4.tmj#tileset-1bit-bg": {
-            "scaleInDock": 2.452
+            "scaleInDock": 1.6278
         },
         "shepherd-phase-5.tmj": {
             "expandedObjectLayers": [
-                6,
                 8,
+                12,
                 4,
-                12
+                6
             ],
-            "scale": 0.7131,
+            "scale": 1.4934,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 139.53162249333894,
-                "y": 342.1679988781377
+                "x": 151.66733627963035,
+                "y": 143.29717423329313
             }
         },
         "shepherd-phase-5.tmj#sample-enemies": {
@@ -222,12 +421,14 @@
         },
         "shepherd-phase-6.tmj": {
             "expandedObjectLayers": [
-                14
+                14,
+                3,
+                6
             ],
             "scale": 1.5368,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 276.22332118688183,
+                "x": 280.77824049973975,
                 "y": 223.19104633003644
             }
         },
@@ -239,6 +440,50 @@
         },
         "shepherd-phase-6.tmj#tileset-1bit": {
             "scaleInDock": 2.805
+        },
+        "shepherd-phase-story-intro-part-2.tmj": {
+            "expandedObjectLayers": [
+                8,
+                13
+            ],
+            "scale": 1.5201,
+            "selectedLayer": 6,
+            "viewCenter": {
+                "x": 236.16867311361096,
+                "y": 183.2116308137622
+            }
+        },
+        "shepherd-phase-story-intro-part-2.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-story-intro-part-2.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-story-intro-part-2.tmj#tileset-1bit": {
+            "scaleInDock": 1.8232
+        },
+        "shepherd-phase-story-intro-part-2.tmj#tileset-1bit-bg": {
+            "scaleInDock": 3.7779
+        },
+        "shepherd-phase-story-intro-part-4.tmj": {
+            "scale": 2.3595,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 167.83216783216778,
+                "y": 115.06675143038777
+            }
+        },
+        "shepherd-phase-story-intro-part-4.tmj#sample-enemies": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-story-intro-part-4.tmj#sample-rewards": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-story-intro-part-4.tmj#tileset-1bit": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-story-intro-part-4.tmj#tileset-1bit-bg": {
+            "scaleInDock": 1
         }
     },
     "last.externalTilesetPath": "/Users/leandroatallah/www/go/ebiten/shepherd/assets/tilemap",
@@ -247,24 +492,28 @@
     "map.lastUsedFormat": "json",
     "map.width": 10,
     "openFiles": [
-        "shepherd-phase-2.tmj",
-        "shepherd-phase-1.tmj",
-        "shepherd-phase-6.tmj",
-        "shepherd-phase-4.tmj"
+        "shepherd-phase-1-1.tmj",
+        "shepherd-phase-1-2--3.tmj",
+        "shepherd-phase-000.tmj",
+        "shepherd-phase-1-3--2.tmj",
+        "shepherd-phase-1-4.tmj",
+        "shepherd-phase-1-3.tmj",
+        "shepherd-phase-1-2.tmj"
     ],
     "project": "shepherd-tiled.tiled-project",
     "recentFiles": [
-        "shepherd-phase-2.tmj",
-        "shepherd-phase-1.tmj",
+        "shepherd-phase-1-1.tmj",
+        "shepherd-phase-000.tmj",
+        "shepherd-phase-1-4.tmj",
+        "shepherd-phase-1-3.tmj",
+        "shepherd-phase-1-2.tmj",
+        "shepherd-phase-1-2--3.tmj",
+        "shepherd-phase-1-3--2.tmj",
+        "shepherd-phase-001.tmj",
         "shepherd-phase-4.tmj",
-        "shepherd-phase-6.tmj",
-        "shepherd-phase-0.tmj",
-        "shepherd-phase-5.tmj",
-        "sample-phase-2.tmj",
-        "sample-phase-1.tmj",
-        "sample-rewards.tsx",
-        "sample-enemies.tsx",
-        "/Users/leandroatallah/www/go/ebiten/firefly/assets/tilemap/sample-phase-1.tmj"
+        "shepherd-phase-story-intro-part-2.tmj",
+        "shepherd-phase-story-intro-part-4.tmj",
+        "shepherd-phase-0.tmj"
     ],
     "tileset.embedInMap": true,
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",

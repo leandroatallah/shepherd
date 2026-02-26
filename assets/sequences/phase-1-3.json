@@ -1,8 +1,10 @@
 {
   "commands": [
+    { "command": "set_speed", "target_id": "DOG_NPC", "speed": 5.5 },
     {
-      "command": "call_sequence",
-      "path": "dog-follows-player.json"
+      "command": "follow_player",
+      "target_id": "DOG_NPC",
+      "stay_on_platform": true
     },
     {
       "command": "play_music",
