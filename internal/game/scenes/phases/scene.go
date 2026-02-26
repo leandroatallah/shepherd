@@ -47,12 +47,10 @@ type PhasesScene struct {
 	allowPause  bool
 
 	// Complete phase
-	isConcludingPhase   bool
-	phaseCompleted      bool
-	phaseCompletedDelay int
-	reachedEndpoint     bool
-	hasEndpoints        bool
-	goal                phases.Goal
+	reachedEndpoint bool
+	hasEndpoints    bool
+	hasPlayer       bool
+	goal            phases.Goal
 
 	// Reboot
 	isRebooting bool
@@ -93,19 +91,24 @@ func (s *PhasesScene) OnStart() {
 
 	ctx := s.AppContext()
 
-	// Create player and register to space and context
-	p, err := createPlayer(ctx, gameentitytypes.ShepherdPlayerType)
-	if err != nil {
-		log.Fatal(err)
-	}
-	s.player = p
-	ctx.ActorManager.Register(s.player)
-	s.PhysicsSpace().AddBody(s.player)
+	// Check if player should be created (based on PlayerStart layer existence)
+	s.hasPlayer = s.Tilemap().HasPlayerStartPosition()
 
-	// Optionally block input for the current player of this phase
-	if phase, err := ctx.PhaseManager.GetCurrentPhase(); err == nil && phase.BlockPlayerMovement {
-		if p, ok := ctx.ActorManager.GetPlayer(); ok {
-			p.BlockMovement()
+	if s.hasPlayer {
+		// Create player and register to space and context
+		p, err := createPlayer(ctx, gameentitytypes.ShepherdPlayerType)
+		if err != nil {
+			log.Fatal(err)
+		}
+		s.player = p
+		ctx.ActorManager.Register(s.player)
+		s.PhysicsSpace().AddBody(s.player)
+
+		// Optionally block input for the current player of this phase
+		if phase, err := ctx.PhaseManager.GetCurrentPhase(); err == nil && phase.BlockPlayerMovement {
+			if p, ok := ctx.ActorManager.GetPlayer(); ok {
+				p.BlockMovement()
+			}
 		}
 	}
 
@@ -116,32 +119,43 @@ func (s *PhasesScene) OnStart() {
 
 	s.PhysicsSpace().Bodies()
 
-	s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFollow})
-	s.Camera().SetFollowTarget(s.player)
-
-	// Init collisions bodies and touch trigger for endpoints
+	// Init collision bodies (obstacles and endpoints) - always created regardless of player
 	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), func(id string) body.Touchable {
 		return bodyphysics.NewTouchTrigger(func() {
 			s.endpointTrigger(id)
 		}, s.player)
 	})
 
-	s.screenFlipper = scene.NewScreenFlipper(s.Camera(), s.player, s.Tilemap(), ctx)
-	tileWidth := s.Tilemap().Tilewidth
-	s.screenFlipper.PlayerPushDistance = float64(tileWidth / 2)
-	s.screenFlipper.FlipStrategy = func(dx, dy int) scene.FlipType {
-		if dy != 0 {
-			return scene.FlipTypeInstant
+	if s.hasPlayer {
+		s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFollow})
+		s.Camera().SetFollowTarget(s.player)
+
+		s.screenFlipper = scene.NewScreenFlipper(s.Camera(), s.player, s.Tilemap(), ctx)
+		tileWidth := s.Tilemap().Tilewidth
+		s.screenFlipper.PlayerPushDistance = float64(tileWidth / 2)
+		s.screenFlipper.FlipStrategy = func(dx, dy int) scene.FlipType {
+			if dy != 0 {
+				return scene.FlipTypeInstant
+			}
+			return scene.FlipTypeSmooth
 		}
-		return scene.FlipTypeSmooth
+		s.screenFlipper.OnFlipStart = func() {
+			s.player.SetImmobile(true)
+		}
+		s.screenFlipper.OnFlipFinish = func() {
+			s.player.SetImmobile(false)
+		}
+		s.screenFlipper.SnapToCurrentRoom()
+	} else {
+		// No player: set camera to fixed mode at CameraStart position or top-left
+		s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFixed})
+
+		if x, y, found := s.Tilemap().GetCameraStartPosition(); found {
+			s.Camera().SetPositionTopLeft(float64(x), float64(y))
+		} else {
+			s.Camera().SetPositionTopLeft(0, 0)
+		}
 	}
-	s.screenFlipper.OnFlipStart = func() {
-		s.player.SetImmobile(true)
-	}
-	s.screenFlipper.OnFlipFinish = func() {
-		s.player.SetImmobile(false)
-	}
-	s.screenFlipper.SnapToCurrentRoom()
 
 	s.pauseScreen = pause.NewPauseScreen(ebiten.KeyEnter, 250*time.Millisecond)
 
@@ -320,20 +334,25 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 
 func (s *PhasesScene) Reboot() {
 	s.ShowDrawScreenFlash = timing.FromDuration(67 * time.Millisecond) // 4 frames
-	s.isRebooting = true
-	s.rebootDelay = timing.FromDuration(1 * time.Second) // 60 frames
+	s.rebootTrigger.Enable(timing.FromDuration(1 * time.Second))       // 60 frames
 }
 
 func (s *PhasesScene) OnFinish() {
 	s.TilemapScene.OnFinish()
 	// Ensure we remove any movement block applied at phase start (for whichever actor is the current player)
-	if p, ok := s.AppContext().ActorManager.GetPlayer(); ok {
-		p.UnblockMovement()
+	if s.hasPlayer {
+		if p, ok := s.AppContext().ActorManager.GetPlayer(); ok {
+			p.UnblockMovement()
+		}
+		s.AppContext().ActorManager.Unregister(s.player)
 	}
-	s.AppContext().ActorManager.Unregister(s.player)
 }
 
 func (s *PhasesScene) endpointTrigger(eventID string) {
+	if !s.hasPlayer {
+		return
+	}
+
 	if eventID == "SPIKE" {
 		s.player.OnDie()
 		return
@@ -379,51 +398,9 @@ func (s *PhasesScene) initTilemap() {
 	npcFactory := npcs.NewNpcFactory(gamenpcs.InitNpcMap(s.AppContext()))
 	scene.InitNPCs(s.TilemapScene, npcFactory)
 
-	s.SetPlayerStartPosition(s.player)
-}
-
-func (s *PhasesScene) checkReboot() bool {
-	if !s.isRebooting {
-		return false
+	if s.hasPlayer {
+		s.SetPlayerStartPosition(s.player)
 	}
-
-	if s.rebootDelay == 0 {
-		s.AppContext().SceneManager.NavigateTo(
-			scenestypes.ScenePhaseReboot,
-			transition.NewFader(0, 0),
-			true,
-		)
-	}
-
-	s.rebootDelay--
-	return false
-}
-
-func (s *PhasesScene) checkPhaseCompleted() bool {
-	if s.isConcludingPhase {
-		return true
-	}
-
-	if s.goal != nil && s.goal.IsCompleted() {
-		s.goal.OnCompletion()
-		return true
-	}
-
-	return false
-}
-
-func (s *PhasesScene) completePhase() {
-	if s.phaseCompleted {
-		return
-	}
-
-	if s.phaseCompletedDelay == 0 {
-		s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
-		s.phaseCompleted = true
-		return
-	}
-
-	s.phaseCompletedDelay--
 }
 
 func (s *PhasesScene) drawPause(screen *ebiten.Image) {
