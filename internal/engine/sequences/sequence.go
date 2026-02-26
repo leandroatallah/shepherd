@@ -35,6 +35,9 @@ type CommandData struct {
 	EndX     float64 `json:"end_x,omitempty"`
 	Speed    float64 `json:"speed,omitempty"`
 
+	// Fields for "follow_player"
+	StayOnPlatform bool `json:"stay_on_platform,omitempty"`
+
 	// Per-command control over whether this command blocks the sequence timeline.
 	// If omitted, commands are treated as blocking (current default behavior).
 	BlockSequence *bool `json:"block_sequence,omitempty"`
@@ -91,7 +94,10 @@ func (cd *CommandData) ToCommand() sequences.Command {
 	case "set_speed":
 		return &SetSpeedCommand{TargetID: cd.TargetID, Speed: cd.Speed}
 	case "follow_player":
-		return &FollowPlayerCommand{TargetID: cd.TargetID}
+		return &FollowPlayerCommand{
+			TargetID:       cd.TargetID,
+			StayOnPlatform: cd.StayOnPlatform,
+		}
 	case "event":
 		return &EventCommand{
 			EventType: cd.EventType,

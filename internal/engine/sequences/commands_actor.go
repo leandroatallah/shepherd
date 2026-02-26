@@ -151,7 +151,8 @@ func (c *SetSpeedCommand) Update() bool { return true }
 
 // FollowPlayerCommand sets movement state to Follow targeting the player
 type FollowPlayerCommand struct {
-	TargetID string
+	TargetID       string
+	StayOnPlatform bool
 }
 
 func (c *FollowPlayerCommand) Init(appContext any) {
@@ -164,7 +165,11 @@ func (c *FollowPlayerCommand) Init(appContext any) {
 		ch := a.GetCharacter()
 		if ch != nil {
 			ch.ClearSkills()
-			a.SetMovementState(movement.Follow, player)
+			if c.StayOnPlatform {
+				a.SetMovementState(movement.Follow, player, movement.WithPlatformFollow())
+			} else {
+				a.SetMovementState(movement.Follow, player)
+			}
 		}
 	}
 }
