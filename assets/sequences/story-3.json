@@ -1,6 +1,10 @@
 {
   "commands": [
     {
+      "command": "call_sequence",
+      "path": "play-story-music.json"
+    },
+    {
       "command": "delay",
       "frames": 60
     },

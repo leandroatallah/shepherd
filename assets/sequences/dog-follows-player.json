@@ -3,5 +3,5 @@
     { "command": "set_speed", "target_id": "DOG_NPC", "speed": 5.5 },
     { "command": "follow_player", "target_id": "DOG_NPC" }
   ],
-  "block_player_movement": false
+  "block_player_movement": true
 }

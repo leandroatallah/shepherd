@@ -5,6 +5,14 @@
       "frames": 60
     },
     {
+      "command": "call_sequence",
+      "path": "play-story-music.json"
+    },
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
       "command": "dialogue",
       "lines": [
         "In a quiet land of hills and stone,",

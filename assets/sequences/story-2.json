@@ -1,5 +1,9 @@
 {
   "commands": [
+    {
+      "command": "call_sequence",
+      "path": "play-story-music.json"
+    },
     { "command": "delay", "frames": 60 },
 
     { "command": "set_speed", "target_id": "DOG_NPC", "speed": 3 },

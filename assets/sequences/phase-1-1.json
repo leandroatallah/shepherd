@@ -5,12 +5,8 @@
       "path": "dog-follows-player.json"
     },
     {
-      "command": "camera_zoom",
-      "zoom": 1.5,
-      "duration": 0,
-      "delay": 60,
-      "out_duration": 40,
-      "target_id": "player"
+      "command": "call_sequence",
+      "path": "phase-start.json"
     }
   ],
   "block_player_movement": true

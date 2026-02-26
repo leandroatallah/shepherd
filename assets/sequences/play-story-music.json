@@ -1,0 +1,9 @@
+{
+  "commands": [
+    {
+      "command": "play_music",
+      "path": "assets/audio/Goblins_Den_Regular.ogg",
+      "volume": 0.75
+    }
+  ]
+}
