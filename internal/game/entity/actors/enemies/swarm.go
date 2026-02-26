@@ -1,16 +1,12 @@
 package gameenemies
 
 import (
-	"log"
-
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/jsonutil"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
-	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
 	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
@@ -20,37 +16,26 @@ type SwarmEnemy struct {
 	*platformer.PlatformerCharacter
 }
 
-// TODO: Use composition to reduce repeated actions in different places
+// NewSwarmEnemy creates a new swarm enemy.
 func NewSwarmEnemy(ctx *app.AppContext, x, y int, id string) (*SwarmEnemy, error) {
-	spriteData, statData, err := jsonutil.ParseSpriteAndStats[actors.StatData]("internal/game/entity/actors/enemies/swarm.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	stateMap, err := builder.BuildStateMap(spriteData)
+	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "internal/game/entity/actors/enemies/swarm.json")
 	if err != nil {
 		return nil, err
 	}
 
-	rect := builder.BodyRectFromSpriteData(spriteData)
-	character := platformer.NewPlatformerCharacter(stateMap, spriteData, rect)
-	character.SetAppContext(ctx)
-	character.SetPosition(x, y)
-
 	enemy := &SwarmEnemy{PlatformerCharacter: character}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	enemy.SetOwner(enemy)
+	enemy.SetPosition(x, y)
 
 	if err = builder.ConfigureCharacter(enemy, spriteData, statData, stateMap, id); err != nil {
 		return nil, err
 	}
 
-	model, err := physicsmovement.NewMovementModel(physicsmovement.Platform, nil)
-	if err != nil {
+	if err = builder.ApplyPlatformerPhysics(enemy, nil); err != nil {
 		return nil, err
 	}
-	enemy.SetMovementModel(model)
-	enemy.SetTouchable(enemy)
+
 	enemy.SetHorizontalInertia(1.0)
 	enemy.Character.SetMovementState(
 		movement.SideToSide,

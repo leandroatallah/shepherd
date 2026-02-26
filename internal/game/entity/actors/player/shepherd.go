@@ -1,16 +1,13 @@
 package gameplayer
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/jsonutil"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
-	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
@@ -77,21 +74,13 @@ type ShepherdPlayer struct {
 	*gameplayermethods.PlayerDeathBehavior
 }
 
+// NewShepherdPlayer creates a new shepherd player.
 func NewShepherdPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, error) {
-	spriteData, statData, err := jsonutil.ParseSpriteAndStats[actors.StatData]("internal/game/entity/actors/player/shepherd.json")
+	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "internal/game/entity/actors/player/shepherd.json")
 	if err != nil {
 		return nil, err
 	}
 
-	stateMap, err := builder.BuildStateMap(spriteData)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create player instance
-	rect := builder.BodyRectFromSpriteData(spriteData)
-	character := platformer.NewPlatformerCharacter(stateMap, spriteData, rect)
-	character.SetAppContext(ctx)
 	character.SetStateTransitionHandler(shepherdStateTransitionLogic)
 
 	player := &ShepherdPlayer{
@@ -107,14 +96,11 @@ func NewShepherdPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, e
 	}
 	player.baseSpeed = player.Speed()
 
-	model, err := physicsmovement.NewMovementModel(physicsmovement.Platform, player)
-	if err != nil {
-		return nil, fmt.Errorf("SetMovementModel: %w", err)
+	if err = builder.ApplyPlatformerPhysics(player, player); err != nil {
+		return nil, err
 	}
-	player.SetMovementModel(model)
 
 	character.StateCollisionManager.RefreshCollisions()
-
 	player.PlayerDeathBehavior = gameplayermethods.NewPlayerDeathBehavior(player)
 
 	return player, nil

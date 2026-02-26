@@ -1,16 +1,12 @@
 package gamenpcs
 
 import (
-	"log"
-
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/jsonutil"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
-	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
@@ -21,41 +17,28 @@ type Sheep struct {
 	*gameplayermethods.PlayerDeathBehavior
 }
 
-// TODO: Use composition to reduce repeated actions in different places
+// NewSheep creates a new sheep NPC.
 func NewSheep(ctx *app.AppContext, x, y int, id string) (*Sheep, error) {
-	spriteData, statData, err := jsonutil.ParseSpriteAndStats[actors.StatData]("internal/game/entity/actors/npcs/sheep.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	stateMap, err := builder.BuildStateMap(spriteData)
+	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "internal/game/entity/actors/npcs/sheep.json")
 	if err != nil {
 		return nil, err
 	}
 
-	rect := builder.BodyRectFromSpriteData(spriteData)
-	character := platformer.NewPlatformerCharacter(stateMap, spriteData, rect)
-	character.SetAppContext(ctx)
-	character.SetPosition(x, y)
-
 	sheep := &Sheep{PlatformerCharacter: character}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	sheep.SetOwner(sheep)
+	sheep.SetPosition(x, y)
 
 	if err = builder.ConfigureCharacter(sheep, spriteData, statData, stateMap, id); err != nil {
 		return nil, err
 	}
 
-	model, err := physicsmovement.NewMovementModel(physicsmovement.Platform, nil)
-	if err != nil {
+	if err = builder.ApplyPlatformerPhysics(sheep, nil); err != nil {
 		return nil, err
 	}
-	sheep.SetMovementModel(model)
-	sheep.SetTouchable(sheep)
+
 	sheep.Character.SetMovementState(movement.Idle, nil)
-
 	sheep.Character.SetStateTransitionHandler(gameplayermethods.StandardStateTransitionLogic)
-
 	sheep.PlayerDeathBehavior = gameplayermethods.NewPlayerDeathBehavior(sheep)
 
 	return sheep, nil
