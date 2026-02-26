@@ -55,7 +55,8 @@ func TestFadeOutAllReachesZero(t *testing.T) {
 	am.SetVolume(1.0)
 	am.FadeOutAll(50 * time.Millisecond)
 	time.Sleep(150 * time.Millisecond)
-	if am.Volume() != 0 {
-		t.Fatalf("expected volume 0 after fadeout, got %f", am.Volume())
+	// After fade out completes, volume is restored for next song
+	if am.Volume() != 1.0 {
+		t.Fatalf("expected volume 1.0 after fadeout (restored), got %f", am.Volume())
 	}
 }

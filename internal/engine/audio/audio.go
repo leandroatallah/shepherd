@@ -2,6 +2,7 @@ package audio
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"io/fs"
 	"log"
@@ -37,6 +38,7 @@ type AudioManager struct {
 	audioPlayers map[string]*audio.Player
 	volume       float64
 	noSound      bool
+	fadeCancel   map[string]context.CancelFunc
 }
 
 func NewAudioManager() *AudioManager {
@@ -50,6 +52,7 @@ func NewAudioManager() *AudioManager {
 		audioPlayers: make(map[string]*audio.Player),
 		volume:       initialVolume,
 		noSound:      noSound,
+		fadeCancel:   make(map[string]context.CancelFunc),
 	}
 }
 
@@ -138,6 +141,17 @@ func (am *AudioManager) PlayMusic(name string) *audio.Player {
 		log.Printf("audio player not found: %s", name)
 		return nil
 	}
+
+	// Cancel any ongoing fades
+	if cancel, ok := am.fadeCancel[name]; ok {
+		cancel()
+		delete(am.fadeCancel, name)
+	}
+	if cancel, ok := am.fadeCancel["_all"]; ok {
+		cancel()
+		delete(am.fadeCancel, "_all")
+	}
+
 	player.SetVolume(am.volume)
 	player.Play()
 	return player
@@ -182,8 +196,8 @@ func (am *AudioManager) Volume() float64 {
 }
 
 func (am *AudioManager) PauseAll() {
-	for _, player := range am.audioPlayers {
-		player.Pause()
+	for _, p := range am.audioPlayers {
+		p.Pause()
 	}
 }
 
@@ -191,10 +205,18 @@ func (am *AudioManager) FadeOutAll(duration time.Duration) {
 	if am.noSound {
 		return
 	}
-	initialVolume := am.volume
-	if initialVolume == 0 {
+	currentVolume := am.volume
+	if currentVolume == 0 {
 		return
 	}
+
+	// Cancel any ongoing fade all
+	if am.fadeCancel["_all"] != nil {
+		am.fadeCancel["_all"]()
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	am.fadeCancel["_all"] = cancel
 
 	go func() {
 		ticker := time.NewTicker(100 * time.Millisecond)
@@ -202,20 +224,32 @@ func (am *AudioManager) FadeOutAll(duration time.Duration) {
 
 		startTime := time.Now()
 
-		for range ticker.C {
-			elapsed := time.Since(startTime)
-			if elapsed >= duration {
-				am.SetVolume(0)
-				am.PauseAll()
+		for {
+			select {
+			case <-ctx.Done():
 				return
-			}
+			case <-ticker.C:
+				elapsed := time.Since(startTime)
+				if elapsed >= duration {
+					for _, p := range am.audioPlayers {
+						p.SetVolume(currentVolume)
+						p.Rewind()
+						p.Pause()
+					}
+					delete(am.fadeCancel, "_all")
+					return
+				}
 
-			progress := float64(elapsed) / float64(duration)
-			newVolume := initialVolume * (1 - progress)
-			if newVolume < 0 {
-				newVolume = 0
+				progress := float64(elapsed) / float64(duration)
+				newVolume := currentVolume * (1 - progress)
+				if newVolume < 0 {
+					newVolume = 0
+				}
+				// Set volume per player, not globally
+				for _, p := range am.audioPlayers {
+					p.SetVolume(newVolume)
+				}
 			}
-			am.SetVolume(newVolume)
 		}
 	}()
 }
@@ -235,27 +269,46 @@ func (am *AudioManager) FadeOut(name string, duration time.Duration) {
 		return
 	}
 
+	// Cancel any ongoing fades
+	if cancel, ok := am.fadeCancel[name]; ok {
+		cancel()
+		delete(am.fadeCancel, name)
+	}
+	if cancel, ok := am.fadeCancel["_all"]; ok {
+		cancel()
+		delete(am.fadeCancel, "_all")
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	am.fadeCancel[name] = cancel
+
 	go func() {
 		ticker := time.NewTicker(100 * time.Millisecond)
 		defer ticker.Stop()
 
 		startTime := time.Now()
 
-		for range ticker.C {
-			elapsed := time.Since(startTime)
-			if elapsed >= duration {
-				player.SetVolume(0)
-				player.Rewind()
-				player.Pause()
+		for {
+			select {
+			case <-ctx.Done():
 				return
-			}
+			case <-ticker.C:
+				elapsed := time.Since(startTime)
+				if elapsed >= duration {
+					player.SetVolume(am.volume)
+					player.Rewind()
+					player.Pause()
+					delete(am.fadeCancel, name)
+					return
+				}
 
-			progress := float64(elapsed) / float64(duration)
-			newVolume := initialVolume * (1 - progress)
-			if newVolume < 0 {
-				newVolume = 0
+				progress := float64(elapsed) / float64(duration)
+				newVolume := initialVolume * (1 - progress)
+				if newVolume < 0 {
+					newVolume = 0
+				}
+				player.SetVolume(newVolume)
 			}
-			player.SetVolume(newVolume)
 		}
 	}()
 }
