@@ -82,3 +82,29 @@ func (s *BaseScene) EnableKeys() {
 func (s *BaseScene) DisableKeys() {
 	s.IsKeysDisabled = true
 }
+
+// PauseAllMusic pauses all music.
+// Useful for scenes that need to control music manually.
+func (s *BaseScene) PauseAllMusic() {
+	s.AppContext().AudioManager.PauseAll()
+}
+
+// PlayMusic plays music with rewind control.
+// If rewind=false and music is already playing, does nothing.
+// If rewind=true, restarts music from the beginning.
+func (s *BaseScene) PlayMusic(path string, rewind bool) {
+	if path == "" {
+		return
+	}
+
+	ctx := s.AppContext()
+	if ctx == nil || ctx.AudioManager == nil {
+		return
+	}
+
+	if !rewind && ctx.AudioManager.IsPlaying(path) {
+		return
+	}
+
+	ctx.AudioManager.PlayMusic(path)
+}

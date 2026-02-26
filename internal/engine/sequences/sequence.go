@@ -57,8 +57,12 @@ type CommandData struct {
 	// Fields for "camera_reset"
 	DefaultZoom float64 `json:"default_zoom,omitempty"`
 
-	// Fields for "call_sequence"
+	// Fields for "call_sequence" and "play_music"
 	Path string `json:"path,omitempty"`
+
+	// Fields for "play_music"
+	MusicRewind bool    `json:"rewind,omitempty"`
+	Volume      float64 `json:"volume,omitempty"`
 }
 
 // SequenceData is a wrapper used for parsing a full sequence from JSON.
@@ -116,6 +120,18 @@ func (cd *CommandData) ToCommand() sequences.Command {
 	case "call_sequence":
 		return &CallSequenceCommand{
 			Path: cd.Path,
+		}
+	case "play_music":
+		return &PlayMusicCommand{
+			Path:   cd.Path,
+			Rewind: cd.MusicRewind,
+			Volume: cd.Volume,
+		}
+	case "pause_all_music":
+		return &PauseAllMusicCommand{}
+	case "fadeout_all_music":
+		return &FadeOutAllMusicCommand{
+			Duration: cd.Duration,
 		}
 	}
 	return nil
