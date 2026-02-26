@@ -19,8 +19,20 @@
           }
         ]
       },
+      "walk": {
+        "path": "assets/images/dog-24-walk.png",
+        "loop": true,
+        "collision_rect": [
+          {
+            "x": 4,
+            "y": 10,
+            "width": 16,
+            "height": 14
+          }
+        ]
+      },
       "die": {
-        "path": "assets/images/dog-24-idle.png",
+        "path": "assets/images/dog-24-die.png",
         "loop": false,
         "collision_rect": []
       }
