@@ -15,10 +15,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 )
 
-const (
-	titleMusic = "assets/audio/Goblins_Den_Regular.ogg"
-)
-
 type PhaseTitleScene struct {
 	scene.BaseScene
 
@@ -26,6 +22,8 @@ type PhaseTitleScene struct {
 	title        string
 	showTitle    bool
 	musicStarted bool
+
+	shouldInitMusic bool
 }
 
 func NewPhaseTitleScene(ctx *app.AppContext) *PhaseTitleScene {
@@ -46,19 +44,7 @@ func (s *PhaseTitleScene) OnStart() {
 		log.Printf("PhaseTitleScene: failed to get current phase: %v", err)
 	}
 	s.title = phase.Title
-
-	if am := s.AppContext().AudioManager; am != nil {
-		am.FadeOutAll(500 * time.Millisecond)
-	}
-
-	s.Schedule(550*time.Millisecond, func() {
-		s.showTitle = true
-		if am := s.AppContext().AudioManager; am != nil && !s.musicStarted {
-			am.SetVolume(1.0)
-			am.PlayMusic(titleMusic)
-			s.musicStarted = true
-		}
-	})
+	s.shouldInitMusic = true
 }
 
 func (s *PhaseTitleScene) Draw(screen *ebiten.Image) {
@@ -76,8 +62,24 @@ func (s *PhaseTitleScene) Update() error {
 	if err := s.BaseScene.Update(); err != nil {
 		return err
 	}
+
+	ctx := s.AppContext()
+
+	if s.shouldInitMusic {
+		if am := ctx.AudioManager; am != nil {
+			am.FadeOutAll(time.Second)
+			s.shouldInitMusic = false
+
+			s.Schedule(4*time.Second, func() {
+				s.showTitle = true
+				am.SetVolume(1.0)
+				am.PlayMusic(TitleSound)
+			})
+		}
+	}
+
 	if s.showTitle && inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
+		ctx.CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
 	}
 	return nil
 }

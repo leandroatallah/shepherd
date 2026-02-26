@@ -25,6 +25,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
+	"github.com/leandroatallah/firefly/internal/engine/utils"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
@@ -52,9 +53,9 @@ type PhasesScene struct {
 	hasPlayer       bool
 	goal            phases.Goal
 
-	// Reboot
-	isRebooting bool
-	rebootDelay int
+	// Navigation triggers
+	rebootTrigger     utils.DelayTrigger
+	completionTrigger utils.DelayTrigger
 
 	// UI effects
 	ShowDrawScreenFlash int
@@ -203,8 +204,7 @@ func (s *PhasesScene) freezeAllActors() {
 }
 
 func (s *PhasesScene) defaultCompletion() {
-	s.isConcludingPhase = true
-	s.phaseCompletedDelay = timing.FromDuration(time.Second)
+	s.completionTrigger.Enable(timing.FromDuration(time.Second))
 }
 
 func (s *PhasesScene) Update() error {
@@ -230,24 +230,36 @@ func (s *PhasesScene) Update() error {
 		}
 	}
 
+	// Update navigation triggers
+	s.rebootTrigger.Update()
+	s.completionTrigger.Update()
+
+	// Check goal completion
+	if s.goal != nil && s.goal.IsCompleted() && !s.completionTrigger.IsEnabled() {
+		s.goal.OnCompletion()
+	}
+
 	if config.Get().CamDebug {
 		s.Camera().CamDebug()
 	}
 
-	if s.checkReboot() {
+	if s.rebootTrigger.Trigger() {
+		s.AppContext().SceneManager.NavigateTo(
+			scenestypes.ScenePhaseReboot,
+			transition.NewFader(0, 0),
+			true,
+		)
 		return nil
 	}
 
-	if s.checkPhaseCompleted() {
-		s.completePhase()
+	if s.completionTrigger.Trigger() {
+		s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
 	}
 
 	// This calls TilemapScene.Update -> BaseScene.Update (handling Schedule)
 	if err := s.TilemapScene.Update(); err != nil {
 		return err
 	}
-
-	s.playBackgroundMusic()
 
 	s.count++
 
@@ -369,20 +381,6 @@ func (s *PhasesScene) endpointTrigger(eventID string) {
 		sheepCarrier.DropSheep()
 		s.bodyCounter.sheepRescued++
 	}
-}
-
-func (s *PhasesScene) playBackgroundMusic() {
-	if s.AppContext().Config.NoSound {
-		return
-	}
-
-	if s.count == 60 {
-		if am := s.AppContext().AudioManager; !am.IsPlaying(bgSound) {
-			am.PlayMusic(bgSound)
-			am.SetVolume(1)
-		}
-	}
-
 }
 
 func (s *PhasesScene) initTilemap() {

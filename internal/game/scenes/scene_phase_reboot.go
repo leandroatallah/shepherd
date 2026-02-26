@@ -9,14 +9,15 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
+	"github.com/leandroatallah/firefly/internal/engine/utils"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 )
 
 type PhaseRebootScene struct {
 	scene.BaseScene
 
-	count      int
-	redirected bool
+	count             int
+	navigationTrigger utils.DelayTrigger
 }
 
 func NewPhaseRebootScene(context *app.AppContext) *PhaseRebootScene {
@@ -31,19 +32,19 @@ func (s *PhaseRebootScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{A: 255})
 }
 
+func (s *PhaseRebootScene) OnStart() {
+	s.navigationTrigger.Enable(timing.FromDuration(167 * time.Millisecond))
+}
+
 func (s *PhaseRebootScene) Update() error {
-	navigateBackDelay := timing.FromDuration(167 * time.Millisecond) // 10 frames
-
 	s.count++
+	s.navigationTrigger.Update()
 
-	if s.count > navigateBackDelay && !s.redirected {
+	if s.navigationTrigger.Trigger() {
 		s.AppContext().SceneManager.NavigateBack(transition.NewFader(0, config.Get().FadeVisibleDuration))
-		s.redirected = true
 	}
 
 	return nil
 }
-
-func (s *PhaseRebootScene) OnStart() {}
 
 func (s *PhaseRebootScene) OnFinish() {}

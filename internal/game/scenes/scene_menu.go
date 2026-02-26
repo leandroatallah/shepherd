@@ -3,6 +3,7 @@ package gamescene
 import (
 	"image/color"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -11,18 +12,21 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
+	"github.com/leandroatallah/firefly/internal/engine/utils"
+	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
-)
-
-const (
-	kickBackBG = "assets/audio/kick_backOGG.ogg"
 )
 
 type MenuScene struct {
 	scene.BaseScene
 
-	isNavigating bool
-	fontText     *font.FontText
+	fontText *font.FontText
+
+	count              int
+	isNavigating       bool
+	navigationTrigger  utils.DelayTrigger
+	shouldFadeOutSound bool
+	isFadingOutSound   bool
 }
 
 func NewMenuScene(context *app.AppContext) *MenuScene {
@@ -37,17 +41,35 @@ func NewMenuScene(context *app.AppContext) *MenuScene {
 }
 
 func (s *MenuScene) OnStart() {
-	// Init audio
 	am := s.AppContext().SceneManager.AudioManager()
 	am.SetVolume(1)
-	// s.audio.PlayMusic(kickBackBG)
+	am.PlayMusic(TitleSound)
 }
 
 func (s *MenuScene) Update() error {
-	if !s.isNavigating && ebiten.IsKeyPressed(ebiten.KeyEnter) {
+	canSkipDelay := s.count > timing.FromDuration(time.Second)
+	if canSkipDelay && !s.isNavigating && ebiten.IsKeyPressed(ebiten.KeyEnter) {
 		s.isNavigating = true
-		s.AppContext().SceneManager.NavigateTo(scenestypes.SceneStory, transition.NewFader(0, config.Get().FadeVisibleDuration), true)
+		s.navigationTrigger.Enable(timing.FromDuration(time.Second))
 	}
+
+	s.navigationTrigger.Update()
+	if s.navigationTrigger.Trigger() {
+		s.AppContext().SceneManager.NavigateTo(
+			scenestypes.SceneStory, transition.NewFader(0, config.Get().FadeVisibleDuration), true,
+		)
+	}
+
+	if s.isNavigating && s.shouldFadeOutSound && !s.isFadingOutSound {
+		s.AppContext().AudioManager.FadeOutAll(time.Second)
+		s.isFadingOutSound = true
+	}
+
+	if s.isNavigating {
+		s.shouldFadeOutSound = true
+	}
+
+	s.count++
 
 	return nil
 }
@@ -70,6 +92,4 @@ func (s *MenuScene) Draw(screen *ebiten.Image) {
 	s.fontText.Draw(screen, "Press Enter to start", 8, textOp)
 }
 
-func (s *MenuScene) OnFinish() {
-	s.AppContext().AudioManager.PauseMusic(kickBackBG)
-}
+func (s *MenuScene) OnFinish() {}

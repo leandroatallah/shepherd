@@ -3,6 +3,7 @@ package gamescene
 import (
 	"image/color"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
@@ -11,6 +12,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
+	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
@@ -41,6 +43,7 @@ type IntroScene struct {
 	duration       int
 	introAnimation introAnimation
 	fadeOverlay    *ebiten.Image
+	isNavigating   bool
 }
 
 func NewIntroScene(context *app.AppContext) *IntroScene {
@@ -58,7 +61,7 @@ func NewIntroScene(context *app.AppContext) *IntroScene {
 func (s *IntroScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{A: 255})
 
-	screenutil.DrawCenteredText(screen, s.fontText, "Presented by", 8, color.White)
+	screenutil.DrawCenteredText(screen, s.fontText, "@leandroatallah", 8, color.White)
 
 	op := &ebiten.DrawImageOptions{}
 	op.ColorScale.Scale(1, 1, 1, float32(s.fadeAlpha)/255.0)
@@ -67,7 +70,8 @@ func (s *IntroScene) Draw(screen *ebiten.Image) {
 
 func (s *IntroScene) Update() error {
 	// Force skip
-	if s.introAnimation != over && ebiten.IsKeyPressed(ebiten.KeyEnter) {
+	canSkipDelay := s.count > timing.FromDuration(2*time.Second)
+	if canSkipDelay && s.introAnimation != over && ebiten.IsKeyPressed(ebiten.KeyEnter) {
 		s.NextScene()
 	}
 
@@ -107,6 +111,11 @@ func (s *IntroScene) Update() error {
 }
 
 func (s *IntroScene) NextScene() {
+	if s.isNavigating {
+		return
+	}
+
+	s.isNavigating = true
 	s.AppContext().SceneManager.NavigateTo(scenestypes.SceneMenu, transition.NewFader(0, 0), true)
 	s.introAnimation = navigationStarted
 }
