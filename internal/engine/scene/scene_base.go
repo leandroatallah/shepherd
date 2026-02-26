@@ -93,6 +93,11 @@ func (s *BaseScene) PauseAllMusic() {
 // If rewind=false and music is already playing, does nothing.
 // If rewind=true, restarts music from the beginning.
 func (s *BaseScene) PlayMusic(path string, rewind bool) {
+	s.PlayMusicWithLoop(path, false, rewind)
+}
+
+// PlayMusicWithLoop plays music with loop and rewind control.
+func (s *BaseScene) PlayMusicWithLoop(path string, loop bool, rewind bool) {
 	if path == "" {
 		return
 	}
@@ -106,5 +111,5 @@ func (s *BaseScene) PlayMusic(path string, rewind bool) {
 		return
 	}
 
-	ctx.AudioManager.PlayMusic(path)
+	ctx.AudioManager.PlayMusic(path, loop)
 }

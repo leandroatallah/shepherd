@@ -97,9 +97,10 @@ func (s *TilemapScene) Audiomanager() *audio.AudioManager {
 func (s *TilemapScene) SetPlayerStartPosition(p actors.ActorEntity) {
 	// Set player initial position from tilemap
 	if x, y, found := s.tilemap.GetPlayerStartPosition(); found {
-		// Adjust Y so actor's base aligns with obstacle top
-		y -= p.Position().Dy() - s.tilemap.Tileheight
-		p.SetPosition(x, y)
+		// PlayerStart is a point object, so y is the ground level
+		// Position player so their bottom aligns with y
+		actorHeight := p.Position().Dy()
+		p.SetPosition(x, y-actorHeight)
 	}
 }
 
