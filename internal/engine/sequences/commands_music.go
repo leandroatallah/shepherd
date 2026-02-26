@@ -12,6 +12,7 @@ type PlayMusicCommand struct {
 	Path   string  `json:"path"`
 	Rewind bool    `json:"rewind"`
 	Volume float64 `json:"volume"`
+	Loop   bool    `json:"loop"`
 }
 
 func (c *PlayMusicCommand) Init(appContext any) {
@@ -25,7 +26,7 @@ func (c *PlayMusicCommand) Init(appContext any) {
 	if c.Volume > 0 {
 		am.SetVolume(c.Volume)
 	}
-	am.PlayMusic(c.Path)
+	am.PlayMusic(c.Path, c.Loop)
 }
 
 func (c *PlayMusicCommand) Update() bool {
