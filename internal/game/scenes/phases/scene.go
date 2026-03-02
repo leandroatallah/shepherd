@@ -18,7 +18,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	"github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
 	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/pause"
@@ -64,7 +63,6 @@ type PhasesScene struct {
 	// sequencePlayer *sequences.SequencePlayer
 	sequencePlayer sequencestypes.Player
 	pauseScreen    *pause.PauseScreen
-	vfxManager     *vfx.Manager
 }
 
 func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
@@ -88,7 +86,6 @@ func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
 func (s *PhasesScene) OnStart() {
 	s.TilemapScene.OnStart()
 	s.count = 0
-	s.vfxManager = vfx.NewManager("assets/particles/vfx.json")
 
 	ctx := s.AppContext()
 
@@ -219,8 +216,8 @@ func (s *PhasesScene) Update() error {
 		s.sequencePlayer.Update()
 	}
 
-	if s.vfxManager != nil {
-		s.vfxManager.Update()
+	if s.AppContext().VFX != nil {
+		s.AppContext().VFX.Update()
 	}
 
 	if s.screenFlipper != nil {
@@ -335,8 +332,8 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 		s.ShowDrawScreenFlash--
 	}
 
-	if s.vfxManager != nil {
-		s.vfxManager.Draw(screen, s.Camera())
+	if s.AppContext().VFX != nil {
+		s.AppContext().VFX.Draw(screen, s.Camera())
 	}
 
 	if s.pauseScreen.IsPaused() {

@@ -11,6 +11,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/event"
 	"github.com/leandroatallah/firefly/internal/engine/physics/space"
+	"github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
@@ -51,6 +52,10 @@ func Setup(assets fs.FS) error {
 	// Load audio assets
 	audio.LoadAudioAssetsFromFS(assets, audioManager)
 
+	// Load VFX Manager (particles + floating text)
+	vfxManager := vfx.NewManager("assets/particles/vfx.json")
+	vfxManager.SetDefaultFont(fontMain)
+
 	// Load phases
 	for _, p := range GetPhases() {
 		phaseManager.AddPhase(p)
@@ -69,6 +74,8 @@ func Setup(assets fs.FS) error {
 		Assets:          assets,
 		Config:          config.Get(),
 		Space:           space.NewSpace(),
+		VFX:             vfxManager,
+		Font:            fontMain,
 	}
 
 	sceneFactory := scene.NewDefaultSceneFactory(gamescene.InitSceneMap(appContext))

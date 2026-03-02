@@ -13,21 +13,21 @@ func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
 		scene.Reboot()
 	})
 	ctx.EventManager.Subscribe(actorevents.ActorJumpedType, func(e event.Event) {
-		if scene.vfxManager == nil {
+		if ctx.VFX == nil {
 			return
 		}
 		if evt, ok := e.(*actorevents.ActorJumpedEvent); ok {
 			yOffset := 1.0
-			scene.vfxManager.SpawnJumpPuff(evt.X, evt.Y+yOffset, 1)
+			ctx.VFX.SpawnJumpPuff(evt.X, evt.Y+yOffset, 1)
 		}
 	})
 	ctx.EventManager.Subscribe(actorevents.ActorLandedType, func(e event.Event) {
-		if scene.vfxManager == nil {
+		if ctx.VFX == nil {
 			return
 		}
 		if evt, ok := e.(*actorevents.ActorLandedEvent); ok {
 			yOffset := 1.0
-			scene.vfxManager.SpawnLandingPuff(evt.X, evt.Y+yOffset, 1)
+			ctx.VFX.SpawnLandingPuff(evt.X, evt.Y+yOffset, 1)
 		}
 	})
 }
