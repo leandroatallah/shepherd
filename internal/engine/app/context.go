@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"log"
 
+	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/assets/imagemanager"
 	"github.com/leandroatallah/firefly/internal/engine/audio"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -12,6 +13,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/data/datamanager"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/event"
+	"github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
 	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
@@ -32,6 +34,8 @@ type AppContext struct {
 	Assets          fs.FS
 	Config          *config.AppConfig
 	Space           body.BodiesSpace
+	VFX             *vfx.Manager
+	Font            *font.FontText
 
 	// Global frame counter
 	FrameCount uint64

@@ -9,9 +9,12 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/render/particles"
+	"github.com/leandroatallah/firefly/internal/engine/render/vfx/text"
 )
 
 type VFXConfig struct {
@@ -19,10 +22,11 @@ type VFXConfig struct {
 	schemas.ParticleData
 }
 
-// Manager handles all visual effects for the game.
+// Manager handles all visual effects for the game (particles + floating text).
 type Manager struct {
-	system  *particles.System
-	configs map[string]*particles.Config
+	system      *particles.System
+	configs     map[string]*particles.Config
+	textManager *text.Manager
 }
 
 func NewManager(path string) *Manager {
@@ -64,9 +68,15 @@ func NewManager(path string) *Manager {
 	}
 
 	return &Manager{
-		system:  particles.NewSystem(),
-		configs: configs,
+		system:      particles.NewSystem(),
+		configs:     configs,
+		textManager: text.NewManager(),
 	}
+}
+
+// SetDefaultFont sets the default font for floating text effects.
+func (m *Manager) SetDefaultFont(f *font.FontText) {
+	m.textManager.SetDefaultFont(f)
 }
 
 // SpawnPuff creates a puff of particles of the specified type at the given location.
@@ -104,10 +114,26 @@ func (m *Manager) SpawnLandingPuff(x, y float64, count int) {
 	m.SpawnPuff("landing", x, y, count, 0.1)
 }
 
+// SpawnFloatingText spawns floating text at the specified location.
+func (m *Manager) SpawnFloatingText(msg string, x, y float64, duration int) {
+	ft := text.NewFloatingText(msg, x, y, duration)
+	m.textManager.Add(ft)
+}
+
+// SpawnFloatingTextAbove spawns floating text above an actor.
+func (m *Manager) SpawnFloatingTextAbove(actor actors.ActorEntity, msg string, duration int) {
+	pos := actor.Position()
+	x := float64(pos.Min.X + pos.Dx()/2) // Center horizontally
+	y := float64(pos.Min.Y)              // Top of actor
+	m.SpawnFloatingText(msg, x, y, duration)
+}
+
 func (m *Manager) Update() {
 	m.system.Update()
+	m.textManager.Update()
 }
 
 func (m *Manager) Draw(screen *ebiten.Image, cam *camera.Controller) {
 	m.system.Draw(screen, cam)
+	m.textManager.Draw(screen, cam)
 }

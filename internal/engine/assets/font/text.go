@@ -24,13 +24,18 @@ func NewFontText(path string) (*FontText, error) {
 	return &FontText{source: src}, nil
 }
 
+// NewFace creates a new text face with the given size.
+func (t *FontText) NewFace(size float64) *text.GoTextFace {
+	return &text.GoTextFace{
+		Source: t.source,
+		Size:   size,
+	}
+}
+
 func (t *FontText) Draw(screen *ebiten.Image, msg string, size float64, op *text.DrawOptions) {
 	if t.source == nil {
 		return
 	}
 
-	text.Draw(screen, msg, &text.GoTextFace{
-		Source: t.source,
-		Size:   size,
-	}, op)
+	text.Draw(screen, msg, t.NewFace(size), op)
 }

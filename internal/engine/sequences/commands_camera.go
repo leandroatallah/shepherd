@@ -10,9 +10,9 @@ import (
 // CameraZoomCommand sets the camera zoom level and always rewinds back
 type CameraZoomCommand struct {
 	Zoom        float64
-	Duration    int // Duration of zoom in frames (0 for instant)
-	Delay       int // Frames to wait at peak zoom before rewinding
-	OutDuration int // Duration of zoom out in frames (0 to use same as Duration)
+	Duration    int    // Duration of zoom in frames (0 for instant)
+	Delay       int    // Frames to wait at peak zoom before rewinding
+	OutDuration int    // Duration of zoom out in frames (0 to use same as Duration)
 	TargetID    string // Optional: body/actor ID to center camera on
 	currentZoom float64
 	targetZoom  float64
@@ -31,38 +31,38 @@ func (c *CameraZoomCommand) Init(appContext any) {
 
 	// Try to get camera from TilemapScene or scenes that embed it
 	var cam *camera.Controller
-	
+
 	if tilemapScene, ok := currentScene.(*scene.TilemapScene); ok {
 		cam = tilemapScene.Camera()
 	} else if phasesScene, ok := currentScene.(interface{ Camera() *camera.Controller }); ok {
 		// For scenes that embed TilemapScene like PhasesScene
 		cam = phasesScene.Camera()
 	}
-	
+
 	c.camera = cam
 	if c.camera != nil {
 		c.currentZoom = c.camera.Kamera().ZoomFactor
-		
+
 		// Store original position BEFORE any movement
 		c.startX, c.startY = c.camera.Kamera().Center()
-		
+
 		c.targetZoom = c.Zoom
 		if c.targetZoom <= 0 {
 			c.targetZoom = 1.0 // Default zoom
 		}
 		c.timer = 0
 		c.phase = 0 // Start with zoom in phase
-		
+
 		// Disable camera following during this command
 		c.camera.SetFollowing(false)
-		
+
 		// Set zoom out duration (use same as Duration if not specified)
 		if c.OutDuration <= 0 {
 			c.rewindDur = c.Duration
 		} else {
 			c.rewindDur = c.OutDuration
 		}
-		
+
 		// Find target actor if specified
 		if c.TargetID != "" {
 			if actor, found := ctx.ActorManager.Find(c.TargetID); found {
@@ -127,6 +127,7 @@ func (c *CameraZoomCommand) Update() bool {
 			// Instant zoom out
 			c.camera.Kamera().ZoomFactor = c.currentZoom
 			c.camera.SetCenter(c.startX, c.startY)
+			c.camera.SetFollowing(true) // Re-enable following
 			return true
 		}
 		c.timer++
@@ -134,6 +135,7 @@ func (c *CameraZoomCommand) Update() bool {
 		if progress >= 1.0 {
 			c.camera.Kamera().ZoomFactor = c.currentZoom
 			c.camera.SetCenter(c.startX, c.startY)
+			c.camera.SetFollowing(true) // Re-enable following
 			return true
 		}
 		// Zoom back out and move to original position (reverse interpolation)
@@ -166,14 +168,14 @@ func (c *CameraMoveCommand) Init(appContext any) {
 
 	// Try to get camera from TilemapScene or scenes that embed it
 	var cam *camera.Controller
-	
+
 	if tilemapScene, ok := currentScene.(*scene.TilemapScene); ok {
 		cam = tilemapScene.Camera()
 	} else if phasesScene, ok := currentScene.(interface{ Camera() *camera.Controller }); ok {
 		// For scenes that embed TilemapScene like PhasesScene
 		cam = phasesScene.Camera()
 	}
-	
+
 	c.camera = cam
 	if c.camera != nil {
 		// Store current position for interpolation
@@ -224,14 +226,14 @@ func (c *CameraResetCommand) Init(appContext any) {
 
 	// Try to get camera from TilemapScene or scenes that embed it
 	var cam *camera.Controller
-	
+
 	if tilemapScene, ok := currentScene.(*scene.TilemapScene); ok {
 		cam = tilemapScene.Camera()
 	} else if phasesScene, ok := currentScene.(interface{ Camera() *camera.Controller }); ok {
 		// For scenes that embed TilemapScene like PhasesScene
 		cam = phasesScene.Camera()
 	}
-	
+
 	c.camera = cam
 	if c.camera != nil {
 		c.startZoom = c.camera.Kamera().ZoomFactor

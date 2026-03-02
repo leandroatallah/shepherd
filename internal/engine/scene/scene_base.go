@@ -113,3 +113,8 @@ func (s *BaseScene) PlayMusicWithLoop(path string, loop bool, rewind bool) {
 
 	ctx.AudioManager.PlayMusic(path, loop)
 }
+
+// VFXManager returns the VFX manager. Override in subclasses.
+func (s *BaseScene) VFXManager() interface{} {
+	return nil
+}

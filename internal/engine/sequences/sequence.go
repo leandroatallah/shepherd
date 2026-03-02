@@ -66,6 +66,10 @@ type CommandData struct {
 	// Fields for "play_music"
 	MusicRewind bool    `json:"rewind,omitempty"`
 	Volume      float64 `json:"volume,omitempty"`
+
+	// Fields for "spawn_text"
+	Text     string `json:"text,omitempty"`
+	TextType string `json:"type,omitempty"` // For spawn_text: "overhead" or "screen"
 }
 
 // SequenceData is a wrapper used for parsing a full sequence from JSON.
@@ -138,6 +142,15 @@ func (cd *CommandData) ToCommand() sequences.Command {
 	case "fadeout_all_music":
 		return &FadeOutAllMusicCommand{
 			Duration: cd.Duration,
+		}
+	case "spawn_text":
+		return &SpawnTextCommand{
+			TargetID: cd.TargetID,
+			Text:     cd.Text,
+			Duration: cd.Duration,
+			Type:     cd.TextType,
+			X:        cd.X,
+			Y:        cd.Y,
 		}
 	}
 	return nil
