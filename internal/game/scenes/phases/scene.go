@@ -205,7 +205,7 @@ func (s *PhasesScene) defaultCompletion() {
 }
 
 func (s *PhasesScene) Update() error {
-	if s.pauseScreen != nil && s.allowPause {
+	if s.pauseScreen != nil && s.canPause() {
 		s.pauseScreen.Update()
 		if s.pauseScreen.IsPaused() {
 			return nil
@@ -398,8 +398,12 @@ func (s *PhasesScene) initTilemap() {
 	}
 }
 
+func (s *PhasesScene) canPause() bool {
+	return s.allowPause && !s.sequencePlayer.IsPlaying()
+}
+
 func (s *PhasesScene) drawPause(screen *ebiten.Image) {
-	if !s.allowPause || s.pauseScreen == nil || !s.pauseScreen.IsPaused() {
+	if !s.canPause() || s.pauseScreen == nil || !s.pauseScreen.IsPaused() {
 		return
 	}
 
