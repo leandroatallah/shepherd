@@ -84,6 +84,7 @@ type CommandData struct {
 	// Fields for "play_music"
 	MusicRewind bool    `json:"rewind,omitempty"`
 	Volume      float64 `json:"volume,omitempty"`
+	Loop        bool    `json:"loop,omitempty"`
 
 	// Fields for "spawn_text"
 	Text     string `json:"text,omitempty"`
@@ -156,6 +157,7 @@ func (cd *CommandData) ToCommand() sequences.Command {
 			Path:   cd.Path,
 			Rewind: cd.MusicRewind,
 			Volume: cd.Volume,
+			Loop:   cd.Loop,
 		}
 	case "pause_all_music":
 		return &PauseAllMusicCommand{}
