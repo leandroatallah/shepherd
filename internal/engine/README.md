@@ -1,6 +1,6 @@
 # Engine Module
 
-This module contains the core, reusable game engine components for the Firefly project. It is designed to be game-agnostic and provides the fundamental building blocks for creating a 2D game.
+This module contains the core, reusable game engine components for the Shepherd project. It is designed to be game-agnostic and provides the fundamental building blocks for creating a 2D game.
 
 ## Core Components
 
@@ -8,10 +8,15 @@ This module contains the core, reusable game engine components for the Firefly p
 - `contracts/`: Defines the Go interfaces (contracts) for key engine components like animations, bodies, configuration, context, navigation, sequences, and tilemap layers. This promotes a decoupled architecture.
 - `data/`: Handles data loading, management, and configuration schemas (e.g., from JSON files).
   - `config/`: Engine-specific configuration structures.
+  - `datamanager/`: Centralized manager for loading and accessing game data.
+  - `jsonutil/`: Helpers for JSON parsing and schema validation.
+  - `schemas/`: Definitions for data structures used in asset files.
 - `event/`: Provides a basic event handling system for inter-component communication.
 - `input/`: Manages user input from keyboard, mouse, or gamepads.
 - `sequences/`: Manages scripted event sequences, commands, and cutscenes.
-- `utils/`: Contains various utility functions (e.g., for fixed-point arithmetic `fp16/`, timing `timing/`).
+  - `player.go`: Executes sequences of commands.
+  - `commands/`: Scriptable actions for actors, camera, music, and visual effects.
+- `utils/`: Contains various utility functions (e.g., fixed-point arithmetic `fp16/`, timing `timing/`, and `delay_trigger.go`).
 
 ## Game Object Management
 
@@ -41,12 +46,14 @@ This module contains the core, reusable game engine components for the Firefly p
   - `imagemanager/`: Manages loading and caching of images.
   - `font/`: Handles font loading and text rendering.
 - `audio/`: Provides the core audio playback functionality.
+  - `loader.go`: Facilitates the loading of audio files into the engine.
 - `render/`: Responsible for all rendering tasks.
   - `camera/`: Controls the game camera's position and zoom.
-  - `particles/`: Manages particle effects.
-  - `sprites/`: Handles sprite rendering.
-  - `tilemap/`: Renders tilemaps.
-  - `screenutil/`: Utility functions for screen rendering.
+  - `particles/`: Manages particle systems.
+  - `sprites/`: Handles sprite rendering and layering.
+  - `tilemap/`: Renders tilemaps and handles tile-based collisions.
+  - `vfx/`: Provides visual effects, including a text subsystem for floating text.
+  - `screenutil/`: Utility functions for screen coordinates, rendering, and screen-wide effects like flashes.
 - `ui/`: Provides building blocks for user interface elements.
   - `hud/`: Base components for Heads-Up Displays.
   - `speech/`: Components for speech bubbles and dialogue systems.

@@ -1,4 +1,4 @@
-# Firefly
+# Shepherd
 
 A 2D game built with Ebitengine, featuring a modular architecture.
 
@@ -20,8 +20,9 @@ This separation allows the engine to be developed independently from the game's 
 │   ├── fonts/           # Font files
 │   ├── images/          # Image files
 │   ├── particles/       # Particle effect configurations
-│   └── tilemap/         # Tilemap related assets
-├── main.go            # Application entry point
+│   ├── sequences/       # Scripted sequences (JSON)
+│   └── tilemap/         # Tilemap related assets (TMJ, TSX, PNG)
+├── main.go              # Application entry point
 ├── internal/
 │   ├── engine/          # Core game engine components
 │   │   ├── app/         # Main engine loop, context, and initialization
@@ -36,24 +37,21 @@ This separation allows the engine to be developed independently from the game's 
 │   │   ├── event/       # Event handling system
 │   │   ├── input/       # User input handling
 │   │   ├── physics/     # Physics simulation (body, movement, skill, space)
-│   │   ├── render/      # Rendering tasks (camera, particles, screenutil, sprites, tilemap)
+│   │   ├── render/      # Rendering tasks (camera, particles, screenutil, sprites, tilemap, vfx)
 │   │   │   └── camera/  # Camera control and rendering
 │   │   ├── scene/       # Game scene management and transitions
 │   │   ├── sequences/   # Game sequences and command processing
 │   │   ├── ui/          # Building blocks for user interface elements (hud, speech)
-│   │   └── utils/       # Utility functions
+│   │   └── utils/       # Utility functions (fixed-point arithmetic, timing, triggers)
 │   └── game/            # Game-specific implementation
 │       ├── app/         # Game-specific setup and initialization (config, phases list, setup)
 │       ├── entity/      # Concrete game entities (actors, items, obstacles, types)
 │       │   ├── actors/  # Game-specific characters and enemies
 │       │   ├── items/   # Game-specific items
 │       │   └── obstacles/ # Game-specific obstacles
-│       ├── events/      # Game-specific events
-│       ├── render/      # Game-specific rendering logic
-│       │   └── camera/  # Game-specific camera settings
-│       ├── scenes/      # Game scenes and phases (intro, menu, phases, story, summary, types)
-│       ├── ui/          # Game's specific user interface (hud, speech)
-│       └── README.md
+│       ├── render/      # Game-specific rendering logic (vfx)
+│       ├── scenes/      # Game scenes and phases (intro, menu, phases, story, summary, types, title)
+│       └── ui/          # Game's specific user interface (hud, speech)
 ├── go.mod               # Go module definition
 └── README.md
 ```
