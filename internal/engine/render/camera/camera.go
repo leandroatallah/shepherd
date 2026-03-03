@@ -101,7 +101,10 @@ func (c *Controller) SetPositionTopLeft(x, y float64) {
 func (c *Controller) SetFollowTarget(b body.Body) {
 	c.followTarget = b
 	x, y := b.GetPositionMin()
-	c.Kamera().SetCenter(float64(x), float64(y))
+	w, h := b.GetShape().Width(), b.GetShape().Height()
+	targetX := float64(x) + float64(w)/2
+	targetY := float64(y) + float64(h)/2
+	c.Kamera().SetCenter(targetX, targetY)
 }
 
 func (c *Controller) Update() {

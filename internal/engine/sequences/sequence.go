@@ -123,6 +123,10 @@ func (cd *CommandData) ToCommand() sequences.Command {
 			TargetID:       cd.TargetID,
 			StayOnPlatform: cd.StayOnPlatform,
 		}
+	case "stop_following":
+		return &StopFollowingCommand{
+			TargetID: cd.TargetID,
+		}
 	case "event":
 		return &EventCommand{
 			EventType: cd.EventType,
@@ -147,6 +151,11 @@ func (cd *CommandData) ToCommand() sequences.Command {
 		return &CameraResetCommand{
 			DefaultZoom: cd.DefaultZoom,
 			Duration:    cd.Duration,
+		}
+	case "camera_set_target":
+		return &CameraSetTargetCommand{
+			TargetID: cd.TargetID,
+			Duration: cd.Duration,
 		}
 	case "call_sequence":
 		return &CallSequenceCommand{

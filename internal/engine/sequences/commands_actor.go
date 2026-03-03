@@ -175,3 +175,20 @@ func (c *FollowPlayerCommand) Init(appContext any) {
 }
 
 func (c *FollowPlayerCommand) Update() bool { return true }
+
+type StopFollowingCommand struct {
+	TargetID       string
+	StayOnPlatform bool
+}
+
+func (c *StopFollowingCommand) Init(appContext any) {
+	ctx := appContext.(*app.AppContext)
+	for _, a := range resolveActorTargets(ctx, c.TargetID) {
+		ch := a.GetCharacter()
+		if ch != nil {
+			a.SetMovementState(movement.Idle, nil)
+		}
+	}
+}
+
+func (c *StopFollowingCommand) Update() bool { return true }

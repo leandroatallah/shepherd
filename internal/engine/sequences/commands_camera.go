@@ -2,6 +2,7 @@ package sequences
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
@@ -270,5 +271,90 @@ func (c *CameraResetCommand) Update() bool {
 	// Smooth transition
 	currentZoom := c.startZoom + (c.DefaultZoom-c.startZoom)*progress
 	c.camera.Kamera().ZoomFactor = currentZoom
+	return false
+}
+
+// CameraSetTargetCommand sets the camera target and can transition smoothly
+type CameraSetTargetCommand struct {
+	camera   *camera.Controller
+	TargetID string
+	Duration int // Duration in frames (0 for instant)
+
+	target body.Body
+	startX float64
+	startY float64
+	timer  int
+}
+
+func (c *CameraSetTargetCommand) Init(appContext any) {
+	ctx := appContext.(*app.AppContext)
+	currentScene := ctx.SceneManager.CurrentScene()
+
+	// Try to get camera from TilemapScene or scenes that embed it
+	var cam *camera.Controller
+
+	if tilemapScene, ok := currentScene.(*scene.TilemapScene); ok {
+		cam = tilemapScene.Camera()
+	} else if phasesScene, ok := currentScene.(interface{ Camera() *camera.Controller }); ok {
+		// For scenes that embed TilemapScene like PhasesScene
+		cam = phasesScene.Camera()
+	}
+
+	c.camera = cam
+	if c.camera == nil {
+		return
+	}
+
+	collidable := ctx.Space.Find(c.TargetID)
+	if collidable == nil {
+		return
+	}
+	c.target = collidable
+
+	if c.Duration <= 0 {
+		// Instant transition
+		c.camera.SetFollowTarget(c.target)
+		c.camera.SetFollowing(true)
+		return
+	}
+
+	// Prepare smooth transition
+	c.startX, c.startY = c.camera.Kamera().Center()
+	c.camera.SetFollowing(false)
+	c.timer = 0
+}
+
+func (c *CameraSetTargetCommand) Update() bool {
+	if c.camera == nil || c.target == nil {
+		return true
+	}
+
+	if c.Duration <= 0 {
+		return true
+	}
+
+	c.timer++
+	progress := float64(c.timer) / float64(c.Duration)
+
+	// Ease-out quadratic interpolation: progress * (2 - progress)
+	easedProgress := progress * (2 - progress)
+
+	// Current target position (it might be moving!)
+	x, y := c.target.GetPositionMin()
+	w, h := c.target.GetShape().Width(), c.target.GetShape().Height()
+	targetX := float64(x) + float64(w)/2
+	targetY := float64(y) + float64(h)/2
+
+	if progress >= 1.0 {
+		c.camera.SetFollowTarget(c.target)
+		c.camera.SetFollowing(true)
+		return true
+	}
+
+	// Interpolate
+	currentX := c.startX + (targetX-c.startX)*easedProgress
+	currentY := c.startY + (targetY-c.startY)*easedProgress
+	c.camera.SetCenter(currentX, currentY)
+
 	return false
 }
