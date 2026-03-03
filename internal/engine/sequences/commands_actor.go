@@ -192,3 +192,18 @@ func (c *StopFollowingCommand) Init(appContext any) {
 }
 
 func (c *StopFollowingCommand) Update() bool { return true }
+
+// RemoveActorCommand removes an actor from the actor manager and the physics space.
+type RemoveActorCommand struct {
+	TargetID string
+}
+
+func (c *RemoveActorCommand) Init(appContext any) {
+	ctx := appContext.(*app.AppContext)
+	for _, a := range resolveActorTargets(ctx, c.TargetID) {
+		ctx.ActorManager.Unregister(a)
+		ctx.Space.QueueForRemoval(a)
+	}
+}
+
+func (c *RemoveActorCommand) Update() bool { return true }

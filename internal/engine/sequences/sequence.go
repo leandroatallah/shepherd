@@ -127,6 +127,10 @@ func (cd *CommandData) ToCommand() sequences.Command {
 		return &StopFollowingCommand{
 			TargetID: cd.TargetID,
 		}
+	case "remove_actor":
+		return &RemoveActorCommand{
+			TargetID: cd.TargetID,
+		}
 	case "event":
 		return &EventCommand{
 			EventType: cd.EventType,
