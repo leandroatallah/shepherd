@@ -10,11 +10,29 @@ import (
 type Sequence struct {
 	commands            []sequences.Command
 	BlockPlayerMovement bool
+	interruptible       bool
+	oneTime             bool
+	Path                string
 	blockSequenceFlags  []bool
 }
 
 func (s *Sequence) Commands() []sequences.Command {
 	return s.commands
+}
+
+// Interruptible returns whether this sequence can be interrupted by other sequences.
+func (s *Sequence) Interruptible() bool {
+	return s.interruptible
+}
+
+// OneTime returns whether this sequence can only be played once.
+func (s *Sequence) OneTime() bool {
+	return s.oneTime
+}
+
+// GetPath returns the path of this sequence.
+func (s *Sequence) GetPath() string {
+	return s.Path
 }
 
 // CommandData is a wrapper used for parsing commands from JSON.
@@ -76,6 +94,8 @@ type CommandData struct {
 type SequenceData struct {
 	Commands            []CommandData `json:"commands"`
 	BlockPlayerMovement bool          `json:"block_player_movement,omitempty"`
+	Interruptible       *bool         `json:"interruptible,omitempty"`
+	OneTime             *bool         `json:"one_time,omitempty"`
 }
 
 // ToCommand converts the generic CommandData into a specific Command implementation.
@@ -182,9 +202,22 @@ func NewSequenceFromJSON(filePath string) (*Sequence, error) {
 		}
 	}
 
+	// Default values for optional fields
+	interruptible := true
+	if sequenceData.Interruptible != nil {
+		interruptible = *sequenceData.Interruptible
+	}
+	oneTime := false
+	if sequenceData.OneTime != nil {
+		oneTime = *sequenceData.OneTime
+	}
+
 	return &Sequence{
 		commands:            commands,
 		BlockPlayerMovement: sequenceData.BlockPlayerMovement,
+		interruptible:       interruptible,
+		oneTime:             oneTime,
+		Path:                filePath,
 		blockSequenceFlags:  flags,
 	}, nil
 }

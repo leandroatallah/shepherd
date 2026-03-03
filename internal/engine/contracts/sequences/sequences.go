@@ -14,11 +14,15 @@ type Command interface {
 
 type Sequence interface {
 	Commands() []Command
+	Interruptible() bool
+	OneTime() bool
+	GetPath() string
 }
 
 type Player interface {
 	IsPlaying() bool
 	IsOver() bool
 	Play(sequence Sequence)
+	Stop()
 	Update()
 }

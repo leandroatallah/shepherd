@@ -25,11 +25,29 @@ func (c *testCommand) Update() bool {
 }
 
 type testSequence struct {
-	commands []contractseq.Command
+	commands      []contractseq.Command
+	interruptible bool
+	oneTime       bool
+	path          string
 }
 
 func (s *testSequence) Commands() []contractseq.Command {
 	return s.commands
+}
+
+func (s *testSequence) Interruptible() bool {
+	return s.interruptible
+}
+
+func (s *testSequence) OneTime() bool {
+	return s.oneTime
+}
+
+func (s *testSequence) GetPath() string {
+	if s.path != "" {
+		return s.path
+	}
+	return "test_sequence"
 }
 
 func TestSequencePlayerPlaysBlockingCommandsToCompletion(t *testing.T) {
@@ -175,3 +193,131 @@ func TestSequencePlayerBlockedByParentPreventsUnblock(t *testing.T) {
 	}
 	// blockedByParent prevents UnblockMovement from being called
 }
+
+func TestSequencePlayerInterruptibleAndOneTime(t *testing.T) {
+	ctx := &app.AppContext{}
+	player := NewSequencePlayer(ctx)
+
+	// Create interruptible sequence (default)
+	interruptibleSeq := &testSequence{
+		commands:      []contractseq.Command{&testCommand{completeAfter: 5}},
+		interruptible: true,
+		path:          "interruptible.json",
+	}
+
+	// Create non-interruptible sequence
+	nonInterruptibleSeq := &testSequence{
+		commands:      []contractseq.Command{&testCommand{completeAfter: 10}},
+		interruptible: false,
+		path:          "non_interruptible.json",
+	}
+
+	// Test 1: Same sequence requested while playing - should not restart
+	player.Play(interruptibleSeq)
+	if !player.IsPlaying() {
+		t.Fatalf("expected player to be playing")
+	}
+	initialIndex := player.currentCommandIndex
+	player.Play(interruptibleSeq)
+	if player.currentCommandIndex != initialIndex {
+		t.Fatalf("expected same sequence to not restart")
+	}
+
+	// Test 2: Different interruptible sequence should interrupt current
+	anotherSeq := &testSequence{
+		commands:      []contractseq.Command{&testCommand{completeAfter: 2}},
+		interruptible: true,
+		path:          "another.json",
+	}
+	player.Play(anotherSeq)
+	if !player.IsPlaying() {
+		t.Fatalf("expected player to still be playing after interrupt")
+	}
+	// Let it complete
+	for i := 0; i < 10 && player.IsPlaying(); i++ {
+		player.Update()
+	}
+
+	// Test 3: Non-interruptible sequence should block other sequences
+	player.Play(nonInterruptibleSeq)
+	if !player.IsPlaying() {
+		t.Fatalf("expected player to be playing non-interruptible sequence")
+	}
+
+	// Try to interrupt with another sequence - should fail
+	interruptSeq := &testSequence{
+		commands:      []contractseq.Command{&testCommand{completeAfter: 1}},
+		interruptible: true,
+		path:          "interrupt.json",
+	}
+	player.Play(interruptSeq)
+	// Should still be running nonInterruptibleSeq, not interruptSeq
+	if player.currentSequencePath != "non_interruptible.json" {
+		t.Fatalf("expected non-interruptible sequence to continue")
+	}
+
+	// Let non-interruptible complete
+	for i := 0; i < 15 && player.IsPlaying(); i++ {
+		player.Update()
+	}
+	if player.IsPlaying() {
+		t.Fatalf("expected non-interruptible sequence to complete")
+	}
+}
+
+func TestSequencePlayerOneTimeSequence(t *testing.T) {
+	ctx := &app.AppContext{}
+	player := NewSequencePlayer(ctx)
+
+	// Create a one-time sequence
+	oneTimeSeq := &testSequence{
+		commands:      []contractseq.Command{&testCommand{completeAfter: 5}},
+		oneTime:       true,
+		path:          "one_time.json",
+	}
+
+	// Play the sequence first time - should work
+	player.Play(oneTimeSeq)
+	if !player.IsPlaying() {
+		t.Fatalf("expected player to be playing first time")
+	}
+
+	// Try to play again BEFORE completion - should be ignored
+	player.Play(oneTimeSeq)
+	if !player.IsPlaying() {
+		t.Fatalf("expected player to still be playing")
+	}
+	// Verify it didn't restart (command index should not reset)
+	initialIndex := player.currentCommandIndex
+	player.Play(oneTimeSeq)
+	if player.currentCommandIndex != initialIndex {
+		t.Fatalf("expected one-time sequence to not restart during playback")
+	}
+
+	// Let it complete
+	for i := 0; i < 10 && player.IsPlaying(); i++ {
+		player.Update()
+	}
+
+	if player.IsPlaying() {
+		t.Fatalf("expected sequence to complete")
+	}
+
+	// Try to play again after completion - should be ignored because it's one-time
+	player.Play(oneTimeSeq)
+	if player.IsPlaying() {
+		t.Fatalf("expected one-time sequence to be ignored on second play after completion")
+	}
+
+	// Different sequence should still work
+	anotherSeq := &testSequence{
+		commands:      []contractseq.Command{&testCommand{completeAfter: 1}},
+		oneTime:       false,
+		path:          "another.json",
+	}
+	player.Play(anotherSeq)
+	if !player.IsPlaying() {
+		t.Fatalf("expected different sequence to play after one-time completed")
+	}
+}
+

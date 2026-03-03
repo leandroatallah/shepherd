@@ -49,6 +49,10 @@ func (p *testPlayer) Play(s contractseq.Sequence) {
 	p.played = append(p.played, s)
 }
 
+func (p *testPlayer) Stop() {
+	p.playing = false
+}
+
 func (p *testPlayer) Update() {
 	p.updates++
 }

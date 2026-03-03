@@ -10,6 +10,7 @@ type SequencePlayer struct {
 	app.AppContextHolder
 
 	currentSequence     sequences.Sequence
+	currentSequencePath string
 	currentCommandIndex int
 	isPlaying           bool
 
@@ -18,23 +19,50 @@ type SequencePlayer struct {
 	blockingEnded     bool
 	blockedByParent   bool
 
-	backgroundCommands []sequences.Command
+	backgroundCommands       []sequences.Command
+	consumedOneTimeSequences map[string]struct{}
 }
 
 // NewSequencePlayer creates a new player.
 func NewSequencePlayer(appContext *app.AppContext) *SequencePlayer {
 	ctx := app.AppContextHolder{}
 	ctx.SetAppContext(appContext)
-	return &SequencePlayer{AppContextHolder: ctx}
+	return &SequencePlayer{
+		AppContextHolder:         ctx,
+		consumedOneTimeSequences: make(map[string]struct{}),
+	}
 }
 
 // Play starts executing a sequence.
 func (p *SequencePlayer) Play(sequence sequences.Sequence) {
-	if p.hasActiveCommands {
+	sequencePath := sequence.GetPath()
+
+	// Check if this is a one-time sequence that has already been consumed
+	if sequence.OneTime() {
+		if _, consumed := p.consumedOneTimeSequences[sequencePath]; consumed {
+			return
+		}
+		// Mark as consumed immediately to prevent re-entry during playback
+		p.consumedOneTimeSequences[sequencePath] = struct{}{}
+	}
+
+	// If same sequence is already playing, don't restart it
+	if p.hasActiveCommands && p.currentSequencePath == sequencePath {
 		return
 	}
 
+	// If a different sequence is requested and current is non-interruptible, skip
+	if p.hasActiveCommands && !p.currentSequence.Interruptible() {
+		return
+	}
+
+	// Stop current sequence if playing
+	if p.hasActiveCommands {
+		p.Stop()
+	}
+
 	p.currentSequence = sequence
+	p.currentSequencePath = sequencePath
 	p.currentCommandIndex = -1
 	p.hasActiveCommands = true
 	p.blockingEnded = false
@@ -68,6 +96,9 @@ func (p *SequencePlayer) IsPlaying() bool {
 }
 
 func (p *SequencePlayer) IsOver() bool {
+	if p.currentSequence == nil {
+		return true
+	}
 	return p.currentCommandIndex >= len(p.currentSequence.Commands())
 }
 
@@ -142,9 +173,34 @@ func (p *SequencePlayer) advanceToNextCommand() {
 
 func (p *SequencePlayer) endSequence() {
 	p.hasActiveCommands = false
+	p.currentSequence = nil
+	p.currentSequencePath = ""
 	if !p.blockingEnded {
 		p.endBlockingPhase()
 	}
+}
+
+// Stop cleanly stops the current sequence.
+func (p *SequencePlayer) Stop() {
+	if !p.hasActiveCommands {
+		return
+	}
+
+	// Unblock player if needed
+	if p.currentSequence != nil && p.currentSequencePath != "" {
+		if seq, ok := p.currentSequence.(*Sequence); ok && seq.BlockPlayerMovement && !p.blockedByParent {
+			if player, found := p.AppContext().ActorManager.GetPlayer(); found {
+				player.UnblockMovement()
+			}
+		}
+	}
+
+	p.hasActiveCommands = false
+	p.currentSequence = nil
+	p.currentSequencePath = ""
+	p.blockingEnded = true
+	p.isPlaying = false
+	p.backgroundCommands = nil
 }
 
 func (p *SequencePlayer) endBlockingPhase() {

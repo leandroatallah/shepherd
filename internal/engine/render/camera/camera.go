@@ -65,6 +65,10 @@ func NewCamera(x, y int) *kamera.Camera {
 	return c
 }
 
+func (c *Controller) IsFollowing() bool {
+	return c.isFollowing
+}
+
 func (c *Controller) SetFollowing(following bool) {
 	c.isFollowing = following
 }
