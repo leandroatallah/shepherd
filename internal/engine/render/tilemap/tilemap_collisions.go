@@ -3,6 +3,7 @@ package tilemap
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
@@ -36,7 +37,7 @@ func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, endpointTriggerF
 			continue
 		}
 
-		if layer.Name == "Endpoint" {
+		if strings.Contains(layer.Name, "Endpoint") {
 			foundEndpoint = true
 			if layer.Type == "tilelayer" {
 				for i, tileID := range layer.Data {
@@ -84,7 +85,7 @@ func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, endpointTriggerF
 			}
 		}
 
-		if layer.Name == "Obstacles" {
+		if strings.Contains(layer.Name, "Obstacles") {
 			foundObstacles = true
 			if layer.Type == "tilelayer" {
 				for i, tileID := range layer.Data {
