@@ -44,6 +44,7 @@ func (s *PhaseTitleScene) OnStart() {
 		log.Printf("PhaseTitleScene: failed to get current phase: %v", err)
 	}
 	s.title = phase.Title
+	s.AppContext().AudioManager.FadeOutAll(time.Second)
 	s.shouldInitMusic = true
 }
 
@@ -67,13 +68,11 @@ func (s *PhaseTitleScene) Update() error {
 
 	if s.shouldInitMusic {
 		if am := ctx.AudioManager; am != nil {
-			am.FadeOutAll(time.Second)
 			s.shouldInitMusic = false
-
 			s.Schedule(4*time.Second, func() {
 				s.showTitle = true
 				am.SetVolume(1.0)
-				am.PlayMusic(TitleSound, true)  // Loop title music
+				am.PlayMusic(TitleSound, true) // Loop title music
 			})
 		}
 	}

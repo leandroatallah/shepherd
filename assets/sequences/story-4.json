@@ -25,7 +25,7 @@
       "end_x": 460,
       "block_sequence": false
     },
-    { "command": "delay", "frames": 60 }
+    { "command": "delay", "frames": 30 }
   ],
   "block_player_movement": true
 }

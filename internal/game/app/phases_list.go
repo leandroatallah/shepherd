@@ -37,7 +37,7 @@ func GetPhases() []phases.Phase {
 		{
 			ID:                  4,
 			Name:                "Story Intro - Part 4",
-			TilemapPath:         "assets/tilemap/shepherd-phase-4.tmj",
+			TilemapPath:         "assets/tilemap/shepherd-phase-story-intro-part-4.tmj",
 			NextPhaseID:         5,
 			GoalType:            gamescenephases.SequenceGoalType,
 			SceneType:           scenestypes.ScenePhases,
