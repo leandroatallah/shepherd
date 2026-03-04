@@ -174,6 +174,9 @@ func (c *Character) MovementState() movement.MovementState {
 }
 
 func (c *Character) Update(space body.BodiesSpace) error {
+	if c.Freeze() {
+		return nil
+	}
 	c.count++
 
 	for _, s := range c.skills {
