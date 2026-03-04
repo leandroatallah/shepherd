@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>config: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/leandroatallah/firefly/internal/engine/data/config/config.go (100.0%)</option>
+				
+				<option value="file1">github.com/leandroatallah/firefly/internal/engine/data/datamanager/datamanager.go (100.0%)</option>
+				
+				<option value="file2">github.com/leandroatallah/firefly/internal/engine/data/jsonutil/jsonutil.go (100.0%)</option>
+				
+				<option value="file3">github.com/leandroatallah/firefly/internal/engine/data/schemas/json.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package config
+
+import "time"
+
+type PhysicsConfig struct {
+        // SpeedMultiplier is a global multiplier for all actor speeds.
+        SpeedMultiplier float64
+        // HorizontalInertia controls the smoothness of horizontal movement. Higher values lead to more sliding.
+        // 0.0 means instant movement.
+        HorizontalInertia float64
+        // AirFrictionMultiplier controls how much friction is applied in the air, as a factor of ground friction.
+        // 0.0 means no air friction; 1.0 means same as ground.
+        AirFrictionMultiplier float64
+        // AirControlMultiplier controls how much acceleration is applied in the air.
+        // &lt; 1.0 for less air control, &gt; 1.0 for more.
+        AirControlMultiplier float64
+        // CoyoteTimeFrames is the number of frames the player can still jump after leaving a ledge.
+        CoyoteTimeFrames int
+        // JumpBufferFrames is the number of frames a jump input is remembered before landing.
+        JumpBufferFrames int
+        // JumpForce is the initial vertical velocity applied when jumping.
+        JumpForce int
+        // JumpCutMultiplier is the factor applied to vertical velocity when the jump button is released mid-air.
+        // Should be between 0.0 and 1.0.
+        JumpCutMultiplier float64
+        // UpwardGravity is the gravity force applied when the actor is moving up.
+        UpwardGravity int
+        // DownwardGravity is the gravity force applied when the actor is falling. A higher value than UpwardGravity creates a snappier jump.
+        DownwardGravity int
+        // MaxFallSpeed is the terminal velocity for falling.
+        MaxFallSpeed int
+}
+
+type AppConfig struct {
+        ScreenWidth  int
+        ScreenHeight int
+        Physics      PhysicsConfig
+
+        DefaultVolume float64
+
+        MainFontFace  string
+        SmallFontFace string
+
+        CamDebug     bool
+        CollisionBox bool
+        NoSound      bool
+
+        // Transition
+        ScreenFlipSpeed      float64
+        FadeHoldDuration     time.Duration   // black screen before scene change
+        FadeVisibleDuration  time.Duration   // black screen after scene change (before fade in)
+}
+
+var cfg AppConfig
+
+func Set(newCfg *AppConfig) <span class="cov8" title="3">{
+        if newCfg != nil </span><span class="cov5" title="2">{
+                cfg = *newCfg
+        }</span>
+}
+
+func Get() *AppConfig <span class="cov10" title="4">{
+        return &amp;cfg
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package datamanager
+
+import "log"
+
+// Manager holds the raw data for assets like JSON files.
+type Manager struct {
+        data map[string][]byte
+}
+
+// NewDataManager creates a new data manager.
+func NewDataManager() *Manager <span class="cov9" title="5">{
+        return &amp;Manager{
+                data: make(map[string][]byte),
+        }
+}</span>
+
+// Add stores the data for a given asset name.
+func (m *Manager) Add(name string, data []byte) <span class="cov10" title="6">{
+        m.data[name] = data
+}</span>
+
+// Get retrieves the data for a given asset name.
+func (m *Manager) Get(name string) []byte <span class="cov10" title="6">{
+        data, ok := m.data[name]
+        if !ok </span><span class="cov1" title="1">{
+                log.Printf("data not found: %s", name)
+                return nil
+        }</span>
+        <span class="cov9" title="5">return data</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package jsonutil
+
+import (
+        "encoding/json"
+        "os"
+
+        "github.com/leandroatallah/firefly/internal/engine/data/schemas"
+)
+
+type SpriteAndStats[T any] struct {
+        SpriteData schemas.SpriteData `json:"sprites"`
+        StatData   T                  `json:"stats"`
+}
+
+func ParseSpriteAndStats[T any](path string) (schemas.SpriteData, T, error) <span class="cov10" title="4">{
+        var zero T
+        data, err := os.ReadFile(path)
+        if err != nil </span><span class="cov1" title="1">{
+                return schemas.SpriteData{}, zero, err
+        }</span>
+        <span class="cov8" title="3">var payload SpriteAndStats[T]
+        if err := json.Unmarshal(data, &amp;payload); err != nil </span><span class="cov1" title="1">{
+                return schemas.SpriteData{}, zero, err
+        }</span>
+        <span class="cov5" title="2">return payload.SpriteData, payload.StatData, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package schemas
+
+import (
+        "github.com/leandroatallah/firefly/internal/engine/contracts/animation"
+)
+
+// ShapeRect defines a rectangular shape with position and dimensions.
+type ShapeRect struct {
+        X      int `json:"x"`
+        Y      int `json:"y"`
+        Width  int `json:"width"`
+        Height int `json:"height"`
+}
+
+// Rect returns the coordinates and dimensions of the rectangle.
+func (s ShapeRect) Rect() (x, y, width, height int) <span class="cov10" title="2">{
+        return s.X, s.Y, s.Width, s.Height
+}</span>
+
+// AssetData holds information about a single asset, including its path and collision areas.
+type AssetData struct {
+        Path           string      `json:"path"`
+        CollisionRects []ShapeRect `json:"collision_rect"`
+        Loop           *bool       `json:"loop,omitempty"`
+}
+
+// SpriteData contains all data related to a sprite's appearance and behavior,
+// including its body rectangle, assets for different states, animation frame rate, and initial facing direction.
+type SpriteData struct {
+        BodyRect        ShapeRect                     `json:"body_rect"`
+        Assets          map[string]AssetData          `json:"assets"`
+        FrameRate       int                           `json:"frame_rate"`
+        FacingDirection animation.FacingDirectionEnum `json:"facing_direction"` // 0 - right, 1 - left
+}
+
+// ParticleData defines the configuration for a particle effect.
+type ParticleData struct {
+        Image       string  `json:"image"`
+        FrameWidth  int     `json:"frame_width"`
+        FrameHeight int     `json:"frame_height"`
+        FrameRate   int     `json:"frame_rate"` // Ticks per frame
+        Scale       float64 `json:"scale"`
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
