@@ -9,7 +9,8 @@
       "command": "dialogue",
       "lines": ["Not one will be lost. \nNot one will be left behind."],
       "position": "top",
-      "speech_speed": 1
+      "speech_speed": 1,
+      "speech_id": "story"
     },
     { "command": "delay", "frames": 120 }
   ]

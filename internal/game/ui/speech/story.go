@@ -21,7 +21,7 @@ func NewStorySpeech(fontSource *speech.SpeechFont) *StorySpeech {
 		baseSpeech: newBaseSpeech(fontSource),
 	}
 	s.indicator = indicatorImg
-	s.SetID("story")
+	s.SetID(speech.StorySpeechID)
 	s.SetColor(color.White) // Default to white for storytelling
 	return s
 }

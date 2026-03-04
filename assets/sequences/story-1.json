@@ -20,7 +20,8 @@
         "Days passed in silence. \nNights passed in trust."
       ],
       "position": "top",
-      "speech_speed": 1
+      "speech_speed": 1,
+      "speech_id": "story"
     },
     {
       "command": "delay",

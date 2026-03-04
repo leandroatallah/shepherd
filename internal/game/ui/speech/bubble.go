@@ -35,6 +35,7 @@ func NewSpeechBubble(fontSource *speech.SpeechFont) *SpeechBubble {
 		baseSpeech: newBaseSpeech(fontSource),
 		nineSlice:  ns,
 	}
+	s.SetID(speech.BubbleSpeechID)
 	s.indicator = indicatorImg
 	return s
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
+	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
 
 type StoryScene struct {
@@ -71,8 +72,7 @@ func (s *StoryScene) NextScene() {
 }
 
 func (s *StoryScene) OnStart() {
-	// TODO: Use a constant
-	s.AppContext().DialogueManager.SetActiveSpeech("story")
+	s.AppContext().DialogueManager.SetActiveSpeech(speech.StorySpeechID)
 
 	// Load sequence path from current phase
 	phase, err := s.AppContext().PhaseManager.GetCurrentPhase()
