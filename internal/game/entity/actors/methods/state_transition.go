@@ -11,8 +11,8 @@ import (
 func StandardStateTransitionLogic(c *actors.Character) bool {
 	state := c.State()
 
-	// When the character dies, the state no longer changes.
-	if state == gamestates.Dying {
+	// When the character dies or is exiting, the state no longer changes.
+	if state == gamestates.Dying || state == gamestates.Exiting {
 		return true
 	}
 

@@ -65,6 +65,11 @@
         "loop": false,
         "collision_rect": []
       },
+      "exit": {
+        "path": "assets/images/shepherd-24-exit.png",
+        "loop": false,
+        "collision_rect": []
+      },
       "carry_idle": {
         "path": "assets/images/shepherd-24-carry-idle.png",
         "loop": true,
