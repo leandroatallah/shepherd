@@ -24,7 +24,7 @@ func Setup(assets fs.FS) error {
 	cfg := config.Get()
 	// Basic Ebiten setup
 	ebiten.SetWindowSize(cfg.ScreenWidth*3, cfg.ScreenHeight*3)
-	ebiten.SetWindowTitle("Firefly")
+	ebiten.SetWindowTitle("No 1Bit Left Behind")
 
 	// Initialize all systems and managers
 	audioManager := audio.NewAudioManager()
