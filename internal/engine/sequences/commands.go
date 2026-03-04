@@ -34,11 +34,17 @@ type DialogueCommand struct {
 	Lines           []string
 	Position        string
 	Speed           int
+	SpeechID        string
 	dialogueManager *speech.Manager
 }
 
 func (c *DialogueCommand) Init(appContext any) {
 	c.dialogueManager = appContext.(*app.AppContext).DialogueManager
+	speechID := c.SpeechID
+	if speechID == "" {
+		speechID = speech.BubbleSpeechID
+	}
+	c.dialogueManager.SetActiveSpeech(speechID)
 	c.dialogueManager.ShowMessages(c.Lines, c.Position, c.Speed)
 }
 

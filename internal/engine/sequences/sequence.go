@@ -44,6 +44,7 @@ type CommandData struct {
 	Lines       []string `json:"lines,omitempty"`
 	Position    string   `json:"position,omitempty"`
 	SpeechSpeed int      `json:"speech_speed,omitempty"`
+	SpeechID    string   `json:"speech_id,omitempty"`
 
 	// Fields for "delay"
 	Frames int `json:"frames,omitempty"`
@@ -107,7 +108,7 @@ func (cd *CommandData) ToCommand() sequences.Command {
 		if speed == 0 && cd.Speed > 0 {
 			speed = int(cd.Speed)
 		}
-		return &DialogueCommand{Lines: cd.Lines, Position: cd.Position, Speed: speed}
+		return &DialogueCommand{Lines: cd.Lines, Position: cd.Position, Speed: speed, SpeechID: cd.SpeechID}
 	case "delay":
 		return &DelayCommand{Frames: cd.Frames}
 	case "move_actor":

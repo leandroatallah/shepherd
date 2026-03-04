@@ -16,6 +16,11 @@ type Manager struct {
 	waitingForInput bool
 }
 
+const (
+	BubbleSpeechID = "bubble"
+	StorySpeechID  = "story"
+)
+
 // NewManager creates a new dialogue manager.
 func NewManager(s ...Speech) *Manager {
 	m := &Manager{
