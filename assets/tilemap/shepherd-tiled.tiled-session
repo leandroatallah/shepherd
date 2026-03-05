@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "shepherd-phase-1-3.tmj",
+    "activeFile": "shepherd-phase-1-1.tmj",
     "expandedProjectPaths": [
         "."
     ],
@@ -177,15 +177,16 @@
         },
         "shepherd-phase-1-1.tmj": {
             "expandedObjectLayers": [
-                8,
                 4,
-                6
+                8,
+                6,
+                12
             ],
-            "scale": 4.3401,
-            "selectedLayer": 3,
+            "scale": 3.9136,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 604.594364185157,
-                "y": 197.80650215432826
+                "x": 556.0098119378578,
+                "y": 211.95318887980375
             }
         },
         "shepherd-phase-1-1.tmj#sample-enemies": {
@@ -195,6 +196,9 @@
             "scaleInDock": 1
         },
         "shepherd-phase-1-1.tmj#tileset-1bit": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-1.tmj#tileset-1bit-bg": {
             "scaleInDock": 1
         },
         "shepherd-phase-1-2--3.tmj": {
@@ -220,13 +224,13 @@
         },
         "shepherd-phase-1-2.tmj": {
             "expandedObjectLayers": [
-                8,
-                14,
                 4,
-                13
+                14,
+                13,
+                8
             ],
             "scale": 1.0725,
-            "selectedLayer": 4,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 218.18181818181816,
                 "y": 178.55477855477858
@@ -239,6 +243,9 @@
             "scaleInDock": 1
         },
         "shepherd-phase-1-2.tmj#tileset-1bit": {
+            "scaleInDock": 1
+        },
+        "shepherd-phase-1-2.tmj#tileset-1bit-bg": {
             "scaleInDock": 1
         },
         "shepherd-phase-1-3--2.tmj": {
@@ -267,7 +274,7 @@
                 12
             ],
             "scale": 1.073,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 383.03821062441756,
                 "y": 623.9515377446412
@@ -282,6 +289,9 @@
         "shepherd-phase-1-3.tmj#tileset-1bit": {
             "scaleInDock": 1.4667
         },
+        "shepherd-phase-1-3.tmj#tileset-1bit-bg": {
+            "scaleInDock": 1
+        },
         "shepherd-phase-1-4.tmj": {
             "expandedObjectLayers": [
                 4
@@ -289,8 +299,8 @@
             "scale": 1.8634,
             "selectedLayer": 6,
             "viewCenter": {
-                "x": 245.2506171514436,
-                "y": 166.63088977138563
+                "x": 159.92272190619298,
+                "y": 111.89223999141353
             }
         },
         "shepherd-phase-1-4.tmj#sample-enemies": {
@@ -448,14 +458,14 @@
         },
         "shepherd-phase-story-intro-part-2.tmj": {
             "expandedObjectLayers": [
-                8,
-                13
+                13,
+                8
             ],
             "scale": 1.5201,
             "selectedLayer": 6,
             "viewCenter": {
-                "x": 236.16867311361096,
-                "y": 183.21163081376224
+                "x": 240.1157818564568,
+                "y": 112.16367344253666
             }
         },
         "shepherd-phase-story-intro-part-2.tmj#sample-enemies": {
@@ -474,8 +484,8 @@
             "scale": 1.7892,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 244.80214621059693,
-                "y": 116.53252850435948
+                "x": 239.7719651240778,
+                "y": 108.70780236977421
             }
         },
         "shepherd-phase-story-intro-part-4.tmj#sample-enemies": {
@@ -497,20 +507,23 @@
     "map.lastUsedFormat": "json",
     "map.width": 10,
     "openFiles": [
+        "shepherd-phase-story-intro-part-4.tmj",
+        "shepherd-phase-story-intro-part-2.tmj",
         "shepherd-phase-1-1.tmj",
         "shepherd-phase-1-2.tmj",
-        "shepherd-phase-1-3.tmj"
+        "shepherd-phase-1-3.tmj",
+        "shepherd-phase-1-4.tmj"
     ],
     "project": "shepherd-tiled.tiled-project",
     "recentFiles": [
-        "shepherd-phase-1-4.tmj",
-        "shepherd-phase-4.tmj",
-        "shepherd-phase-story-intro-part-2.tmj",
-        "shepherd-phase-story-intro-part-4.tmj",
-        "shepherd-phase-1.tmj",
         "shepherd-phase-1-3.tmj",
         "shepherd-phase-1-2.tmj",
         "shepherd-phase-1-1.tmj",
+        "shepherd-phase-story-intro-part-4.tmj",
+        "shepherd-phase-story-intro-part-2.tmj",
+        "shepherd-phase-1-4.tmj",
+        "shepherd-phase-4.tmj",
+        "shepherd-phase-1.tmj",
         "shepherd-phase-000.tmj",
         "shepherd-phase-1-2--3.tmj",
         "shepherd-phase-1-3--2.tmj",
