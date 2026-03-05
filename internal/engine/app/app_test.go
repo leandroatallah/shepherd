@@ -4,45 +4,12 @@ import (
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/audio"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/mocks"
 	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
-
-type stubSceneManager struct {
-	navigation.SceneManager
-	updateCalled bool
-	drawCalled   bool
-
-	lastSceneType navigation.SceneType
-	lastFresh     bool
-	navigateCalls int
-}
-
-func (s *stubSceneManager) AudioManager() *audio.AudioManager {
-	return nil
-}
-
-func (s *stubSceneManager) Draw(screen *ebiten.Image) {
-	s.drawCalled = true
-}
-
-func (s *stubSceneManager) NavigateTo(sceneType navigation.SceneType, sceneTransition navigation.Transition, freshInstance bool) {
-	s.navigateCalls++
-	s.lastSceneType = sceneType
-	s.lastFresh = freshInstance
-}
-
-func (s *stubSceneManager) NavigateBack(sceneTransition navigation.Transition) {}
-
-func (s *stubSceneManager) SwitchTo(scene navigation.Scene) {}
-
-func (s *stubSceneManager) Update() error {
-	s.updateCalled = true
-	return nil
-}
 
 func TestGameUpdateAndDrawIntegration(t *testing.T) {
 	cfg := &config.AppConfig{
@@ -55,7 +22,7 @@ func TestGameUpdateAndDrawIntegration(t *testing.T) {
 		DialogueManager: speech.NewManager(),
 	}
 
-	sm := &stubSceneManager{}
+	sm := &mocks.MockSceneManager{}
 	ctx.SceneManager = sm
 
 	game := NewGame(ctx)
@@ -72,14 +39,14 @@ func TestGameUpdateAndDrawIntegration(t *testing.T) {
 		t.Fatalf("expected FrameCount 1 after Update, got %d", ctx.FrameCount)
 	}
 
-	if !sm.updateCalled {
+	if !sm.UpdateCalled {
 		t.Fatalf("expected SceneManager.Update to be called")
 	}
 
 	screen := ebiten.NewImage(cfg.ScreenWidth, cfg.ScreenHeight)
 	game.Draw(screen)
 
-	if !sm.drawCalled {
+	if !sm.DrawCalled {
 		t.Fatalf("expected SceneManager.Draw to be called")
 	}
 
@@ -101,7 +68,7 @@ func TestAppContextPhaseNavigationIntegration(t *testing.T) {
 		t.Fatalf("SetCurrentPhase: %v", err)
 	}
 
-	sm := &stubSceneManager{}
+	sm := &mocks.MockSceneManager{}
 	ctx := &AppContext{
 		PhaseManager: pm,
 		SceneManager: sm,
@@ -109,11 +76,11 @@ func TestAppContextPhaseNavigationIntegration(t *testing.T) {
 
 	ctx.GoToCurrentPhaseScene(nil, true)
 
-	if sm.navigateCalls != 1 {
-		t.Fatalf("expected 1 NavigateTo call, got %d", sm.navigateCalls)
+	if sm.NavigateCalls != 1 {
+		t.Fatalf("expected 1 NavigateTo call, got %d", sm.NavigateCalls)
 	}
-	if sm.lastSceneType != sceneType1 {
-		t.Fatalf("GoToCurrentPhaseScene navigated to scene %d, want %d", sm.lastSceneType, sceneType1)
+	if sm.LastSceneType != sceneType1 {
+		t.Fatalf("GoToCurrentPhaseScene navigated to scene %d, want %d", sm.LastSceneType, sceneType1)
 	}
 
 	ctx.CompleteCurrentPhase(nil, true)
@@ -121,10 +88,10 @@ func TestAppContextPhaseNavigationIntegration(t *testing.T) {
 	if pm.CurrentPhase != 2 {
 		t.Fatalf("expected CurrentPhase to be 2 after completion, got %d", pm.CurrentPhase)
 	}
-	if sm.navigateCalls != 2 {
-		t.Fatalf("expected 2 NavigateTo calls after completing phase, got %d", sm.navigateCalls)
+	if sm.NavigateCalls != 2 {
+		t.Fatalf("expected 2 NavigateTo calls after completing phase, got %d", sm.NavigateCalls)
 	}
-	if sm.lastSceneType != sceneType2 {
-		t.Fatalf("CompleteCurrentPhase navigated to scene %d, want %d", sm.lastSceneType, sceneType2)
+	if sm.LastSceneType != sceneType2 {
+		t.Fatalf("CompleteCurrentPhase navigated to scene %d, want %d", sm.LastSceneType, sceneType2)
 	}
 }
