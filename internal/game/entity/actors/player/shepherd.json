@@ -70,6 +70,16 @@
         "loop": false,
         "collision_rect": []
       },
+      "lie": {
+        "path": "assets/images/shepherd-24-lie.png",
+        "loop": false,
+        "collision_rect": []
+      },
+      "rise": {
+        "path": "assets/images/shepherd-24-rise.png",
+        "loop": false,
+        "collision_rect": []
+      },
       "carry_idle": {
         "path": "assets/images/shepherd-24-carry-idle.png",
         "loop": true,

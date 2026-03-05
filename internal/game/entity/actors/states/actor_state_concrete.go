@@ -28,6 +28,24 @@ func (s *ExitingState) OnStart(currentCount int) {
 
 }
 
+// Lying
+type LyingState struct {
+	actors.BaseState
+}
+
+func (s *LyingState) OnStart(currentCount int) {
+	s.BaseState.OnStart(currentCount)
+}
+
+// Rising
+type RisingState struct {
+	actors.BaseState
+}
+
+func (s *RisingState) OnStart(currentCount int) {
+	s.BaseState.OnStart(currentCount)
+}
+
 // CarryingIdle
 type CarryingIdleState struct {
 	actors.BaseState
@@ -88,6 +106,8 @@ func (s *CarryingLandingState) OnStart(currentCount int) {
 var (
 	Dying           actors.ActorStateEnum
 	Exiting         actors.ActorStateEnum
+	Lying           actors.ActorStateEnum
+	Rising          actors.ActorStateEnum
 	CarryingIdle    actors.ActorStateEnum
 	CarryingWalking actors.ActorStateEnum
 	CarryingJump    actors.ActorStateEnum
@@ -98,6 +118,9 @@ var (
 func init() {
 	Dying = actors.RegisterState("die", func(b actors.BaseState) actors.ActorState { return &DyingState{BaseState: b} })
 	Exiting = actors.RegisterState("exit", func(b actors.BaseState) actors.ActorState { return &ExitingState{BaseState: b} })
+	Lying = actors.RegisterState("lie", func(b actors.BaseState) actors.ActorState { return &LyingState{BaseState: b} })
+	Rising = actors.RegisterState("rise", func(b actors.BaseState) actors.ActorState { return &RisingState{BaseState: b} })
+
 	CarryingIdle = actors.RegisterState("carry_idle", func(b actors.BaseState) actors.ActorState { return &CarryingIdleState{BaseState: b} })
 	CarryingWalking = actors.RegisterState("carry_walking", func(b actors.BaseState) actors.ActorState { return &CarryingWalkingState{BaseState: b} })
 	CarryingJump = actors.RegisterState("carry_jump", func(b actors.BaseState) actors.ActorState { return &CarryingJumpState{BaseState: b} })

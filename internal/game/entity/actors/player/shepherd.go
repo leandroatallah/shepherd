@@ -22,7 +22,7 @@ func shepherdStateTransitionLogic(c *actors.Character) bool {
 
 	state := c.State()
 
-	if state == gamestates.Exiting {
+	if state == gamestates.Exiting || state == gamestates.Lying || state == gamestates.Rising {
 		return true
 	}
 

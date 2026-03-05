@@ -28,4 +28,3 @@ func StandardStateTransitionLogic(c *actors.Character) bool {
 
 	return false
 }
-
