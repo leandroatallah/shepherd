@@ -4,14 +4,14 @@ import (
 	"testing"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/leandroatallah/firefly/internal/engine/mocks"
 	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 )
 
 type mockSceneWithCamera struct {
-	scene.BaseScene
+	mocks.MockScene
 	cam *camera.Controller
 }
 
@@ -32,8 +32,8 @@ func TestCameraSetTargetCommand_SmoothTransition(t *testing.T) {
 	mockScene.SetAppContext(appContext)
 	appContext.SceneManager.SwitchTo(mockScene)
 
-	target := body.NewCollidableBodyFromRect(body.NewRect(100, 100, 10, 10))
-	target.SetID("test_target")
+	target := &mocks.MockActor{Id: "test_target"}
+	target.SetPosition(100, 100)
 	appContext.Space.AddBody(target)
 
 	cmd := &CameraSetTargetCommand{
@@ -79,7 +79,7 @@ func TestCameraSetTargetCommand_SmoothTransition(t *testing.T) {
 
 	finalX, finalY := cmd.camera.Kamera().Center()
 	targetX, targetY := target.GetPositionMin()
-	w, h := target.GetShape().Width(), target.GetShape().Height()
+	w, h := target.Width(), target.Height()
 	expectedX := float64(targetX) + float64(w)/2
 	expectedY := float64(targetY) + float64(h)/2
 
@@ -102,8 +102,8 @@ func TestCameraSetTargetCommand_InstantTransition(t *testing.T) {
 	mockScene.SetAppContext(appContext)
 	appContext.SceneManager.SwitchTo(mockScene)
 
-	target := body.NewCollidableBodyFromRect(body.NewRect(100, 100, 10, 10))
-	target.SetID("test_target")
+	target := &mocks.MockActor{Id: "test_target"}
+	target.SetPosition(100, 100)
 	appContext.Space.AddBody(target)
 
 	cmd := &CameraSetTargetCommand{
@@ -127,7 +127,7 @@ func TestCameraSetTargetCommand_InstantTransition(t *testing.T) {
 	// 4. Verify final state
 	finalX, finalY := cmd.camera.Kamera().Center()
 	targetX, targetY := target.GetPositionMin()
-	w, h := target.GetShape().Width(), target.GetShape().Height()
+	w, h := target.Width(), target.Height()
 	expectedX := float64(targetX) + float64(w)/2
 	expectedY := float64(targetY) + float64(h)/2
 

@@ -7,58 +7,18 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	contractseq "github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
+	"github.com/leandroatallah/firefly/internal/engine/mocks"
 )
-
-type testCommand struct {
-	initCalled    bool
-	updateCount   int
-	completeAfter int
-}
-
-func (c *testCommand) Init(appContext any) {
-	c.initCalled = true
-}
-
-func (c *testCommand) Update() bool {
-	c.updateCount++
-	return c.updateCount >= c.completeAfter
-}
-
-type testSequence struct {
-	commands      []contractseq.Command
-	interruptible bool
-	oneTime       bool
-	path          string
-}
-
-func (s *testSequence) Commands() []contractseq.Command {
-	return s.commands
-}
-
-func (s *testSequence) Interruptible() bool {
-	return s.interruptible
-}
-
-func (s *testSequence) OneTime() bool {
-	return s.oneTime
-}
-
-func (s *testSequence) GetPath() string {
-	if s.path != "" {
-		return s.path
-	}
-	return "test_sequence"
-}
 
 func TestSequencePlayerPlaysBlockingCommandsToCompletion(t *testing.T) {
 	ctx := &app.AppContext{}
 
 	player := NewSequencePlayer(ctx)
 
-	cmd1 := &testCommand{completeAfter: 1}
-	cmd2 := &testCommand{completeAfter: 1}
+	cmd1 := &mocks.MockCommand{CompleteAfter: 1}
+	cmd2 := &mocks.MockCommand{CompleteAfter: 1}
 
-	seq := &testSequence{commands: []contractseq.Command{cmd1, cmd2}}
+	seq := &mocks.MockSequence{CommandsList: []contractseq.Command{cmd1, cmd2}}
 
 	if player.IsPlaying() {
 		t.Fatalf("expected player to be idle before Play")
@@ -66,10 +26,10 @@ func TestSequencePlayerPlaysBlockingCommandsToCompletion(t *testing.T) {
 
 	player.Play(seq)
 
-	if !cmd1.initCalled {
+	if !cmd1.InitCalled {
 		t.Fatalf("expected first command Init to be called on Play")
 	}
-	if cmd2.initCalled {
+	if cmd2.InitCalled {
 		t.Fatalf("expected second command Init not to be called yet")
 	}
 	if !player.IsPlaying() {
@@ -78,10 +38,10 @@ func TestSequencePlayerPlaysBlockingCommandsToCompletion(t *testing.T) {
 
 	player.Update()
 
-	if cmd1.updateCount != 1 {
-		t.Fatalf("expected first command Update to be called once, got %d", cmd1.updateCount)
+	if cmd1.UpdateCount != 1 {
+		t.Fatalf("expected first command Update to be called once, got %d", cmd1.UpdateCount)
 	}
-	if !cmd2.initCalled {
+	if !cmd2.InitCalled {
 		t.Fatalf("expected second command Init to be called after first completes")
 	}
 	if !player.IsPlaying() {
@@ -90,7 +50,7 @@ func TestSequencePlayerPlaysBlockingCommandsToCompletion(t *testing.T) {
 
 	player.Update()
 
-	if cmd2.updateCount == 0 {
+	if cmd2.UpdateCount == 0 {
 		t.Fatalf("expected second command Update to be called")
 	}
 	if player.IsPlaying() {
@@ -199,17 +159,17 @@ func TestSequencePlayerInterruptibleAndOneTime(t *testing.T) {
 	player := NewSequencePlayer(ctx)
 
 	// Create interruptible sequence (default)
-	interruptibleSeq := &testSequence{
-		commands:      []contractseq.Command{&testCommand{completeAfter: 5}},
-		interruptible: true,
-		path:          "interruptible.json",
+	interruptibleSeq := &mocks.MockSequence{
+		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 5}},
+		IsInterruptible: true,
+		Path:          "interruptible.json",
 	}
 
 	// Create non-interruptible sequence
-	nonInterruptibleSeq := &testSequence{
-		commands:      []contractseq.Command{&testCommand{completeAfter: 10}},
-		interruptible: false,
-		path:          "non_interruptible.json",
+	nonInterruptibleSeq := &mocks.MockSequence{
+		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 10}},
+		IsInterruptible: false,
+		Path:          "non_interruptible.json",
 	}
 
 	// Test 1: Same sequence requested while playing - should not restart
@@ -224,10 +184,10 @@ func TestSequencePlayerInterruptibleAndOneTime(t *testing.T) {
 	}
 
 	// Test 2: Different interruptible sequence should interrupt current
-	anotherSeq := &testSequence{
-		commands:      []contractseq.Command{&testCommand{completeAfter: 2}},
-		interruptible: true,
-		path:          "another.json",
+	anotherSeq := &mocks.MockSequence{
+		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 2}},
+		IsInterruptible: true,
+		Path:          "another.json",
 	}
 	player.Play(anotherSeq)
 	if !player.IsPlaying() {
@@ -245,10 +205,10 @@ func TestSequencePlayerInterruptibleAndOneTime(t *testing.T) {
 	}
 
 	// Try to interrupt with another sequence - should fail
-	interruptSeq := &testSequence{
-		commands:      []contractseq.Command{&testCommand{completeAfter: 1}},
-		interruptible: true,
-		path:          "interrupt.json",
+	interruptSeq := &mocks.MockSequence{
+		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 1}},
+		IsInterruptible: true,
+		Path:          "interrupt.json",
 	}
 	player.Play(interruptSeq)
 	// Should still be running nonInterruptibleSeq, not interruptSeq
@@ -270,10 +230,10 @@ func TestSequencePlayerOneTimeSequence(t *testing.T) {
 	player := NewSequencePlayer(ctx)
 
 	// Create a one-time sequence
-	oneTimeSeq := &testSequence{
-		commands:      []contractseq.Command{&testCommand{completeAfter: 5}},
-		oneTime:       true,
-		path:          "one_time.json",
+	oneTimeSeq := &mocks.MockSequence{
+		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 5}},
+		IsOneTime:       true,
+		Path:            "one_time.json",
 	}
 
 	// Play the sequence first time - should work
@@ -310,10 +270,10 @@ func TestSequencePlayerOneTimeSequence(t *testing.T) {
 	}
 
 	// Different sequence should still work
-	anotherSeq := &testSequence{
-		commands:      []contractseq.Command{&testCommand{completeAfter: 1}},
-		oneTime:       false,
-		path:          "another.json",
+	anotherSeq := &mocks.MockSequence{
+		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 1}},
+		IsOneTime:       false,
+		Path:            "another.json",
 	}
 	player.Play(anotherSeq)
 	if !player.IsPlaying() {
