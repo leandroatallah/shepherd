@@ -62,3 +62,24 @@ This separation allows the engine to be developed independently from the game's 
 - **EbitenUI**: A UI library for Ebitengine.
 - **Kamera/v2**: A camera library for Ebitengine.
 - **Go**: The programming language.
+
+## Code Style Guidelines
+
+### Avoid `_ = variable` Pattern
+
+Do **not** use `_ = variable` to silence unused variable warnings in production code. This pattern clutters code and hides potential issues.
+
+**Instead, use one of these approaches:**
+
+1. **Use blank identifier in parameter list** (for unused params):
+   ```go
+   func (t *Transition) Draw(_ *ebiten.Image) {}
+   ```
+
+2. **Remove unused variables entirely** if not needed
+
+3. **Actually use the variable** if it should be used
+
+**Acceptable uses of `_`:**
+- Ignoring return values: `_, err := someFunc()` 
+- Blank identifier in assignments: `val, _ = map[key]`
