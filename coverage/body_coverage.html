@@ -1,0 +1,982 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>body: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/leandroatallah/firefly/internal/engine/physics/body/body.go (90.9%)</option>
+				
+				<option value="file1">github.com/leandroatallah/firefly/internal/engine/physics/body/body_alive.go (100.0%)</option>
+				
+				<option value="file2">github.com/leandroatallah/firefly/internal/engine/physics/body/body_builder.go (100.0%)</option>
+				
+				<option value="file3">github.com/leandroatallah/firefly/internal/engine/physics/body/body_collidable.go (91.8%)</option>
+				
+				<option value="file4">github.com/leandroatallah/firefly/internal/engine/physics/body/body_movable.go (41.1%)</option>
+				
+				<option value="file5">github.com/leandroatallah/firefly/internal/engine/physics/body/body_touchable.go (100.0%)</option>
+				
+				<option value="file6">github.com/leandroatallah/firefly/internal/engine/physics/body/obstacle.go (100.0%)</option>
+				
+				<option value="file7">github.com/leandroatallah/firefly/internal/engine/physics/body/obstacle_factory.go (100.0%)</option>
+				
+				<option value="file8">github.com/leandroatallah/firefly/internal/engine/physics/body/ownership.go (100.0%)</option>
+				
+				<option value="file9">github.com/leandroatallah/firefly/internal/engine/physics/body/shape_rect.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package body
+
+import (
+        "image"
+        "log"
+
+        "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+        "github.com/leandroatallah/firefly/internal/engine/utils/fp16"
+)
+
+type Body struct {
+        shape body.Shape
+
+        Ownership
+
+        id       string
+        x16, y16 int
+}
+
+func NewBody(shape body.Shape) *Body <span class="cov10" title="138">{
+        return &amp;Body{
+                shape: shape,
+        }
+}</span>
+
+func (b *Body) GetShape() body.Shape <span class="cov8" title="78">{
+        return b.shape
+}</span>
+
+func (b *Body) SetID(id string) <span class="cov8" title="64">{
+        b.id = id
+}</span>
+
+func (b *Body) ID() string <span class="cov8" title="59">{
+        return b.id
+}</span>
+
+// Position() returns the body coordinates as a image.Rectangle.
+func (b *Body) Position() image.Rectangle <span class="cov8" title="62">{
+        minX := fp16.From16(b.x16)
+        minY := fp16.From16(b.y16)
+        maxX := minX + b.shape.Width()
+        maxY := minY + b.shape.Height()
+        return image.Rect(minX, minY, maxX, maxY)
+}</span>
+
+func (b *Body) GetPositionMin() (int, int) <span class="cov6" title="19">{
+        pos := b.Position()
+        return pos.Min.X, pos.Min.Y
+}</span>
+
+// SetPosition updates the body position.
+func (b *Body) SetPosition(x, y int) <span class="cov6" title="16">{
+        // NOTE: For now, it only accepts rect shape.
+        _, ok := b.GetShape().(*Rect)
+        if !ok </span><span class="cov0" title="0">{
+                log.Fatal("SetPosition expects a *Rect instance")
+        }</span>
+        <span class="cov6" title="16">b.x16 = fp16.To16(x)
+        b.y16 = fp16.To16(y)</span>
+}
+
+func (b *Body) SetPosition16(x16, y16 int) <span class="cov7" title="45">{
+        // NOTE: For now, it only accepts rect shape.
+        _, ok := b.GetShape().(*Rect)
+        if !ok </span><span class="cov0" title="0">{
+                log.Fatal("SetPosition expects a *Rect instance")
+        }</span>
+        <span class="cov7" title="45">b.x16 = x16
+        b.y16 = y16</span>
+}
+
+func (b *Body) GetPosition16() (int, int) <span class="cov7" title="29">{
+        return b.x16, b.y16
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package body
+
+// Implements Alive
+type AliveBody struct {
+        *Body
+
+        Ownership
+
+        health       int
+        maxHealth    int
+        invulnerable bool
+}
+
+func NewAliveBody(body *Body) *AliveBody <span class="cov9" title="21">{
+        if body == nil </span><span class="cov1" title="1">{
+                panic("NewAliveBody: body must not be nil")</span>
+        }
+        <span class="cov9" title="20">return &amp;AliveBody{Body: body}</span>
+}
+
+func (b *AliveBody) Health() int <span class="cov10" title="23">{
+        return b.health
+}</span>
+
+func (b *AliveBody) MaxHealth() int <span class="cov4" title="4">{
+        return b.maxHealth
+}</span>
+
+func (b *AliveBody) SetHealth(health int) <span class="cov9" title="18">{
+        b.health = health
+}</span>
+
+func (b *AliveBody) SetMaxHealth(health int) <span class="cov8" title="12">{
+        b.health = health
+        b.maxHealth = health
+}</span>
+
+func (b *AliveBody) LoseHealth(damage int) <span class="cov7" title="9">{
+        b.health = max(b.health-damage, 0)
+}</span>
+func (b *AliveBody) RestoreHealth(heal int) <span class="cov6" title="8">{
+        b.health = min(b.health+heal, b.maxHealth)
+}</span>
+
+func (b *AliveBody) Invulnerable() bool <span class="cov4" title="3">{
+        return b.invulnerable
+}</span>
+
+func (b *AliveBody) SetInvulnerability(value bool) <span class="cov2" title="2">{
+        b.invulnerable = value
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package body
+
+import (
+        "github.com/leandroatallah/firefly/internal/engine/contracts/animation"
+        "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+        "github.com/leandroatallah/firefly/internal/engine/data/schemas"
+)
+
+// SetCollisionBodies processes collision rectangles from sprite data and attaches them to an entity.
+// It requires the entity to be touchable, a map of states, a function to provide IDs for the collision bodies,
+// and a function to add the collision rectangle to the entity.
+func SetCollisionBodies(
+        entity body.Collidable,
+        data schemas.SpriteData,
+        stateMap map[string]animation.SpriteState,
+        idProvider func(assetKey string, index int) string,
+        addCollisionRect func(state animation.SpriteState, rect body.Collidable),
+) <span class="cov10" title="9">{
+        entity.SetTouchable(entity)
+
+        for key, assetData := range data.Assets </span><span class="cov10" title="9">{
+                state, ok := stateMap[key]
+                if !ok </span><span class="cov3" title="2">{
+                        continue</span>
+                }
+
+                <span class="cov8" title="7">for i, r := range assetData.CollisionRects </span><span class="cov9" title="8">{
+                        rect := NewCollidableBodyFromRect(NewRect(r.Rect()))
+                        rect.SetPosition(r.X, r.Y)
+                        rect.SetID(idProvider(key, i))
+                        addCollisionRect(state, rect)
+                }</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package body
+
+import (
+        "fmt"
+        "image"
+        "image/color"
+        "log"
+        "runtime/debug"
+
+        "github.com/hajimehoshi/ebiten/v2"
+        "github.com/hajimehoshi/ebiten/v2/vector"
+        "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+        "github.com/leandroatallah/firefly/internal/engine/utils/fp16"
+)
+
+type CollidableBody struct {
+        *Body
+
+        Ownership
+        Touchable     body.Touchable
+        collisionList []body.Collidable
+        isObstructive bool
+
+        // Accumulators for sub-pixel movement
+        accumulatorX16 int
+        accumulatorY16 int
+}
+
+func NewCollidableBody(body *Body) *CollidableBody <span class="cov10" title="92">{
+        if body == nil </span><span class="cov1" title="1">{
+                panic("NewCollidableBody: body must not be nil")</span>
+        }
+        <span class="cov9" title="91">return &amp;CollidableBody{Body: body}</span>
+}
+
+func NewCollidableBodyFromRect(rect body.Shape) *CollidableBody <span class="cov9" title="67">{
+        b := NewBody(rect)
+        return NewCollidableBody(b)
+}</span>
+
+func (b *CollidableBody) SetTouchable(t body.Touchable) <span class="cov5" title="12">{
+        b.Touchable = t
+}</span>
+
+func (b *CollidableBody) GetTouchable() body.Touchable <span class="cov3" title="4">{
+        return b.Touchable
+}</span>
+
+func (b *CollidableBody) DrawCollisionBox(screen *ebiten.Image, position image.Rectangle) <span class="cov1" title="1">{
+        for _, collisionRect := range b.CollisionPosition() </span><span class="cov1" title="1">{
+                // Calculate top-left corner of collision box relative to the character's body origin.
+                offsetX := float32(collisionRect.Min.X - position.Min.X)
+                offsetY := float32(collisionRect.Min.Y - position.Min.Y)
+
+                width := float32(collisionRect.Dx())
+                height := float32(collisionRect.Dy())
+
+                // Draw on the 'screen' (which is the sprite) at the relative offset.
+                vector.DrawFilledRect(
+                        screen,
+                        offsetX, offsetY, width, height,
+                        color.RGBA{0, 0xaa, 0, 0xff}, false)
+                vector.DrawFilledRect(
+                        screen,
+                        offsetX+1, offsetY+1, width-2, height-2,
+                        color.RGBA{0, 0xff, 0, 0xff}, false)
+        }</span>
+}
+
+func (b *CollidableBody) CollisionPosition() []image.Rectangle <span class="cov2" title="2">{
+        res := []image.Rectangle{}
+        for _, c := range b.collisionList </span><span class="cov2" title="2">{
+                res = append(res, c.Position())
+        }</span>
+        <span class="cov2" title="2">return res</span>
+}
+
+func (b *CollidableBody) SetIsObstructive(value bool) <span class="cov3" title="4">{
+        b.isObstructive = value
+}</span>
+
+func (b *CollidableBody) IsObstructive() bool <span class="cov4" title="5">{
+        return b.isObstructive
+}</span>
+
+func (b *CollidableBody) OnTouch(other body.Collidable) <span class="cov1" title="1">{
+        if b.Touchable != nil </span><span class="cov1" title="1">{
+                b.Touchable.OnTouch(other)
+        }</span>
+}
+func (b *CollidableBody) OnBlock(other body.Collidable) <span class="cov1" title="1">{
+        if b.Touchable != nil </span><span class="cov1" title="1">{
+                b.Touchable.OnBlock(other)
+        }</span>
+}
+func (b *CollidableBody) AddCollision(list ...body.Collidable) <span class="cov5" title="12">{
+        if b.ID() == "" </span><span class="cov0" title="0">{
+                debug.PrintStack()
+                log.Fatal("(*CollidableBody).AddCollision: A body must have an ID")
+        }</span>
+
+        <span class="cov5" title="12">if b.GetShape() == nil </span><span class="cov0" title="0">{
+                log.Fatal("(*CollidableBody).AddCollision: A body must have a shape")
+        }</span>
+
+        <span class="cov5" title="12">for d, i := range list </span><span class="cov5" title="12">{
+                i.SetID(fmt.Sprintf("%v_COLLISION_%d", b.ID(), d))
+                b.collisionList = append(b.collisionList, i)
+        }</span>
+}
+func (b *CollidableBody) CollisionShapes() []body.Collidable <span class="cov4" title="5">{
+        return b.collisionList
+}</span>
+
+func (b *CollidableBody) ClearCollisions() <span class="cov1" title="1">{
+        b.collisionList = nil
+}</span>
+
+// SetPosition overrides Body.SetPosition method to updates the body position and its collisions
+func (b *CollidableBody) SetPosition(x, y int) <span class="cov6" title="13">{
+        b.SetPosition16(fp16.To16(x), fp16.To16(y))
+}</span>
+
+func (b *CollidableBody) SetPosition16(x16, y16 int) <span class="cov8" title="41">{
+        // Calculate the difference to move the collision areas as well
+        diffX16 := x16 - b.Body.x16
+        diffY16 := y16 - b.Body.y16
+
+        b.Body.SetPosition16(x16, y16)
+
+        for _, c := range b.collisionList </span><span class="cov2" title="2">{
+                cx16, cy16 := c.GetPosition16()
+                c.SetPosition16(cx16+diffX16, cy16+diffY16)
+        }</span>
+}
+
+// ApplyValidPosition moves the body by a given distance, ensuring it stops at the first collision.
+// It accumulates sub-pixel movements and only moves when a full pixel step is reached.
+// Might update: Body x16 and y16
+func (b *CollidableBody) ApplyValidPosition(distance16 int, isXAxis bool, space body.BodiesSpace) (int, int, bool) <span class="cov5" title="9">{
+        if distance16 == 0 || space == nil </span><span class="cov2" title="2">{
+                x, y := b.GetPositionMin()
+                return x, y, false
+        }</span>
+
+        <span class="cov4" title="7">var totalDistance16 int
+        if isXAxis </span><span class="cov4" title="6">{
+                b.accumulatorX16 += distance16
+                totalDistance16 = b.accumulatorX16
+        }</span> else<span class="cov1" title="1"> {
+                b.accumulatorY16 += distance16
+                totalDistance16 = b.accumulatorY16
+        }</span>
+
+        // Calculate whole pixels to move
+        <span class="cov4" title="7">pixelSteps := fp16.From16(totalDistance16)
+
+        if pixelSteps == 0 </span><span class="cov1" title="1">{
+                // Not enough accumulated distance to move a full pixel yet
+                x, y := b.GetPositionMin()
+                return x, y, false
+        }</span>
+
+        <span class="cov4" title="6">var isBlocking bool
+
+        // Determine the direction of movement (step is one pixel).
+        step := 1
+        if pixelSteps &lt; 0 </span><span class="cov1" title="1">{
+                step = -1
+                pixelSteps = -pixelSteps
+        }</span>
+
+        // Move pixel by pixel and check for collisions.
+        <span class="cov4" title="6">pixelsMoved := 0
+        for i := 0; i &lt; pixelSteps; i++ </span><span class="cov7" title="23">{
+                lastX16, lastY16 := b.GetPosition16()
+
+                // Move one pixel (in 16.16 fixed point)
+                step16 := fp16.To16(step)
+                if isXAxis </span><span class="cov6" title="13">{
+                        b.SetPosition16(lastX16+step16, lastY16)
+                }</span> else<span class="cov5" title="10"> {
+                        b.SetPosition16(lastX16, lastY16+step16)
+                }</span>
+
+                // Check if this new position causes a collision.
+                <span class="cov7" title="23">_, blocking := space.ResolveCollisions(b)
+                if blocking </span><span class="cov2" title="2">{
+                        // A collision occurred. Revert to the last valid position.
+                        b.SetPosition16(lastX16, lastY16)
+                        isBlocking = true
+                        break</span>
+                }
+                <span class="cov7" title="21">pixelsMoved += step</span>
+        }
+
+        // Update the accumulator by subtracting the distance actually moved
+        <span class="cov4" title="6">movedDistance16 := fp16.To16(pixelsMoved)
+        if isXAxis </span><span class="cov4" title="5">{
+                b.accumulatorX16 -= movedDistance16
+                if isBlocking </span><span class="cov2" title="2">{
+                        b.accumulatorX16 = 0 // Clear momentum on collision
+                }</span>
+        } else<span class="cov1" title="1"> {
+                b.accumulatorY16 -= movedDistance16
+                if isBlocking </span><span class="cov0" title="0">{
+                        b.accumulatorY16 = 0 // Clear momentum on collision
+                }</span>
+        }
+
+        <span class="cov4" title="6">x, y := b.GetPositionMin()
+        return x, y, isBlocking</span>
+}
+
+func abs(n int) int <span class="cov0" title="0">{
+        if n &lt; 0 </span><span class="cov0" title="0">{
+                return -n
+        }</span>
+        <span class="cov0" title="0">return n</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package body
+
+import (
+        "fmt"
+
+        "github.com/leandroatallah/firefly/internal/engine/contracts/animation"
+        "github.com/leandroatallah/firefly/internal/engine/data/config"
+        "github.com/leandroatallah/firefly/internal/engine/utils/fp16"
+)
+
+type MovableBody struct {
+        *Body
+
+        Ownership
+
+        vx16                int
+        vy16                int
+        accelerationX       int
+        accelerationY       int
+        speed               int
+        maxSpeed            int
+        jumpForceMultiplier float64
+        horizontalInertia   float64
+        immobile            bool
+        freeze              bool
+        faceDirection       animation.FacingDirectionEnum
+}
+
+func NewMovableBody(body *Body) *MovableBody <span class="cov10" title="24">{
+        if body == nil </span><span class="cov0" title="0">{
+                panic("NewMovableBody: body must not be nil")</span>
+        }
+        <span class="cov10" title="24">return &amp;MovableBody{
+                Body:                body,
+                jumpForceMultiplier: 1.0,
+                horizontalInertia:   -1.0,
+        }</span>
+}
+
+func (b *MovableBody) MoveX(distance int) <span class="cov6" title="7">{
+        multiplier := config.Get().Physics.SpeedMultiplier
+        if multiplier == 0 </span><span class="cov6" title="7">{
+                multiplier = 1.0
+        }</span>
+        <span class="cov6" title="7">dist16 := fp16.To16(distance)
+        b.accelerationX = int(float64(dist16) * multiplier)</span>
+}
+
+func (b *MovableBody) MoveY(distance int) <span class="cov6" title="6">{
+        multiplier := config.Get().Physics.SpeedMultiplier
+        if multiplier == 0 </span><span class="cov6" title="6">{
+                multiplier = 1.0
+        }</span>
+        <span class="cov6" title="6">dist16 := fp16.To16(distance)
+        b.accelerationY = int(float64(dist16) * multiplier)</span>
+}
+
+func (b *MovableBody) OnMoveLeft(distance int) <span class="cov1" title="1">{
+        b.MoveX(-distance)
+}</span>
+func (b *MovableBody) OnMoveUpLeft(distance int) <span class="cov1" title="1">{
+        b.MoveX(-distance)
+        b.MoveY(-distance)
+}</span>
+func (b *MovableBody) OnMoveDownLeft(distance int) <span class="cov1" title="1">{
+        b.MoveX(-distance)
+        b.MoveY(distance)
+}</span>
+func (b *MovableBody) OnMoveRight(distance int) <span class="cov2" title="2">{
+        b.MoveX(distance)
+}</span>
+func (b *MovableBody) OnMoveUpRight(distance int) <span class="cov1" title="1">{
+        b.MoveX(distance)
+        b.MoveY(-distance)
+}</span>
+func (b *MovableBody) OnMoveDownRight(distance int) <span class="cov1" title="1">{
+        b.MoveX(distance)
+        b.MoveY(distance)
+}</span>
+func (b *MovableBody) OnMoveUp(distance int) <span class="cov1" title="1">{
+        b.MoveY(-distance)
+}</span>
+func (b *MovableBody) OnMoveDown(distance int) <span class="cov1" title="1">{
+        b.MoveY(distance)
+}</span>
+
+func (b *MovableBody) SetSpeed(speed int) error <span class="cov1" title="1">{
+        if b == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("MovableBody is nil")
+        }</span>
+        <span class="cov1" title="1">if speed &lt; 0 </span><span class="cov0" title="0">{
+                return fmt.Errorf("speed must be &gt;= 0; got %d", speed)
+        }</span>
+        <span class="cov1" title="1">b.speed = speed
+        return nil</span>
+}
+
+func (b *MovableBody) SetMaxSpeed(maxSpeed int) error <span class="cov0" title="0">{
+        if b == nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("MovableBody is nil")
+        }</span>
+        <span class="cov0" title="0">if maxSpeed &lt; 0 </span><span class="cov0" title="0">{
+                return fmt.Errorf("maxSpeed must be &gt;= 0; got %d", maxSpeed)
+        }</span>
+        <span class="cov0" title="0">b.maxSpeed = maxSpeed
+        return nil</span>
+}
+
+func (b *MovableBody) Speed() int <span class="cov1" title="1">{
+        return b.speed
+}</span>
+
+func (b *MovableBody) MaxSpeed() int <span class="cov0" title="0">{
+        return b.maxSpeed
+}</span>
+
+func (b *MovableBody) Velocity() (int, int) <span class="cov0" title="0">{
+        return b.vx16, b.vy16
+}</span>
+
+func (b *MovableBody) SetVelocity(vx16, vy16 int) <span class="cov0" title="0">{
+        b.vx16, b.vy16 = vx16, vy16
+}</span>
+
+func (b *MovableBody) Acceleration() (accX, accY int) <span class="cov1" title="1">{
+        return b.accelerationX, b.accelerationY
+}</span>
+
+func (b *MovableBody) SetAcceleration(accX, accY int) <span class="cov0" title="0">{
+        b.accelerationX, b.accelerationY = accX, accY
+}</span>
+
+func (b *MovableBody) Immobile() bool <span class="cov0" title="0">{
+        return b.immobile
+}</span>
+
+func (b *MovableBody) SetImmobile(immobile bool) <span class="cov0" title="0">{
+        b.immobile = immobile
+}</span>
+func (b *MovableBody) SetFreeze(freeze bool) <span class="cov0" title="0">{
+        b.freeze = freeze
+}</span>
+
+func (b *MovableBody) Freeze() bool <span class="cov0" title="0">{
+        return b.freeze
+}</span>
+
+func (b *MovableBody) FaceDirection() animation.FacingDirectionEnum <span class="cov0" title="0">{
+        return b.faceDirection
+}</span>
+
+func (b *MovableBody) SetFaceDirection(value animation.FacingDirectionEnum) <span class="cov0" title="0">{
+        b.faceDirection = value
+}</span>
+
+func (b *MovableBody) IsIdle() bool <span class="cov0" title="0">{
+        return !b.IsWalking() &amp;&amp; !b.IsFalling() &amp;&amp; !b.IsGoingUp()
+}</span>
+
+func (b *MovableBody) IsWalking() bool <span class="cov0" title="0">{
+        // A body cannot be walking if it is airborne.
+        if b.IsFalling() || b.IsGoingUp() </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        <span class="cov0" title="0">threshold := config.Get().Physics.DownwardGravity
+        if b.vx16 &gt; threshold || b.vx16 &lt; -threshold </span><span class="cov0" title="0">{
+                return true
+        }</span>
+
+        <span class="cov0" title="0">return false</span>
+}
+
+func (b *MovableBody) IsGoingUp() bool <span class="cov0" title="0">{
+        threshold := config.Get().Physics.DownwardGravity
+        if b.vy16 &lt;= -threshold </span><span class="cov0" title="0">{
+                return true
+        }</span>
+
+        <span class="cov0" title="0">return false</span>
+}
+
+func (b *MovableBody) IsFalling() bool <span class="cov0" title="0">{
+        threshold := config.Get().Physics.DownwardGravity
+        if b.vy16 &gt;= threshold </span><span class="cov0" title="0">{
+                return true
+        }</span>
+
+        <span class="cov0" title="0">return false</span>
+}
+
+// Platform methods
+func (b *MovableBody) TryJump(force int) <span class="cov0" title="0">{
+        b.vy16 = -fp16.To16(force)
+}</span>
+
+// CheckMovementDirectionX set face direction based on accelerationX
+func (b *MovableBody) CheckMovementDirectionX() <span class="cov0" title="0">{
+        if b.accelerationX &gt; 0 </span><span class="cov0" title="0">{
+                b.SetFaceDirection(animation.FaceDirectionRight)
+        }</span> else<span class="cov0" title="0"> if b.accelerationX &lt; 0 </span><span class="cov0" title="0">{
+                b.SetFaceDirection(animation.FaceDirectionLeft)
+        }</span>
+}
+
+func (b *MovableBody) SetJumpForceMultiplier(multiplier float64) <span class="cov0" title="0">{
+        b.jumpForceMultiplier = multiplier
+}</span>
+
+func (b *MovableBody) JumpForceMultiplier() float64 <span class="cov0" title="0">{
+        return b.jumpForceMultiplier
+}</span>
+
+func (b *MovableBody) SetHorizontalInertia(inertia float64) <span class="cov0" title="0">{
+        b.horizontalInertia = inertia
+}</span>
+
+func (b *MovableBody) HorizontalInertia() float64 <span class="cov0" title="0">{
+        return b.horizontalInertia
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package body
+
+import (
+        "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+)
+
+// TouchTrigger implements the physics.Touchable interface to handle body contact.
+type TouchTrigger struct {
+        execute func()
+        subject body.Body
+}
+
+func NewTouchTrigger(execute func(), subject body.Body) *TouchTrigger <span class="cov9" title="12">{
+        return &amp;TouchTrigger{execute: execute, subject: subject}
+}</span>
+
+// OnTouch is called by the physics engine when a non-obstructive collision occurs.
+func (e *TouchTrigger) OnTouch(other body.Collidable) <span class="cov10" title="14">{
+        if e.subject == nil </span><span class="cov1" title="1">{
+                return
+        }</span>
+        // Check if the body that touched the endpoint is the subject.
+        <span class="cov9" title="13">if other.ID() == e.subject.ID() </span><span class="cov9" title="11">{
+                if e.execute != nil </span><span class="cov8" title="10">{
+                        e.execute()
+                }</span>
+        }
+}
+
+// OnBlock is called for obstructive collisions, which won't happen for a sensor.
+func (e *TouchTrigger) OnBlock(other body.Collidable) {<span class="cov3" title="2">}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package body
+
+import (
+        "fmt"
+        "image"
+        "image/color"
+
+        "github.com/hajimehoshi/ebiten/v2"
+        "github.com/hajimehoshi/ebiten/v2/vector"
+        "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+)
+
+type ObstacleRect struct {
+        Ownership
+        *MovableBody
+        *CollidableBody
+
+        imageOptions *ebiten.DrawImageOptions
+}
+
+func NewObstacleRect(bodyRect *Rect) *ObstacleRect <span class="cov10" title="22">{
+        b := NewBody(bodyRect)
+        movable := NewMovableBody(b)
+        collidable := NewCollidableBody(b)
+        obs := &amp;ObstacleRect{
+                MovableBody:    movable,
+                CollidableBody: collidable,
+
+                imageOptions: &amp;ebiten.DrawImageOptions{},
+        }
+        // Set the owner for all body components to this ObstacleRect
+        b.SetOwner(movable)
+        movable.SetOwner(obs)
+        collidable.SetOwner(obs)
+
+        return obs
+}</span>
+
+// Forwarding methods for Body to avoid ambiguous selector
+// Always route via the MovableBody component
+func (o *ObstacleRect) ID() string <span class="cov4" title="3">{
+        return o.MovableBody.ID()
+}</span>
+func (o *ObstacleRect) SetID(id string) <span class="cov5" title="5">{
+        o.MovableBody.SetID(id)
+}</span>
+func (o *ObstacleRect) Position() image.Rectangle <span class="cov6" title="6">{
+        return o.MovableBody.Position()
+}</span>
+func (o *ObstacleRect) SetPosition(x, y int) <span class="cov5" title="5">{
+        o.MovableBody.SetPosition(x, y)
+}</span>
+func (o *ObstacleRect) GetPositionMin() (int, int) <span class="cov5" title="5">{
+        return o.MovableBody.GetPositionMin()
+}</span>
+
+func (o *ObstacleRect) SetPosition16(x16, y16 int) <span class="cov1" title="1">{
+        o.MovableBody.SetPosition16(x16, y16)
+}</span>
+
+func (o *ObstacleRect) GetPosition16() (int, int) <span class="cov1" title="1">{
+        return o.MovableBody.GetPosition16()
+}</span>
+
+func (o *ObstacleRect) GetShape() body.Shape <span class="cov5" title="4">{
+        return o.MovableBody.GetShape()
+}</span>
+
+func (o *ObstacleRect) AddCollisionBodies(list ...body.Collidable) <span class="cov3" title="2">{
+        if len(list) == 0 </span><span class="cov1" title="1">{
+                b := NewCollidableBodyFromRect(o.GetShape())
+                x, y := o.GetPositionMin()
+                b.SetPosition(x, y)
+                b.SetID(fmt.Sprintf("%v_COLLISION_0", o.ID()))
+                list = []body.Collidable{b}
+        }</span>
+        <span class="cov3" title="2">o.AddCollision(list...)</span>
+}
+
+func (o *ObstacleRect) Draw(screen *ebiten.Image) <span class="cov1" title="1">{
+        rect := o.GetShape().(*Rect)
+        x, y := o.GetPositionMin()
+        vector.DrawFilledRect(
+                screen,
+                float32(x),
+                float32(y),
+                float32(rect.width),
+                float32(rect.height),
+                color.Transparent,
+                false,
+        )
+}</span>
+
+func (o *ObstacleRect) Image() *ebiten.Image <span class="cov1" title="1">{
+        w := o.Position().Dx()
+        h := o.Position().Dy()
+        i := ebiten.NewImage(w, h)
+        return i
+}</span>
+
+func (o *ObstacleRect) ImageOptions() *ebiten.DrawImageOptions <span class="cov3" title="2">{
+        return o.imageOptions
+}</span>
+
+func (o *ObstacleRect) UpdateImageOptions() <span class="cov1" title="1">{
+        o.imageOptions.GeoM.Reset()
+        x, y := o.GetPositionMin()
+        o.imageOptions.GeoM.Translate(float64(x), float64(y))
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package body
+
+import (
+        "fmt"
+
+        "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+)
+
+type ObstacleType int
+type ObstacleMap map[ObstacleType]func() body.Obstacle
+
+type ObstacleFactory interface {
+        Create(obstacleType ObstacleType) (body.Obstacle, error)
+}
+
+type DefaultObstacleFactory struct {
+        obstacleMap ObstacleMap
+}
+
+func NewDefaultObstacleFactory() *DefaultObstacleFactory <span class="cov10" title="6">{
+        return &amp;DefaultObstacleFactory{}
+}</span>
+
+func (f *DefaultObstacleFactory) Create(obstableType ObstacleType) (body.Obstacle, error) <span class="cov10" title="6">{
+        obstacleFunc, ok := f.obstacleMap[obstableType]
+        if !ok </span><span class="cov1" title="1">{
+                return nil, fmt.Errorf("unknown obstacle type")
+        }</span>
+        <span class="cov9" title="5">o := obstacleFunc()
+        return o, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package body
+
+// Ownership handles the hierarchical ownership of components.
+// It allows components to traverse up to the root entity.
+type Ownership struct {
+        owner interface{}
+}
+
+// SetOwner sets the immediate owner of the component.
+func (o *Ownership) SetOwner(owner interface{}) <span class="cov10" title="96">{
+        o.owner = owner
+}</span>
+
+// Owner returns the immediate owner of the component.
+func (o *Ownership) Owner() interface{} <span class="cov7" title="26">{
+        return o.owner
+}</span>
+
+// LastOwner returns the top-most owner in the hierarchy.
+// If the component has no owner, it returns nil.
+func (o *Ownership) LastOwner() interface{} <span class="cov6" title="13">{
+        current := o.owner
+        visited := make(map[interface{}]struct{})
+
+        for current != nil </span><span class="cov7" title="25">{
+                if _, exists := visited[current]; exists </span><span class="cov2" title="2">{
+                        return current
+                }</span>
+                <span class="cov7" title="23">visited[current] = struct{}{}
+
+                if ownerGetter, ok := current.(interface{ Owner() interface{} }); ok </span><span class="cov6" title="16">{
+                        next := ownerGetter.Owner()
+                        if next == nil </span><span class="cov3" title="3">{
+                                return current
+                        }</span>
+                        <span class="cov6" title="13">current = next
+                        continue</span>
+                }
+
+                <span class="cov4" title="7">return current</span>
+        }
+        <span class="cov1" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package body
+
+type Rect struct {
+        width, height int
+}
+
+func NewRect(x, y, width, height int) *Rect <span class="cov10" title="156">{
+        return &amp;Rect{
+                width:  width,
+                height: height,
+        }
+}</span>
+
+func (r *Rect) Width() int <span class="cov8" title="77">{
+        return r.width
+}</span>
+
+func (r *Rect) Height() int <span class="cov8" title="77">{
+        return r.height
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
