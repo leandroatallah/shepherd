@@ -29,6 +29,7 @@ type PlatformerActorEntity interface {
 	OnFall()
 	SetOnJump(func(image.Point))
 	SetOnFall(func(image.Point))
+	SetOnLand(func(image.Point))
 }
 
 type PlatformerCharacter struct {
