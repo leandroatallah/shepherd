@@ -1,7 +1,18 @@
 {
   "commands": [
+    {
+      "command": "event",
+      "event_type": "cutscene_shepherd_fall",
+      "payload": {}
+    },
     { "command": "fadeout_all_music", "duration": 120 },
-    { "command": "delay", "frames": 120 },
+    { "command": "delay", "frames": 360 },
+    {
+      "command": "event",
+      "event_type": "cutscene_shepherd_fall_rise",
+      "payload": {}
+    },
+    { "command": "delay", "frames": 180 },
     {
       "command": "dialogue",
       "lines": ["I'm okay.", "Dog! Go find an alternate \nway to help me!"],
