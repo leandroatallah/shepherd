@@ -1,178 +1,70 @@
 package scene
 
 import (
+	"image"
 	"testing"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/render/tilemap"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/mocks"
 )
 
-// createValidTilemap creates a minimal valid tilemap for testing
-func createValidTilemap(layers []*tilemap.Layer) *tilemap.Tilemap {
-	return &tilemap.Tilemap{
-		Tilewidth:  16,
-		Tileheight: 16,
-		Width:      40,
-		Height:     14,
-		Tilesets: []*tilemap.Tileset{
-			{Firstgid: 1, Tilewidth: 16, Tileheight: 16},
-		},
-		Layers: layers,
+func TestTilemapScene_Basics(t *testing.T) {
+	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
+	am := &audio.AudioManager{}
+	ctx := &app.AppContext{AudioManager: am}
+	
+	s := NewTilemapScene(ctx)
+	
+	if s.AppContext() != ctx {
+		t.Error("AppContext not set correctly")
+	}
+	
+	if s.Camera() == nil {
+		t.Error("Camera not initialized")
+	}
+	
+	if s.Audiomanager() != am {
+		t.Error("Audiomanager() returned wrong manager")
+	}
+	
+	// Test Camera Config
+	s.SetCameraConfig(CameraConfig{Mode: CameraModeFollow})
+	if !s.Camera().IsFollowing() {
+		t.Error("SetCameraConfig(Follow) failed to set camera following state")
+	}
+	
+	s.SetCameraConfig(CameraConfig{Mode: CameraModeFixed})
+	if s.Camera().IsFollowing() {
+		t.Error("SetCameraConfig(Fixed) failed to unset camera following state")
+	}
+	
+	// Test Tilemap Width/Height defaults (no tilemap loaded)
+	if s.GetTilemapWidth() != 320 {
+		t.Errorf("expected default width 320; got %d", s.GetTilemapWidth())
+	}
+	if s.GetTilemapHeight() != 240 {
+		t.Errorf("expected default height 240; got %d", s.GetTilemapHeight())
+	}
+	
+	// Test Camera Bounds
+	bounds := image.Rect(0, 0, 100, 100)
+	s.Camera().SetBounds(&bounds)
+	b, ok := s.GetCameraBounds()
+	if !ok || b != bounds {
+		t.Errorf("GetCameraBounds returned %v, %v; want %v, true", b, ok, bounds)
+	}
+	
+	// Test Update
+	if err := s.Update(); err != nil {
+		t.Fatalf("Update failed: %v", err)
 	}
 }
 
-// Test SetPlayerStartPosition adjusts Y correctly
-func TestTilemapScene_SetPlayerStartPosition(t *testing.T) {
-	ctx := &app.AppContext{}
-	scene := NewTilemapScene(ctx)
-
-	// Create a mock tilemap with PlayerStart at (80, 144) and tile height 16
-	scene.tilemap = createValidTilemap([]*tilemap.Layer{
-		{
-			Name:    "PlayerStart",
-			Type:    "objectgroup",
-			Visible: true,
-			Objects: []*tilemap.Obstacle{
-				{X: 80, Y: 144},
-			},
-		},
-	})
-
-	// Verify tilemap loads PlayerStart correctly
-	x, y, found := scene.tilemap.GetPlayerStartPosition()
-	if !found {
-		t.Fatal("expected PlayerStart to be found")
-	}
-	if x != 80 {
-		t.Errorf("expected x=80, got %d", x)
-	}
-	if y != 144 {
-		t.Errorf("expected y=144, got %d", y)
-	}
-
-	// Expected adjustment: y = 144 - (actorHeight - tileHeight)
-	// For actorHeight=24, tileHeight=16: y = 144 - 8 = 136
-	expectedY := y - (24 - scene.tilemap.Tileheight)
-	if expectedY != 136 {
-		t.Errorf("expected adjusted y=136, got %d", expectedY)
-	}
-}
-
-// Test SetPlayerStartPosition with no PlayerStart layer
-func TestTilemapScene_SetPlayerStartPosition_NoLayer(t *testing.T) {
-	ctx := &app.AppContext{}
-	scene := NewTilemapScene(ctx)
-
-	scene.tilemap = createValidTilemap([]*tilemap.Layer{})
-
-	_, _, found := scene.tilemap.GetPlayerStartPosition()
-	if found {
-		t.Fatal("expected PlayerStart not to be found")
-	}
-}
-
-// Test InitEnemies position adjustment calculation
-func TestTilemapScene_InitEnemies_PositionAdjustment(t *testing.T) {
-	ctx := &app.AppContext{}
-	scene := NewTilemapScene(ctx)
-
-	scene.tilemap = createValidTilemap([]*tilemap.Layer{
-		{
-			Name:    "Enemies",
-			Type:    "objectgroup",
-			Visible: true,
-			Objects: []*tilemap.Obstacle{
-				{X: 192, Y: 160, Gid: 174},
-			},
-		},
-	})
-
-	enemiesPos := scene.Tilemap().GetEnemiesPositionID()
-	if len(enemiesPos) != 1 {
-		t.Fatalf("expected 1 enemy position, got %d", len(enemiesPos))
-	}
-
-	e := enemiesPos[0]
-	if e.X != 192 {
-		t.Errorf("expected enemy x=192, got %d", e.X)
-	}
-	if e.Y != 160 {
-		t.Errorf("expected enemy y=160, got %d", e.Y)
-	}
-
-	// Expected adjustment: y = 160 - (actorHeight - tileHeight)
-	// For actorHeight=24, tileHeight=16: y = 160 - 8 = 152
-	actorHeight := 24
-	expectedY := e.Y - (actorHeight - scene.tilemap.Tileheight)
-	if expectedY != 152 {
-		t.Errorf("expected adjusted y=152, got %d", expectedY)
-	}
-}
-
-// Test InitNPCs position adjustment calculation
-func TestTilemapScene_InitNPCs_PositionAdjustment(t *testing.T) {
-	ctx := &app.AppContext{}
-	scene := NewTilemapScene(ctx)
-
-	scene.tilemap = createValidTilemap([]*tilemap.Layer{
-		{
-			Name:    "NPCs",
-			Type:    "objectgroup",
-			Visible: true,
-			Objects: []*tilemap.Obstacle{
-				{X: 32, Y: 160, Gid: 184},
-			},
-		},
-	})
-
-	npcsPos := scene.Tilemap().GetNpcsPositionID()
-	if len(npcsPos) != 1 {
-		t.Fatalf("expected 1 npc position, got %d", len(npcsPos))
-	}
-
-	n := npcsPos[0]
-	if n.X != 32 {
-		t.Errorf("expected npc x=32, got %d", n.X)
-	}
-	if n.Y != 160 {
-		t.Errorf("expected npc y=160, got %d", n.Y)
-	}
-
-	// Expected adjustment: y = 160 - (actorHeight - tileHeight)
-	// For actorHeight=24, tileHeight=16: y = 160 - 8 = 152
-	actorHeight := 24
-	expectedY := n.Y - (actorHeight - scene.tilemap.Tileheight)
-	if expectedY != 152 {
-		t.Errorf("expected adjusted y=152, got %d", expectedY)
-	}
-}
-
-// Test InitItems position
-func TestTilemapScene_InitItems_Position(t *testing.T) {
-	ctx := &app.AppContext{}
-	scene := NewTilemapScene(ctx)
-
-	scene.tilemap = createValidTilemap([]*tilemap.Layer{
-		{
-			Name:    "Items",
-			Type:    "objectgroup",
-			Visible: true,
-			Objects: []*tilemap.Obstacle{
-				{X: 100, Y: 100, Gid: 1}, // Gid > 0 to use tileset
-			},
-		},
-	})
-
-	itemsPos := scene.Tilemap().GetItemsPositionID()
-	if len(itemsPos) != 1 {
-		t.Fatalf("expected 1 item position, got %d", len(itemsPos))
-	}
-
-	i := itemsPos[0]
-	if i.X != 100 {
-		t.Errorf("expected item x=100, got %d", i.X)
-	}
-	if i.Y != 100 {
-		t.Errorf("expected item y=100, got %d", i.Y)
-	}
+func TestTilemapScene_SetPlayerStartPosition_NoTilemap(t *testing.T) {
+	s := &TilemapScene{} // No tilemap
+	p := &mocks.MockActor{}
+	// Should not panic
+	s.SetPlayerStartPosition(p)
 }

@@ -86,7 +86,11 @@ func (s *BaseScene) DisableKeys() {
 // PauseAllMusic pauses all music.
 // Useful for scenes that need to control music manually.
 func (s *BaseScene) PauseAllMusic() {
-	s.AppContext().AudioManager.PauseAll()
+	ctx := s.AppContext()
+	if ctx == nil || ctx.AudioManager == nil {
+		return
+	}
+	ctx.AudioManager.PauseAll()
 }
 
 // PlayMusic plays music with rewind control.
@@ -116,5 +120,5 @@ func (s *BaseScene) PlayMusicWithLoop(path string, loop bool, rewind bool) {
 
 // VFXManager returns the VFX manager. Override in subclasses.
 func (s *BaseScene) VFXManager() interface{} {
-	return nil
+	return s.count
 }

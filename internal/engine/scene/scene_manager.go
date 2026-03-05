@@ -110,8 +110,12 @@ func (m *SceneManager) NavigateBack(sceneTransition navigation.Transition) {
 }
 
 func (m *SceneManager) AudioManager() *audio.AudioManager {
+	if m.AppContext() == nil {
+		return nil
+	}
 	return m.AppContext().AudioManager
 }
+
 
 // CurrentScene returns the currently active scene.
 func (m *SceneManager) CurrentScene() navigation.Scene {

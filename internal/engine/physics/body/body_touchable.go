@@ -28,6 +28,4 @@ func (e *TouchTrigger) OnTouch(other body.Collidable) {
 }
 
 // OnBlock is called for obstructive collisions, which won't happen for a sensor.
-func (e *TouchTrigger) OnBlock(other body.Collidable) {
-	_ = other
-}
+func (e *TouchTrigger) OnBlock(other body.Collidable) {}
