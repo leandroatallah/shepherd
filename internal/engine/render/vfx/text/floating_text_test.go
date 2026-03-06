@@ -3,9 +3,11 @@ package text_test
 import (
 	"image/color"
 	"testing"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/render/vfx/text"
 )
@@ -83,12 +85,37 @@ func TestFloatingTextBase_SetColor(t *testing.T) {
 	}
 }
 
-func TestFloatingTextBase_DrawText_NilFont(t *testing.T) {
-	ft := newMockText("Test", 10)
-	ft.Font = nil
+func TestNewFloatingTextWithVelocity(t *testing.T) {
+	ft := text.NewFloatingTextWithVelocity("msg", 10, 20, 30, -1.5)
+	if ft.VelocityY != -1.5 {
+		t.Errorf("expected VelocityY -1.5, got %f", ft.VelocityY)
+	}
+}
 
-	screen := ebiten.NewImage(100, 100)
-	ft.DrawText(screen, 50, 50, nil)
+func TestFloatingTextBase_DrawText_WithCamera(t *testing.T) {
+	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
+	cam := camera.NewController(0, 0)
+	cam.SetCenter(100, 100)
+
+	ft := text.NewFloatingText("test", 100, 100, 10)
+	
+	// Try to load a real font from assets for the test
+	fontPath := "../../../../../assets/fonts/monogram.ttf"
+	if _, err := os.Stat(fontPath); err == nil {
+		f, err := font.NewFontText(fontPath)
+		if err == nil {
+			ft.SetFont(f)
+		}
+	} else {
+		// Fallback to testing without a font if assets are not reachable
+		ft.SetFont(nil)
+	}
+
+	screen := ebiten.NewImage(320, 240)
+	ft.DrawText(screen, 100, 100, cam)
+	
+	// Test without camera
+	ft.DrawText(screen, 100, 100, nil)
 }
 
 func TestManager_NewManager(t *testing.T) {
