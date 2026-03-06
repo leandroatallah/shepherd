@@ -88,16 +88,16 @@ func (m *MockActor) AddCollision(list ...body.Collidable)                {}
 func (m *MockActor) ClearCollisions()                                    {}
 func (m *MockActor) SetTouchable(t body.Touchable)                       {}
 func (m *MockActor) ApplyValidPosition(d int, ax bool, sp body.BodiesSpace) (int, int, bool) {
-	return 0, 0, false
+	return m.Pos.Min.X, m.Pos.Min.Y, false
 }
-func (m *MockActor) MoveX(d int)                                      {}
-func (m *MockActor) MoveY(d int)                                      {}
-func (m *MockActor) OnMoveUpLeft(d int)                               {}
-func (m *MockActor) OnMoveDownLeft(d int)                             {}
-func (m *MockActor) OnMoveUpRight(d int)                              {}
-func (m *MockActor) OnMoveDownRight(d int)                            {}
-func (m *MockActor) OnMoveUp(d int)                                   {}
-func (m *MockActor) OnMoveDown(d int)                                 {}
+func (m *MockActor) MoveX(d int)                                      { m.MoveRightForce = d }
+func (m *MockActor) MoveY(d int)                                      { m.MoveRightForce = d }
+func (m *MockActor) OnMoveUpLeft(d int)                               { m.MoveLeftForce = d }
+func (m *MockActor) OnMoveDownLeft(d int)                             { m.MoveLeftForce = d }
+func (m *MockActor) OnMoveUpRight(d int)                              { m.MoveRightForce = d }
+func (m *MockActor) OnMoveDownRight(d int)                            { m.MoveRightForce = d }
+func (m *MockActor) OnMoveUp(d int)                                   { m.MoveRightForce = d } // Simplified
+func (m *MockActor) OnMoveDown(d int)                                 { m.MoveRightForce = d } // Simplified
 func (m *MockActor) Velocity() (int, int)                             { return 0, 0 }
 func (m *MockActor) SetVelocity(vx, vy int)                           {}
 func (m *MockActor) Acceleration() (ax, ay int)                       { return 0, 0 }
@@ -113,7 +113,7 @@ func (m *MockActor) IsWalking() bool                                  { return f
 func (m *MockActor) IsFalling() bool                                  { return false }
 func (m *MockActor) IsGoingUp() bool                                  { return false }
 func (m *MockActor) CheckMovementDirectionX()                         {}
-func (m *MockActor) TryJump(f int)                                    {}
+func (m *MockActor) TryJump(f int)                                    { m.MoveRightForce = f }
 func (m *MockActor) SetJumpForceMultiplier(mu float64)                {}
 func (m *MockActor) JumpForceMultiplier() float64                     { return 1.0 }
 func (m *MockActor) SetHorizontalInertia(i float64)                   {}
