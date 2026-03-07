@@ -24,6 +24,7 @@ type Speech interface {
 	SetSpeed(speed int)
 	SetColor(c color.Color)
 	Color() color.Color
+	SetSkipFlash(frames int)
 }
 
 type SpeechBase struct {
@@ -37,6 +38,7 @@ type SpeechBase struct {
 	position      string
 	speed         int
 	color         color.Color
+	skipFlash     int
 }
 
 func NewSpeechBase(fontSource *SpeechFont) *SpeechBase {
@@ -50,6 +52,9 @@ func NewSpeechBase(fontSource *SpeechFont) *SpeechBase {
 
 func (s *SpeechBase) Update() error {
 	s.count++
+	if s.skipFlash > 0 {
+		s.skipFlash--
+	}
 	if s.count > s.spellingDelay {
 		effectiveCount := s.count - s.spellingDelay
 		speed := s.speed
@@ -119,6 +124,7 @@ func (s *SpeechBase) CompleteSpelling() {
 func (s *SpeechBase) ResetText() {
 	s.spellingCount = 0
 	s.count = 0
+	s.skipFlash = 0
 }
 
 func (s *SpeechBase) SetColor(c color.Color) {
@@ -127,6 +133,14 @@ func (s *SpeechBase) SetColor(c color.Color) {
 
 func (s *SpeechBase) Color() color.Color {
 	return s.color
+}
+
+func (s *SpeechBase) SetSkipFlash(frames int) {
+	s.skipFlash = frames
+}
+
+func (s *SpeechBase) SkipFlash() int {
+	return s.skipFlash
 }
 
 func (s *SpeechBase) Image(screen *ebiten.Image) *ebiten.Image {

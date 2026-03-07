@@ -45,10 +45,15 @@ type AppConfig struct {
 	CollisionBox bool
 	NoSound      bool
 
+	EnableSpeechSkip          bool
+	EnableTypingSounds        bool
+	TypingSoundVolume         float64
+	TypingSoundCooldownFrames int
+
 	// Transition
-	ScreenFlipSpeed      float64
-	FadeHoldDuration     time.Duration   // black screen before scene change
-	FadeVisibleDuration  time.Duration   // black screen after scene change (before fade in)
+	ScreenFlipSpeed     float64
+	FadeHoldDuration    time.Duration // black screen before scene change
+	FadeVisibleDuration time.Duration // black screen after scene change (before fade in)
 }
 
 var cfg AppConfig
