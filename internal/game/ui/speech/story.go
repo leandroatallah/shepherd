@@ -31,6 +31,10 @@ func (s *StorySpeech) Show() {
 	s.SpeechBase.SetSpellingDelay(0)
 }
 
+func (s *StorySpeech) TypingSoundEnabled() bool {
+	return false
+}
+
 func (s *StorySpeech) Draw(screen *ebiten.Image, msg string) {
 	if !s.Visible() && s.removed {
 		return

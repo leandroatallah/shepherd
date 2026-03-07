@@ -52,6 +52,10 @@ func (s *SpeechBubble) ResetText() {
 	}
 }
 
+func (s *SpeechBubble) TypingSoundEnabled() bool {
+	return true
+}
+
 func (s *SpeechBubble) Draw(screen *ebiten.Image, msg string) {
 	if !s.Visible() && s.removed {
 		return
