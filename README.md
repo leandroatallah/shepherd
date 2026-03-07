@@ -36,6 +36,7 @@ This separation allows the engine to be developed independently from the game's 
 │   │   │   └── items/   # Item management
 │   │   ├── event/       # Event handling system
 │   │   ├── input/       # User input handling
+│   │   ├── mocks/       # Test mocks for engine components
 │   │   ├── physics/     # Physics simulation (body, movement, skill, space)
 │   │   ├── render/      # Rendering tasks (camera, particles, screenutil, sprites, tilemap, vfx)
 │   │   │   └── camera/  # Camera control and rendering
@@ -46,11 +47,11 @@ This separation allows the engine to be developed independently from the game's 
 │   └── game/            # Game-specific implementation
 │       ├── app/         # Game-specific setup and initialization (config, phases list, setup)
 │       ├── entity/      # Concrete game entities (actors, items, obstacles, types)
-│       │   ├── actors/  # Game-specific characters and enemies
-│       │   ├── items/   # Game-specific items
-│       │   └── obstacles/ # Game-specific obstacles
+│       │   ├── actors/  # Game-specific characters (player, npcs, enemies) and state logic
+│       │   ├── items/   # Game-specific items (coins, falling platforms)
+│       │   └── obstacles/ # Game-specific obstacles (walls, hazards)
 │       ├── render/      # Game-specific rendering logic (vfx)
-│       ├── scenes/      # Game scenes and phases (intro, menu, phases, story, summary, types, title)
+│       ├── scenes/      # Game scenes and phases (intro, menu, story, summary)
 │       └── ui/          # Game's specific user interface (hud, speech)
 ├── go.mod               # Go module definition
 └── README.md

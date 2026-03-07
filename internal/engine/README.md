@@ -13,6 +13,7 @@ This module contains the core, reusable game engine components for the Shepherd 
   - `schemas/`: Definitions for data structures used in asset files.
 - `event/`: Provides a basic event handling system for inter-component communication.
 - `input/`: Manages user input from keyboard, mouse, or gamepads.
+- `mocks/`: Contains mock implementations of engine components for testing purposes, facilitating unit and integration tests for the game module.
 - `sequences/`: Manages scripted event sequences, commands, and cutscenes.
   - `player.go`: Executes sequences of commands.
   - `commands/`: Scriptable actions for actors, camera, music, and visual effects.
