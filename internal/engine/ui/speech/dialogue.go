@@ -30,6 +30,10 @@ type Manager struct {
 	dialogueSkipEnabled   bool
 }
 
+type typingSoundPolicy interface {
+	TypingSoundEnabled() bool
+}
+
 const (
 	BubbleSpeechID = "bubble"
 	StorySpeechID  = "story"
@@ -222,6 +226,11 @@ func (m *Manager) startSpeechAudioIfNeeded() {
 	if key == "" {
 		return
 	}
+	// Check typing sound policy - if disabled, skip speech audio as well
+	s := m.getActiveSpeech()
+	if policy, ok := s.(typingSoundPolicy); ok && !policy.TypingSoundEnabled() {
+		return
+	}
 	m.speechAudioPlayingKey = key
 	m.audioManager.PlaySound(m.speechAudioPlayingKey)
 }
@@ -255,6 +264,9 @@ func (m *Manager) stopSpeechAudio(clearQueue bool) {
 func (m *Manager) updateTypingSound(s Speech) {
 	cfg := m.config
 	if cfg == nil || !cfg.EnableTypingSounds || m.audioManager == nil || len(m.typingSounds) == 0 {
+		return
+	}
+	if policy, ok := s.(typingSoundPolicy); ok && !policy.TypingSoundEnabled() {
 		return
 	}
 	if s.IsSpellingComplete() {
