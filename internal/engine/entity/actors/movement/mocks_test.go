@@ -19,6 +19,7 @@ type mockActor struct {
 	immobile       bool
 	obstructive    bool
 	id             string
+	velocity       struct{ x, y int }
 }
 
 func (m *mockActor) ID() string { 
@@ -49,8 +50,8 @@ func (m *mockActor) OnMoveDownRight(d int) { m.moveRightForce = d; m.moveDownFor
 func (m *mockActor) OnMoveUp(d int) { m.moveUpForce = d }
 func (m *mockActor) OnMoveDown(d int) { m.moveDownForce = d }
 
-func (m *mockActor) Velocity() (int, int) { return 0, 0 }
-func (m *mockActor) SetVelocity(vx, vy int) {}
+func (m *mockActor) Velocity() (int, int) { return m.velocity.x, m.velocity.y }
+func (m *mockActor) SetVelocity(vx, vy int) { m.velocity.x, m.velocity.y = vx, vy }
 func (m *mockActor) Acceleration() (ax, ay int) { return 0, 0 }
 func (m *mockActor) SetAcceleration(ax, ay int) {}
 func (m *mockActor) SetSpeed(s int) error { m.speed = s; return nil }

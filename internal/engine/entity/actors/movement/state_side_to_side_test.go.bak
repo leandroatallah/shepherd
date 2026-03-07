@@ -265,3 +265,38 @@ func TestSideToSideMovementState_TurnAfterWall(t *testing.T) {
 	}
 }
 
+func TestSideToSideMovementState_WaitDuringVerticalMovement(t *testing.T) {
+	actor := &mockActor{speed: 5}
+	actor.SetPosition(0, 0)
+
+	// Wall below - make sure it's obstructive
+	wall := &mockActor{}
+	wall.pos = image.Rect(0, 10, 10, 20)
+	wall.obstructive = true
+
+	space := &mockSpace{bodies: []body.Collidable{wall}}
+
+	base := NewBaseMovementState(SideToSide, actor, nil)
+	state := NewSideToSideMovementState(base)
+	state.vertical = true
+	state.waitDuration = 5
+
+	// First move - hit wall, should start waiting
+	state.Move(space)
+
+	if !state.isWaiting {
+		t.Error("expected state to be waiting after hitting wall")
+	}
+
+	// During wait, velocity should be zeroed
+	actor.SetVelocity(10, 80) // Set some initial velocity
+	state.Move(space)
+
+	vx, vy := actor.Velocity()
+	if vy != 0 {
+		t.Errorf("expected velocity Y to be 0 during wait, got %d", vy)
+	}
+	if vx != 10 {
+		t.Errorf("expected velocity X to remain 10 during wait, got %d", vx)
+	}
+}
