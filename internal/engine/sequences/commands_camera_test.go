@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/mocks"
 	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
@@ -133,5 +134,164 @@ func TestCameraSetTargetCommand_InstantTransition(t *testing.T) {
 
 	if finalX != expectedX || finalY != expectedY {
 		t.Fatalf("expected camera to be centered on target (%f, %f), got (%f, %f)", expectedX, expectedY, finalX, finalY)
+	}
+}
+
+func TestCameraMoveCommand_Init(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+
+	cam := camera.NewController(0, 0)
+	mockScene := &mockSceneWithCamera{cam: cam}
+	mockScene.SetAppContext(appContext)
+	appContext.SceneManager.SwitchTo(mockScene)
+
+	cmd := &CameraMoveCommand{
+		X:        100.0,
+		Y:        200.0,
+		Duration: 30,
+	}
+
+	cmd.Init(appContext)
+
+	// Camera should be found via the interface assertion
+	if cmd.camera == nil {
+		t.Error("camera should not be nil")
+	}
+}
+
+func TestCameraMoveCommand_Update_NilCamera(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+	// No camera in this scene
+
+	cmd := &CameraMoveCommand{
+		X:        100.0,
+		Y:        200.0,
+		Duration: 10,
+	}
+
+	cmd.Init(appContext)
+
+	finished := cmd.Update()
+	if !finished {
+		t.Error("command with nil camera should finish immediately")
+	}
+}
+
+func TestCameraResetCommand_Init(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+
+	cam := camera.NewController(0, 0)
+	cam.Kamera().ZoomFactor = 2.0 // Start zoomed in
+
+	mockScene := &mockSceneWithCamera{cam: cam}
+	mockScene.SetAppContext(appContext)
+	appContext.SceneManager.SwitchTo(mockScene)
+
+	cmd := &CameraResetCommand{
+		DefaultZoom: 1.0,
+		Duration:    30,
+	}
+
+	cmd.Init(appContext)
+
+	// Camera should be found via the interface assertion
+	if cmd.camera == nil {
+		t.Error("camera should not be nil")
+	}
+}
+
+func TestCameraResetCommand_Update_NilCamera(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+	// No camera
+
+	cmd := &CameraResetCommand{
+		DefaultZoom: 1.0,
+		Duration:    10,
+	}
+
+	cmd.Init(appContext)
+
+	finished := cmd.Update()
+	if !finished {
+		t.Error("command with nil camera should finish immediately")
+	}
+}
+
+func TestCameraZoomCommand_Init_NilCamera(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+
+	cmd := &CameraZoomCommand{
+		Zoom:     2.0,
+		Duration: 30,
+		Delay:    10,
+	}
+
+	// Should not panic with nil camera
+	cmd.Init(appContext)
+}
+
+func TestCameraZoomCommand_Update_NilCamera(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+
+	cmd := &CameraZoomCommand{
+		Zoom:     2.0,
+		Duration: 30,
+	}
+
+	cmd.Init(appContext)
+
+	finished := cmd.Update()
+	if !finished {
+		t.Error("command with nil camera should finish immediately")
+	}
+}
+
+func TestCameraZoomCommand_WithTarget(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+	appContext.Space = space.NewSpace()
+	appContext.ActorManager = actors.NewManager()
+
+	cam := camera.NewController(0, 0)
+	mockScene := &mockSceneWithCamera{cam: cam}
+	mockScene.SetAppContext(appContext)
+	appContext.SceneManager.SwitchTo(mockScene)
+
+	target := &mocks.MockActor{Id: "zoom_target"}
+	target.SetPosition(100, 100)
+	appContext.Space.AddBody(target)
+	appContext.ActorManager.Register(target)
+
+	cmd := &CameraZoomCommand{
+		Zoom:     2.0,
+		Duration: 0, // Instant
+		TargetID: "zoom_target",
+	}
+
+	// Camera should be found via the interface assertion
+	cmd.Init(appContext)
+
+	if cmd.camera == nil {
+		t.Error("camera should not be nil")
 	}
 }
