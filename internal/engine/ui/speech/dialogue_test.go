@@ -1,7 +1,12 @@
 package speech
 
 import (
+	"image/color"
 	"testing"
+
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 )
 
 func TestManager(t *testing.T) {
@@ -126,5 +131,102 @@ func TestManager_Draw(t *testing.T) {
 	m.Draw(nil)
 	if s.drawCalled != 1 {
 		t.Errorf("Expected Draw to be called on speech, got %d", s.drawCalled)
+	}
+}
+
+type typingSpeech struct {
+	id               string
+	visible          bool
+	spellingComplete bool
+	spelled          int
+}
+
+func (t *typingSpeech) ID() string { return t.id }
+func (t *typingSpeech) Show() { t.visible = true }
+func (t *typingSpeech) Hide() { t.visible = false }
+func (t *typingSpeech) Visible() bool { return t.visible }
+func (t *typingSpeech) Text(msg string) string {
+	if t.spelled <= 0 {
+		return ""
+	}
+	if t.spelled >= len(msg) {
+		return msg
+	}
+	return msg[:t.spelled]
+}
+func (t *typingSpeech) ResetText() { t.spelled = 0; t.spellingComplete = false }
+func (t *typingSpeech) SetID(id string) { t.id = id }
+func (t *typingSpeech) SetSpellingDelay(d int) {}
+func (t *typingSpeech) IsSpellingComplete() bool { return t.spellingComplete }
+func (t *typingSpeech) CompleteSpelling() { t.spellingComplete = true }
+func (t *typingSpeech) Count() int { return 0 }
+func (t *typingSpeech) Update() error {
+	t.spelled++
+	return nil
+}
+func (t *typingSpeech) Draw(screen *ebiten.Image, text string) {}
+func (t *typingSpeech) SetPosition(pos string) {}
+func (t *typingSpeech) SetSpeed(speed int) {}
+func (t *typingSpeech) SetColor(c color.Color) {}
+func (t *typingSpeech) Color() color.Color { return color.Black }
+func (t *typingSpeech) SetSkipFlash(frames int) {}
+
+func TestManager_ApplyDefaultSpeechAudio_Rotates(t *testing.T) {
+	config.Set(&config.AppConfig{})
+	s := &mockSpeech{id: "test"}
+	m := NewManager(s)
+	m.SetDefaultSpeechAudio([]string{"a", "b"})
+
+	m.ApplyDefaultSpeechAudio(3)
+
+	want := []string{"a", "b", "a"}
+	if len(m.speechAudioByLine) != len(want) {
+		t.Fatalf("expected %d entries, got %d", len(want), len(m.speechAudioByLine))
+	}
+	for i := range want {
+		if m.speechAudioByLine[i] != want[i] {
+			t.Fatalf("expected %s at %d, got %s", want[i], i, m.speechAudioByLine[i])
+		}
+	}
+}
+
+func TestManager_StartSpeechAudio_UsesLineAudio(t *testing.T) {
+	config.Set(&config.AppConfig{})
+	s := &mockSpeech{id: "test"}
+	m := NewManager(s)
+	m.SetActiveSpeech("test")
+	m.SetAudioManager(&audio.AudioManager{})
+	m.SetSpeechAudioQueue([]string{"assets/audio/bleeps/bleep001.ogg"})
+
+	m.ShowMessages([]string{"Line 1"}, "bottom", 0)
+
+	if m.speechAudioPlayingKey != "assets/audio/bleeps/bleep001.ogg" {
+		t.Fatalf("expected speech audio key to be set, got %s", m.speechAudioPlayingKey)
+	}
+}
+
+func TestManager_TypingSound_Rotates(t *testing.T) {
+	config.Set(&config.AppConfig{
+		EnableTypingSounds:        true,
+		TypingSoundCooldownFrames: 1,
+		TypingSoundVolume:         1,
+	})
+	s := &typingSpeech{id: "test"}
+	m := NewManager(s)
+	m.SetActiveSpeech("test")
+	m.SetAudioManager(&audio.AudioManager{})
+	m.SetTypingSounds([]string{"a", "b", "c"})
+
+	m.ShowMessages([]string{"abcd"}, "bottom", 0)
+
+	_ = m.Update()
+	if m.typingSoundIndex != 1 {
+		t.Fatalf("expected typingSoundIndex 1, got %d", m.typingSoundIndex)
+	}
+
+	_ = m.Update()
+	_ = m.Update()
+	if m.typingSoundIndex != 2 {
+		t.Fatalf("expected typingSoundIndex 2, got %d", m.typingSoundIndex)
 	}
 }
