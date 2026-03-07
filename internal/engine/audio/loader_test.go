@@ -1,7 +1,6 @@
 package audio
 
 import (
-	"io/fs"
 	"testing"
 	"testing/fstest"
 )
@@ -30,9 +29,8 @@ func TestLoadAudioAssetsFromFS(t *testing.T) {
 
 func TestLoadAudioAssetsFromFS_EmptyDir(t *testing.T) {
 	am := getTestAudioManager()
-	mockFS := fstest.MapFS{
-		"assets/audio/": &fstest.MapFile{Mode: fs.ModeDir},
-	}
+	// Use a valid empty MapFS - just a root directory entry
+	mockFS := fstest.MapFS{}
 
 	LoadAudioAssetsFromFS(mockFS, am) // should not panic/exit
 }
