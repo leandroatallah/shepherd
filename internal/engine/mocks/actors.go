@@ -17,6 +17,8 @@ type MockActor struct {
 	Pos            image.Rectangle
 	SpeedVal       int
 	MaxSpeedVal    int
+	HealthVal      int
+	MaxHealthVal   int
 	MovementMdl    physicsmovement.MovementModel
 	MovementSt     movement.MovementStateEnum
 	IsScripted     bool
@@ -64,16 +66,25 @@ func (m *MockActor) NewState(state actors.ActorStateEnum) (actors.ActorState, er
 	return nil, nil
 }
 func (m *MockActor) Hurt(damage int)                                     {}
+func (m *MockActor) OnDie()                                             {}
+func (m *MockActor) OnJump()                                            {}
+func (m *MockActor) OnLand()                                            {}
+func (m *MockActor) OnFall()                                            {}
+func (m *MockActor) SetOnJump(f func(image.Point))                      {}
+func (m *MockActor) SetOnFall(f func(image.Point))                      {}
+func (m *MockActor) SetOnLand(f func(image.Point))                      {}
+func (m *MockActor) SetAppContext(_ any)                                {}
+func (m *MockActor) AppContext() any                                    { return nil }
 func (m *MockActor) Owner() interface{}                                  { return nil }
 func (m *MockActor) SetOwner(interface{})                                { }
 func (m *MockActor) LastOwner() interface{}                              { return nil }
 func (m *MockActor) Update(space body.BodiesSpace) error                 { return nil }
-func (m *MockActor) Health() int                                         { return 100 }
-func (m *MockActor) MaxHealth() int                                      { return 100 }
-func (m *MockActor) SetHealth(h int)                                     {}
-func (m *MockActor) SetMaxHealth(h int)                                  {}
-func (m *MockActor) LoseHealth(d int)                                    {}
-func (m *MockActor) RestoreHealth(h int)                                 {}
+func (m *MockActor) Health() int                                         { return m.HealthVal }
+func (m *MockActor) MaxHealth() int                                      { return m.MaxHealthVal }
+func (m *MockActor) SetHealth(h int)                                     { m.HealthVal = h }
+func (m *MockActor) SetMaxHealth(h int)                                  { m.MaxHealthVal = h }
+func (m *MockActor) LoseHealth(d int)                                    { m.HealthVal -= d }
+func (m *MockActor) RestoreHealth(h int)                                 { m.HealthVal += h }
 func (m *MockActor) Invulnerable() bool                                  { return false }
 func (m *MockActor) SetInvulnerability(v bool)                           {}
 func (m *MockActor) GetTouchable() body.Touchable                        { return m }
