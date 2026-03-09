@@ -15,13 +15,14 @@
     {
       "command": "dialogue",
       "lines": [
-        "In a quiet land of hills and stone,",
-        "A shepherd lived with his dog \nand a small flock of sheep.",
-        "Days passed in silence. \nNights passed in trust."
+        "In a quiet land of hills and stone, In a quiet land of hills and stone,",
+        "A shepherd lived with his dog and a small flock of sheep. \nIn a quiet land of hills and stone,",
+        "Days passed in silence. Nights passed in trust."
       ],
       "position": "top",
       "speech_speed": 1,
-      "speech_id": "story"
+      "speech_id": "story",
+      "accumulative": true
     },
     {
       "command": "delay",

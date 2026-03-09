@@ -20,6 +20,7 @@ func NewStorySpeech(fontSource *speech.SpeechFont) *StorySpeech {
 	s := &StorySpeech{
 		baseSpeech: newBaseSpeech(fontSource),
 	}
+	s.SetAccumulative(true)
 	s.indicator = indicatorImg
 	s.SetID(speech.StorySpeechID)
 	s.SetColor(color.White) // Default to white for storytelling
@@ -42,7 +43,7 @@ func (s *StorySpeech) Draw(screen *ebiten.Image, msg string) {
 
 	// For storytelling, we use more space and no bubble
 	w := config.Get().ScreenWidth - minMargin*2
-	h := 64
+	h := 100 // Increased height for multiple lines
 	x := float64(minMargin)
 	var y float64
 
