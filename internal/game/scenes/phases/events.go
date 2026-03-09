@@ -7,6 +7,7 @@ import (
 	actorevents "github.com/leandroatallah/firefly/internal/engine/entity/actors/events"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 	"github.com/leandroatallah/firefly/internal/engine/event"
+	"github.com/leandroatallah/firefly/internal/engine/sequences"
 	"github.com/leandroatallah/firefly/internal/game/entity/actors/events"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 )
@@ -61,7 +62,6 @@ func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
 		if landUnsubscribe != nil {
 			landUnsubscribe()
 		}
-
 		// Add one-time land handler for cutscene
 		var cutsceneUnsubscribe func()
 		cutsceneUnsubscribe = em.Subscribe(actorevents.ActorLandedType, func(e event.Event) {
@@ -71,6 +71,9 @@ func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
 				return
 			}
 			p.SetState(s)
+
+			// Dramatic shake when falling in cutscene
+			ctx.VFX.AddTrauma(scene.Camera(), 0.8)
 
 			// Cleanup cutscene handler
 			if cutsceneUnsubscribe != nil {
@@ -104,5 +107,15 @@ func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
 			return
 		}
 		p.SetState(s)
+
+		if scene.sequencePlayer == nil {
+			scene.sequencePlayer = sequences.NewSequencePlayer(ctx)
+		}
+		seq, err := sequences.NewSequenceFromJSON("assets/sequences/phase-1-3-cutscene-2.json")
+		if err == nil {
+			scene.sequencePlayer.Play(seq)
+		} else {
+			log.Printf("Failed to load cutscene sequence: %v", err)
+		}
 	})
 }

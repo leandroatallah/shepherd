@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	animationDelay = 240
+	animationDelay = 120
 	fadeDelay      = 60
 	maxDuration    = 60
 	fadeAnimStep   = 2
