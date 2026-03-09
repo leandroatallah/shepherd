@@ -47,6 +47,7 @@ type CommandData struct {
 	SpeechID         string   `json:"speech_id,omitempty"`
 	SpeechAudio      []string `json:"speech_audio,omitempty"`
 	EnableSpeechSkip *bool    `json:"enable_speech_skip,omitempty"`
+	Accumulative     *bool    `json:"accumulative,omitempty"`
 
 	// Fields for "delay"
 	Frames int `json:"frames,omitempty"`
@@ -113,7 +114,7 @@ func (cd *CommandData) ToCommand() sequences.Command {
 		if speed == 0 && cd.Speed > 0 {
 			speed = int(cd.Speed)
 		}
-		return &DialogueCommand{Lines: cd.Lines, Position: cd.Position, Speed: speed, SpeechID: cd.SpeechID, SpeechAudio: cd.SpeechAudio, EnableSpeechSkip: cd.EnableSpeechSkip}
+		return &DialogueCommand{Lines: cd.Lines, Position: cd.Position, Speed: speed, SpeechID: cd.SpeechID, SpeechAudio: cd.SpeechAudio, EnableSpeechSkip: cd.EnableSpeechSkip, Accumulative: cd.Accumulative}
 	case "delay":
 		return &DelayCommand{Frames: cd.Frames}
 	case "move_actor":

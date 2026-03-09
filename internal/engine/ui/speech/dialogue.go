@@ -1,6 +1,8 @@
 package speech
 
 import (
+	"strings"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/engine/audio"
@@ -61,7 +63,7 @@ func (m *Manager) SetSpeech(id string) {
 	}
 }
 
-func (m *Manager) getActiveSpeech() Speech {
+func (m *Manager) GetActiveSpeech() Speech {
 	return m.speeches[m.activeSpeech]
 }
 
@@ -125,7 +127,7 @@ func (m *Manager) ShowMessages(lines []string, position string, speed int) {
 	if len(lines) == 0 {
 		return
 	}
-	s := m.getActiveSpeech()
+	s := m.GetActiveSpeech()
 	m.lines = lines
 	m.currentLine = 0
 	m.isSpeaking = true
@@ -156,7 +158,7 @@ func (m *Manager) Update() error {
 		return nil
 	}
 
-	s := m.getActiveSpeech()
+	s := m.GetActiveSpeech()
 	if err := s.Update(); err != nil {
 		return err
 	}
@@ -184,10 +186,12 @@ func (m *Manager) Update() error {
 				m.isSpeaking = false
 				m.stopSpeechAudio(true)
 			} else {
-				s.ResetText()
-				m.currentText = ""
-				m.typingSoundLastCount = 0
-				m.typingSoundCooldown = 0
+				if !s.IsAccumulative() {
+					s.ResetText()
+					m.currentText = ""
+					m.typingSoundLastCount = 0
+					m.typingSoundCooldown = 0
+				}
 				m.waitingForInput = false
 				m.startSpeechAudioIfNeeded()
 			}
@@ -202,9 +206,18 @@ func (m *Manager) Draw(screen *ebiten.Image) {
 		return
 	}
 
+	s := m.GetActiveSpeech()
 	if m.currentLine < len(m.lines) {
-		m.getActiveSpeech().Draw(screen, m.lines[m.currentLine])
+		s.Draw(screen, m.getCurrentMessage())
 	}
+}
+
+func (m *Manager) getCurrentMessage() string {
+	s := m.GetActiveSpeech()
+	if s.IsAccumulative() {
+		return strings.Join(m.lines[:m.currentLine+1], "\n\n")
+	}
+	return m.lines[m.currentLine]
 }
 
 func (m *Manager) shouldSkipTyping() bool {
@@ -227,7 +240,7 @@ func (m *Manager) startSpeechAudioIfNeeded() {
 		return
 	}
 	// Check typing sound policy - if disabled, skip speech audio as well
-	s := m.getActiveSpeech()
+	s := m.GetActiveSpeech()
 	if policy, ok := s.(typingSoundPolicy); ok && !policy.TypingSoundEnabled() {
 		return
 	}
@@ -280,7 +293,7 @@ func (m *Manager) updateTypingSound(s Speech) {
 		return
 	}
 
-	text := s.Text(m.lines[m.currentLine])
+	text := s.Text(m.getCurrentMessage())
 	currentCount := len(text)
 	if currentCount > m.typingSoundLastCount {
 		if len(m.typingSounds) > 0 {

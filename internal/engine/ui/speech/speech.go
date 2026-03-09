@@ -25,6 +25,8 @@ type Speech interface {
 	SetColor(c color.Color)
 	Color() color.Color
 	SetSkipFlash(frames int)
+	IsAccumulative() bool
+	SetAccumulative(bool)
 }
 
 type SpeechBase struct {
@@ -39,6 +41,7 @@ type SpeechBase struct {
 	speed         int
 	color         color.Color
 	skipFlash     int
+	accumulative  bool
 }
 
 func NewSpeechBase(fontSource *SpeechFont) *SpeechBase {
@@ -62,7 +65,9 @@ func (s *SpeechBase) Update() error {
 			speed = 4
 		}
 		if effectiveCount > 0 && effectiveCount%speed == 0 {
-			s.spellingCount++
+			if s.spellingCount < len(s.text) {
+				s.spellingCount++
+			}
 		}
 	}
 	return nil
@@ -141,6 +146,14 @@ func (s *SpeechBase) SetSkipFlash(frames int) {
 
 func (s *SpeechBase) SkipFlash() int {
 	return s.skipFlash
+}
+
+func (s *SpeechBase) IsAccumulative() bool {
+	return s.accumulative
+}
+
+func (s *SpeechBase) SetAccumulative(acc bool) {
+	s.accumulative = acc
 }
 
 func (s *SpeechBase) Image(screen *ebiten.Image) *ebiten.Image {

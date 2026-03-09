@@ -37,6 +37,7 @@ type DialogueCommand struct {
 	SpeechID         string
 	SpeechAudio      []string
 	EnableSpeechSkip *bool
+	Accumulative     *bool
 	dialogueManager  *speech.Manager
 }
 
@@ -48,6 +49,9 @@ func (c *DialogueCommand) Init(appContext any) {
 		speechID = speech.BubbleSpeechID
 	}
 	c.dialogueManager.SetActiveSpeech(speechID)
+
+	s := c.dialogueManager.GetActiveSpeech()
+
 	skipEnabled := false
 	if c.EnableSpeechSkip != nil {
 		skipEnabled = *c.EnableSpeechSkip
@@ -60,6 +64,11 @@ func (c *DialogueCommand) Init(appContext any) {
 	} else {
 		c.dialogueManager.ApplyDefaultSpeechAudio(len(c.Lines))
 	}
+
+	if c.Accumulative != nil {
+		s.SetAccumulative(*c.Accumulative)
+	}
+
 	c.dialogueManager.ShowMessages(c.Lines, c.Position, c.Speed)
 }
 
