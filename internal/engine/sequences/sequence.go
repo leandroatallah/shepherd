@@ -92,6 +92,9 @@ type CommandData struct {
 	// Fields for "spawn_text"
 	Text     string `json:"text,omitempty"`
 	TextType string `json:"type,omitempty"` // For spawn_text: "overhead" or "screen"
+
+	// Fields for "camera_shake"
+	Trauma float64 `json:"trauma,omitempty"`
 }
 
 // SequenceData is a wrapper used for parsing a full sequence from JSON.
@@ -162,6 +165,15 @@ func (cd *CommandData) ToCommand() sequences.Command {
 	case "camera_set_target":
 		return &CameraSetTargetCommand{
 			TargetID: cd.TargetID,
+			Duration: cd.Duration,
+		}
+	case "camera_shake":
+		return &CameraShakeCommand{
+			Trauma: cd.Trauma,
+		}
+	case "quake":
+		return &QuakeCommand{
+			Trauma:   cd.Trauma,
 			Duration: cd.Duration,
 		}
 	case "call_sequence":

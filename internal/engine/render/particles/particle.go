@@ -20,6 +20,7 @@ type Config struct {
 type Particle struct {
 	X, Y       float64
 	VelX, VelY float64
+	AccX, AccY float64
 
 	Duration    int // Current remaining ticks
 	MaxDuration int // Initial total duration
@@ -38,6 +39,8 @@ type Particle struct {
 
 // Update advances the particle state.
 func (p *Particle) Update() {
+	p.VelX += p.AccX
+	p.VelY += p.AccY
 	p.X += p.VelX
 	p.Y += p.VelY
 	p.Duration--

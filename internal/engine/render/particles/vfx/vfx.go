@@ -27,6 +27,7 @@ type Manager struct {
 	system      *particles.System
 	configs     map[string]*particles.Config
 	textManager *text.Manager
+	pixelConfig *particles.Config
 }
 
 func NewManager(path string) *Manager {
@@ -67,10 +68,19 @@ func NewManager(path string) *Manager {
 		}
 	}
 
+	pixelImg := ebiten.NewImage(1, 1)
+	pixelImg.Fill(color.White)
+
 	return &Manager{
 		system:      particles.NewSystem(),
 		configs:     configs,
 		textManager: text.NewManager(),
+		pixelConfig: &particles.Config{
+			Image:       pixelImg,
+			FrameWidth:  1,
+			FrameHeight: 1,
+			FrameCount:  1,
+		},
 	}
 }
 
@@ -114,6 +124,37 @@ func (m *Manager) SpawnLandingPuff(x, y float64, count int) {
 	m.SpawnPuff("landing", x, y, count, 0.1)
 }
 
+// SpawnFallingRocks spawns falling pixel particles across a specified area.
+func (m *Manager) SpawnFallingRocks(x, y, width float64, count int) {
+	for i := 0; i < count; i++ {
+		rx := x + rand.Float64()*width
+		ry := y + (rand.Float64()-0.5)*10
+
+		// Random gray color for dust/rocks (mostly opaque)
+		gray := uint8(150 + rand.Intn(80))
+		c := color.RGBA{gray, gray, gray, 255}
+
+		scale := 1.0
+		if rand.Float64() > 0.7 {
+			scale = 2.0
+		}
+
+		p := &particles.Particle{
+			X:           rx,
+			Y:           ry,
+			VelX:        (rand.Float64() - 0.5) * 0.2,
+			VelY:        rand.Float64() * 0.5,
+			AccY:        0.03 + rand.Float64()*0.05, // Lighter gravity for dust
+			Duration:    90 + rand.Intn(60),
+			MaxDuration: 150,
+			Scale:       scale,
+			Config:      m.pixelConfig,
+		}
+		p.ColorScale.ScaleWithColor(c)
+		m.system.Add(p)
+	}
+}
+
 // SpawnFloatingText spawns floating text at the specified location.
 func (m *Manager) SpawnFloatingText(msg string, x, y float64, duration int) {
 	ft := text.NewFloatingText(msg, x, y, duration)
@@ -126,6 +167,20 @@ func (m *Manager) SpawnFloatingTextAbove(actor actors.ActorEntity, msg string, d
 	x := float64(pos.Min.X + pos.Dx()/2) // Center horizontally
 	y := float64(pos.Min.Y)              // Top of actor
 	m.SpawnFloatingText(msg, x, y, duration)
+}
+
+// AddTrauma adds trauma to the camera to cause a screen shake and spawns falling rocks.
+func (m *Manager) AddTrauma(cam *camera.Controller, amount float64) {
+	if cam != nil {
+		cam.AddTrauma(amount)
+
+		// Spawn rocks proportional to trauma
+		k := cam.Kamera()
+		vw := cam.Width() / k.ZoomFactor
+		// 1 to 5 rocks depending on intensity
+		count := 1 + int(amount*4.0)
+		m.SpawnFallingRocks(k.X, k.Y-10, vw, count)
+	}
 }
 
 func (m *Manager) Update() {

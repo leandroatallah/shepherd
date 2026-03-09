@@ -376,3 +376,15 @@ func TestCamDebugSmoke(t *testing.T) {
 	ctrl := NewController(0, 0)
 	ctrl.CamDebug()
 }
+
+func TestControllerAddTrauma(t *testing.T) {
+	originalConfig := config.Get()
+	t.Cleanup(func() {
+		config.Set(originalConfig)
+	})
+	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
+
+	ctrl := NewController(0, 0)
+	// Smoke test, should not panic
+	ctrl.AddTrauma(0.5)
+}

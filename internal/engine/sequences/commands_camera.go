@@ -10,20 +10,23 @@ import (
 
 // CameraZoomCommand sets the camera zoom level and always rewinds back
 type CameraZoomCommand struct {
-	Zoom        float64
-	Duration    int    // Duration of zoom in frames (0 for instant)
-	Delay       int    // Frames to wait at peak zoom before rewinding
-	OutDuration int    // Duration of zoom out in frames (0 to use same as Duration)
-	TargetID    string // Optional: body/actor ID to center camera on
-	currentZoom float64
-	targetZoom  float64
-	timer       int
-	camera      *camera.Controller
-	startX      float64
-	startY      float64
-	phase       int // 0=zooming in, 1=waiting, 2=zooming out
-	rewindDur   int
-	targetActor actors.ActorEntity
+	Zoom            float64
+	Duration        int    // Duration of zoom in frames (0 for instant)
+	Delay           int    // Frames to wait at peak zoom before rewinding
+	OutDuration     int    // Duration of zoom out in frames (0 to use same as Duration)
+	TargetID        string // Optional: body/actor ID to center camera on
+	currentZoom     float64
+	targetZoom      float64
+	timer           int
+	camera          *camera.Controller
+	startX          float64
+	startY          float64
+	phase           int // 0=zooming in, 1=waiting, 2=zooming out
+	rewindDur       int
+	targetActor     actors.ActorEntity
+	origFollowing   bool       // Store original following state
+	origFollowTarget body.Body // Store original follow target
+	sameTarget      bool // True if target is same as current follow target
 }
 
 func (c *CameraZoomCommand) Init(appContext any) {
@@ -47,15 +50,16 @@ func (c *CameraZoomCommand) Init(appContext any) {
 		// Store original position BEFORE any movement
 		c.startX, c.startY = c.camera.Kamera().Center()
 
+		// Store original following state and target
+		c.origFollowing = c.camera.IsFollowing()
+		c.origFollowTarget = c.camera.FollowTarget()
+
 		c.targetZoom = c.Zoom
 		if c.targetZoom <= 0 {
 			c.targetZoom = 1.0 // Default zoom
 		}
 		c.timer = 0
 		c.phase = 0 // Start with zoom in phase
-
-		// Disable camera following during this command
-		c.camera.SetFollowing(false)
 
 		// Set zoom out duration (use same as Duration if not specified)
 		if c.OutDuration <= 0 {
@@ -68,12 +72,20 @@ func (c *CameraZoomCommand) Init(appContext any) {
 		if c.TargetID != "" {
 			if actor, found := ctx.ActorManager.Find(c.TargetID); found {
 				c.targetActor = actor
-				// Center camera on target immediately
-				pos := actor.Position()
-				centerX := float64(pos.Min.X + pos.Dx()/2)
-				centerY := float64(pos.Min.Y + pos.Dy()/2)
-				c.camera.SetCenter(centerX, centerY)
+				// Check if target is same as current follow target
+				c.sameTarget = c.origFollowing && c.origFollowTarget == actor
+				// Only disable following if target is different from current follow target
+				if !c.sameTarget {
+					c.camera.SetFollowing(false)
+					// Store current position for interpolation
+					c.startX, c.startY = c.camera.Kamera().Center()
+				}
+				// If sameTarget is true, keep following enabled so camera naturally tracks the actor
 			}
+		} else {
+			// No target specified, store current position for interpolation
+			c.startX, c.startY = c.camera.Kamera().Center()
+			c.camera.SetFollowing(false)
 		}
 	}
 }
@@ -81,14 +93,6 @@ func (c *CameraZoomCommand) Init(appContext any) {
 func (c *CameraZoomCommand) Update() bool {
 	if c.camera == nil {
 		return true
-	}
-
-	// Update target position if following an actor
-	if c.targetActor != nil {
-		pos := c.targetActor.Position()
-		centerX := float64(pos.Min.X + pos.Dx()/2)
-		centerY := float64(pos.Min.Y + pos.Dy()/2)
-		c.camera.SetCenter(centerX, centerY)
 	}
 
 	// Phase 0: Zoom in
@@ -127,25 +131,38 @@ func (c *CameraZoomCommand) Update() bool {
 		if c.rewindDur <= 0 {
 			// Instant zoom out
 			c.camera.Kamera().ZoomFactor = c.currentZoom
-			c.camera.SetCenter(c.startX, c.startY)
-			c.camera.SetFollowing(true) // Re-enable following
+			// Only restore position if target was different from current follow target
+			if !c.sameTarget {
+				c.camera.SetCenter(c.startX, c.startY)
+				// Restore original following state and target
+				c.camera.SetFollowTarget(c.origFollowTarget)
+				c.camera.SetFollowing(c.origFollowing)
+			}
 			return true
 		}
 		c.timer++
 		progress := float64(c.timer) / float64(c.rewindDur)
 		if progress >= 1.0 {
 			c.camera.Kamera().ZoomFactor = c.currentZoom
-			c.camera.SetCenter(c.startX, c.startY)
-			c.camera.SetFollowing(true) // Re-enable following
+			// Only restore position if target was different from current follow target
+			if !c.sameTarget {
+				c.camera.SetCenter(c.startX, c.startY)
+				// Restore original following state and target
+				c.camera.SetFollowTarget(c.origFollowTarget)
+				c.camera.SetFollowing(c.origFollowing)
+			}
 			return true
 		}
 		// Zoom back out and move to original position (reverse interpolation)
 		currentZoom := c.targetZoom + (c.currentZoom-c.targetZoom)*progress
 		c.camera.Kamera().ZoomFactor = currentZoom
-		currX, currY := c.camera.Kamera().Center()
-		currentX := currX + (c.startX-currX)*progress
-		currentY := currY + (c.startY-currY)*progress
-		c.camera.SetCenter(currentX, currentY)
+		// Only interpolate position if target was different from current follow target
+		if !c.sameTarget {
+			currX, currY := c.camera.Kamera().Center()
+			currentX := currX + (c.startX-currX)*progress
+			currentY := currY + (c.startY-currY)*progress
+			c.camera.SetCenter(currentX, currentY)
+		}
 	}
 
 	return false
@@ -357,4 +374,31 @@ func (c *CameraSetTargetCommand) Update() bool {
 	c.camera.SetCenter(currentX, currentY)
 
 	return false
+}
+
+// CameraShakeCommand triggers a screen shake using trauma
+type CameraShakeCommand struct {
+	Trauma float64
+	camera *camera.Controller
+}
+
+func (c *CameraShakeCommand) Init(appContext any) {
+	ctx := appContext.(*app.AppContext)
+	currentScene := ctx.SceneManager.CurrentScene()
+
+	var cam *camera.Controller
+	if tilemapScene, ok := currentScene.(*scene.TilemapScene); ok {
+		cam = tilemapScene.Camera()
+	} else if phasesScene, ok := currentScene.(interface{ Camera() *camera.Controller }); ok {
+		cam = phasesScene.Camera()
+	}
+
+	c.camera = cam
+	if c.camera != nil {
+		c.camera.AddTrauma(c.Trauma)
+	}
+}
+
+func (c *CameraShakeCommand) Update() bool {
+	return true
 }

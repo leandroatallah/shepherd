@@ -69,6 +69,10 @@ func (c *Controller) IsFollowing() bool {
 	return c.isFollowing
 }
 
+func (c *Controller) FollowTarget() body.Body {
+	return c.followTarget
+}
+
 func (c *Controller) SetFollowing(following bool) {
 	c.isFollowing = following
 }
@@ -201,4 +205,16 @@ func (c *Controller) Position() image.Rectangle {
 func (c *Controller) Target() body.Body {
 	// return c.target
 	return c.followTarget
+}
+
+func (c *Controller) Width() float64 {
+	return c.screenWidth
+}
+
+func (c *Controller) Height() float64 {
+	return c.screenHeight
+}
+
+func (c *Controller) AddTrauma(amount float64) {
+	c.cam.AddTrauma(amount)
 }

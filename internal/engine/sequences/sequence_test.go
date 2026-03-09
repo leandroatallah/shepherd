@@ -211,6 +211,23 @@ func TestSequence_ToCommand_Dialogue(t *testing.T) {
 			wantType: "*sequences.SpawnTextCommand",
 		},
 		{
+			name: "camera_shake",
+			cmdData: CommandData{
+				Type:   "camera_shake",
+				Trauma: 0.5,
+			},
+			wantType: "*sequences.CameraShakeCommand",
+		},
+		{
+			name: "quake",
+			cmdData: CommandData{
+				Type:     "quake",
+				Trauma:   0.5,
+				Duration: 60,
+			},
+			wantType: "*sequences.QuakeCommand",
+		},
+		{
 			name: "unknown",
 			cmdData: CommandData{
 				Type: "unknown_command",
@@ -423,6 +440,10 @@ func getTypeName(v interface{}) string {
 		return "*sequences.PauseAllMusicCommand"
 	case *FadeOutAllMusicCommand:
 		return "*sequences.FadeOutAllMusicCommand"
+	case *CameraShakeCommand:
+		return "*sequences.CameraShakeCommand"
+	case *QuakeCommand:
+		return "*sequences.QuakeCommand"
 	case *SpawnTextCommand:
 		return "*sequences.SpawnTextCommand"
 	default:
