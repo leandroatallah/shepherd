@@ -4,14 +4,14 @@ This document provides specialized instructions for AI agents tasked with increa
 
 ## 🎯 Goal
 
-Achieve **80%+ test coverage** for all packages within `internal/engine`, prioritizing the most critical systems first.
+Achieve **80%+ test coverage** across the codebase, prioritizing the engine's entity management and the game's level infrastructure.
 
 ## 🔝 Priorities
 
-1. **Physics (`physics/body`, `physics/movement`, `physics/space`)**: Currently low coverage (9.7% - 57.8%). Critical for game stability.
-2. **Scene Management (`scene`)**: Low coverage (14.5%). Essential for game flow and state transitions.
-3. **Audio (`audio`)**: Low coverage (17.1%).
-4. **Rendering (`render/*`)**: Core visual components.
+1. **Entity State Machine (`internal/engine/entity/actors`)**: 50.0% coverage. The `handleState` logic is the most critical and complex part of the engine and is currently under-tested.
+2. **Level Management (`internal/game/scenes/phases`)**: 0.0% coverage. This is the foundation for all game levels.
+3. **Player & Character Logic (`internal/game/entity/actors/player`)**: ~25% coverage. Core gameplay mechanics need regression tests.
+4. **Sequences (`internal/engine/sequences`)**: 67.5% coverage. Essential for cutscenes and scripted events.
 
 ## 🛠 Testing Strategy & Patterns
 
@@ -95,10 +95,11 @@ func (t *Transition) Draw(_ *ebiten.Image) {}  // Use blank in param list
 
 ## 🔍 Key Packages to Target
 
-| Package          | Current Coverage | Focus Area                                          |
-| :--------------- | :--------------- | :-------------------------------------------------- |
-| `physics/body`   | 9.7%             | `ApplyValidPosition`, `CollisionPosition`           |
-| `scene`          | 14.5%            | `SceneManager` state machine, `Transition` triggers |
-| `audio`          | 17.1%            | `Loader` error handling, Volume state               |
-| `physics/skill`  | 32.7%            | Specific skill activations and cooldowns            |
-| `render/sprites` | 40.0%            | Layer sorting, frame calculation                    |
+| Package | Current Coverage | Focus Area |
+| :--- | :--- | :--- |
+| `entity/actors` | 50.0% | `handleState` state machine, animation logic |
+| `game/scenes/phases` | 0.0% | `PhasesScene` life cycle, goal tracking |
+| `game/entity/actors/player` | 25.3% | Player input, physics integration, interactions |
+| `sequences` | 67.5% | Command execution and completion conditions |
+| `entity/items` | 54.1% | Item collection and state transitions |
+| `scene` | 73.0% | Scene transitions and tilemap initialization |
