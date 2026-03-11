@@ -20,7 +20,22 @@ func shepherdStateTransitionLogic(c *actors.Character) bool {
 		return true
 	}
 
+	setNewState := func(s actors.ActorStateEnum) {
+		state, err := c.NewState(s)
+		if err != nil {
+			// Log the error instead of crashing if a state is not registered.
+			log.Printf("Failed to create new state %v: %v", s, err)
+			return
+		}
+		c.SetState(state)
+	}
+
 	state := c.State()
+
+	if state == gamestates.Rising && c.IsAnimationFinished() {
+		setNewState(actors.Idle)
+		return true
+	}
 
 	if state == gamestates.Exiting || state == gamestates.Lying || state == gamestates.Rising {
 		return true
@@ -34,16 +49,6 @@ func shepherdStateTransitionLogic(c *actors.Character) bool {
 
 	if !isCarryingState {
 		return false // Let the engine handle other states
-	}
-
-	setNewState := func(s actors.ActorStateEnum) {
-		state, err := c.NewState(s)
-		if err != nil {
-			// Log the error instead of crashing if a state is not registered.
-			log.Printf("Failed to create new state %v: %v", s, err)
-			return
-		}
-		c.SetState(state)
 	}
 
 	// State machine for when the character is carrying something.
