@@ -37,48 +37,43 @@ func (f *Fader) Update() {
 		if f.alpha >= 255 {
 			f.alpha = 255
 			f.exiting = false
-			// If no hold duration, call callback immediately
-			if f.holdDuration <= 0 {
-				if f.onExitCb != nil {
-					f.onExitCb()
-				}
-				// If no visible wait, start fade in immediately
-				if f.visibleDuration <= 0 {
-					f.starting = true
-					return
-				}
-				f.waitFrames = 0
-				return
-			}
-			f.waitFrames = 0
-		}
-		return
-	}
-
-	// Hold phase: wait with black screen BEFORE callback
-	if f.holdDuration > 0 && !f.starting {
-		f.waitFrames++
-		if timing.ToDuration(f.waitFrames) >= f.holdDuration {
-			// Hold complete, call callback and start visible wait
+			// Call callback immediately when fade-out completes
+			// This ensures scene.OnStart() runs and sequences start instantly
 			if f.onExitCb != nil {
 				f.onExitCb()
 			}
-			if f.visibleDuration > 0 {
-				f.waitFrames = 0
-				return
-			}
-			// No visible wait, start fade in immediately
-			f.starting = true
+			f.waitFrames = 0
+			// State transition handled below
 		}
 		return
 	}
 
-	// Visible phase: wait with black screen AFTER callback (before fade in)
-	if f.visibleDuration > 0 && !f.starting {
-		f.waitFrames++
-		if timing.ToDuration(f.waitFrames) >= f.visibleDuration {
-			f.starting = true
+	// State transition from black screen to hold/visible/starting
+	if !f.exiting && !f.starting && f.alpha == 255 {
+		if f.holdDuration > 0 {
+			f.waitFrames++
+			if timing.ToDuration(f.waitFrames) >= f.holdDuration {
+				// Hold complete, move to next stage
+				if f.visibleDuration > 0 {
+					f.waitFrames = 0 // Wait for visible duration
+					return
+				}
+				f.starting = true
+				return
+			}
+			return
 		}
+
+		if f.visibleDuration > 0 {
+			f.waitFrames++
+			if timing.ToDuration(f.waitFrames) >= f.visibleDuration {
+				f.starting = true
+			}
+			return
+		}
+
+		// No hold or visible duration, start fade in immediately
+		f.starting = true
 		return
 	}
 
@@ -123,6 +118,7 @@ func (f *Fader) fadeOut(cb func()) {
 }
 
 func (f *Fader) fadeIn(cb func()) {
-	f.starting = true
+	// fadeIn now only calls the callback. Update handles setting f.starting = true
+	// so that holdDuration and visibleDuration are respected.
 	cb()
 }

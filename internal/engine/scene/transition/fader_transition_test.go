@@ -60,6 +60,10 @@ func TestFader_FadeOutFadeInSequence(t *testing.T) {
 	if !called {
 		t.Error("expected callback to be called when alpha reaches 255 (no hold)")
 	}
+
+	// Next update will transition to fade in (starting)
+	f.Update()
+
 	if !f.starting {
 		t.Error("expected fade in (starting) to begin immediately (no visible wait)")
 	}
@@ -80,6 +84,8 @@ func TestFader_FadeOutFadeInSequence(t *testing.T) {
 func TestFader_WithHoldDuration(t *testing.T) {
 	setupConfig()
 	// Fader with 1 second hold (60 frames at 60 TPS)
+	// New behavior: callback is called immediately when fade-out completes
+	// Hold duration is the wait AFTER callback before fade-in starts
 	f := NewFader(time.Second, 0)
 	f.fadeSpeed = 255 // instant fade out
 
@@ -87,29 +93,29 @@ func TestFader_WithHoldDuration(t *testing.T) {
 	cb := func() { called = true }
 
 	f.fadeOut(cb)
-	f.Update() // Alpha 0 -> 255, exiting becomes false
+	f.Update() // Alpha 0 -> 255, exiting becomes false, callback called immediately
 
 	if f.alpha != 255 || f.exiting {
 		t.Fatalf("expected instant fade out; alpha=%f, exiting=%v", f.alpha, f.exiting)
 	}
-	if called {
-		t.Error("callback should not be called yet due to holdDuration")
+	if !called {
+		t.Error("callback should be called immediately when fade-out completes")
+	}
+	if f.starting {
+		t.Error("fade in should not start yet due to holdDuration")
 	}
 
-	// Wait for holdDuration (approx 60 frames)
+	// Wait for holdDuration (approx 60 frames) - fade in should not start yet
 	for i := 0; i < 59; i++ {
 		f.Update()
-		if called {
-			t.Errorf("callback called too early at frame %d", i)
+		if f.starting {
+			t.Errorf("fade in started too early at frame %d", i)
 		}
 	}
 
-	f.Update() // Frame 60
-	if !called {
-		t.Error("callback should be called after holdDuration")
-	}
+	f.Update() // Frame 60 - hold complete, fade in should start
 	if !f.starting {
-		t.Error("fade in should start after holdDuration (no visible wait)")
+		t.Error("fade in should start after holdDuration")
 	}
 }
 

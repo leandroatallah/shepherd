@@ -170,6 +170,8 @@ func (t *typingSpeech) SetSpeed(speed int) {}
 func (t *typingSpeech) SetColor(c color.Color) {}
 func (t *typingSpeech) Color() color.Color { return color.Black }
 func (t *typingSpeech) SetSkipFlash(frames int) {}
+func (t *typingSpeech) IsAccumulative() bool { return false }
+func (t *typingSpeech) SetAccumulative(bool) {}
 
 func TestManager_ApplyDefaultSpeechAudio_Rotates(t *testing.T) {
 	config.Set(&config.AppConfig{})

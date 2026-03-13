@@ -37,3 +37,5 @@ func (m *mockSpeech) SetSpeed(speed int) { m.setSpeedCalled = speed }
 func (m *mockSpeech) SetColor(c color.Color) {}
 func (m *mockSpeech) Color() color.Color { return color.Black }
 func (m *mockSpeech) SetSkipFlash(frames int) {}
+func (m *mockSpeech) IsAccumulative() bool { return false }
+func (m *mockSpeech) SetAccumulative(bool) {}
