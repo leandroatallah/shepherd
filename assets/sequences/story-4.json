@@ -4,7 +4,6 @@
       "command": "call_sequence",
       "path": "play-story-music.json"
     },
-    { "command": "delay", "frames": 60 },
     { "command": "set_speed", "target_id": "DOG_NPC", "speed": 3 },
     { "command": "follow_player", "target_id": "DOG_NPC" },
     { "command": "set_speed", "target_id": "player", "speed": 4 },
